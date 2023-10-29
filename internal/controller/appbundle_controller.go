@@ -75,11 +75,6 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
-	// Just for debugging
-	if app_bundle.Namespace != "devel" {
-		panic("not devel namespace")
-	}
-
 	if err := RunReconciles(ctx, r, req, app_bundle,
 		r.ReconcileVolumes,
 		r.ReconcileService,
@@ -97,6 +92,10 @@ func (r *AppBundleReconciler) ReconcileService(ctx context.Context, req ctrl.Req
 	mu.Lock()
 	defer mu.Unlock()
 
+	if app_bundle.Spec.Routes == nil {
+		return nil
+	}
+
 	// Ports
 	var ports []corev1.ServicePort
 	for _, route := range app_bundle.Spec.Routes {
@@ -109,8 +108,12 @@ func (r *AppBundleReconciler) ReconcileService(ctx context.Context, req ctrl.Req
 	}
 
 	service := &corev1.Service{
-		ObjectMeta: metav1.ObjectMeta{Name: app_bundle.Name, Namespace: app_bundle.Namespace},
-		Spec:       corev1.ServiceSpec{Ports: ports, Type: *app_bundle.Spec.ServiceType}}
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            app_bundle.Name,
+			Namespace:       app_bundle.Namespace,
+			OwnerReferences: []metav1.OwnerReference{app_bundle.OwnerReference()},
+		},
+		Spec: corev1.ServiceSpec{Ports: ports, Type: *app_bundle.Spec.ServiceType}}
 
 	if err := UpsertResource(ctx, r, service); err != nil {
 		return err
@@ -124,6 +127,10 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 	mu := getMutex("volume", app_bundle.Name, app_bundle.Namespace)
 	mu.Lock()
 	defer mu.Unlock()
+
+	if app_bundle.Spec.Volumes == nil {
+		return nil
+	}
 
 	for _, volume := range app_bundle.Spec.Volumes {
 		if volume.ExistingClaim == nil {
@@ -154,7 +161,11 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 			}
 
 			recurringJob := &longhornv1beta2.RecurringJob{
-				ObjectMeta: metav1.ObjectMeta{Name: reccuringJobName, Namespace: "longhorn-system"},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:            reccuringJobName,
+					Namespace:       "longhorn-system",
+					OwnerReferences: []metav1.OwnerReference{app_bundle.OwnerReference()},
+				},
 				Spec: longhornv1beta2.RecurringJobSpec{
 					Name:        reccuringJobName,
 					Groups:      []string{},
@@ -194,16 +205,98 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 		volumes = append(volumes, corev1.Volume{Name: *volume.Name, VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: *volume.Name}}})
 	}
 
+	// TESTING ONLY !!!
+	var image_pull_secrets []corev1.LocalObjectReference
+	image_pull_secrets = append(image_pull_secrets, corev1.LocalObjectReference{Name: "regcred"})
+	// TESTING ONLY !!!
+
+	revision_history_limit := int32(3)
+	strategy := appsv1.RecreateDeploymentStrategyType
+
 	deployment := &appsv1.Deployment{
-		TypeMeta:   metav1.TypeMeta{APIVersion: "apps/v1", Kind: "Deployment"},
-		ObjectMeta: metav1.ObjectMeta{Name: app_bundle.Name, Namespace: app_bundle.Namespace, Labels: map[string]string{"app": app_bundle.Name}},
+		TypeMeta: metav1.TypeMeta{APIVersion: "apps/v1", Kind: "Deployment"},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            app_bundle.Name,
+			Namespace:       app_bundle.Namespace,
+			Labels:          map[string]string{"app": app_bundle.Name},
+			OwnerReferences: []metav1.OwnerReference{app_bundle.OwnerReference()},
+		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: app_bundle.Spec.Replicas,
-			Selector: &metav1.LabelSelector{MatchLabels: map[string]string{"app": app_bundle.Name}},
+			Replicas:             app_bundle.Spec.Replicas,
+			RevisionHistoryLimit: &revision_history_limit,
+			Strategy:             appsv1.DeploymentStrategy{Type: strategy},
+			Selector:             &metav1.LabelSelector{MatchLabels: map[string]string{"app": app_bundle.Name}},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{"app": app_bundle.Name}},
 				Spec: corev1.PodSpec{
-					Volumes: volumes,
+					Volumes:          volumes,
+					ImagePullSecrets: image_pull_secrets,
+					Containers: []corev1.Container{
+						{
+							Name:           app_bundle.Name,
+							Image:          fmt.Sprintf("%s:%s", app_bundle.Spec.Image.Repository, app_bundle.Spec.Image.Tag),
+							Resources:      *app_bundle.Spec.Resources,
+							Ports:          ports,
+							VolumeMounts:   volume_mounts,
+							LivenessProbe:  app_bundle.Spec.LivenessProbe,
+							ReadinessProbe: app_bundle.Spec.ReadinessProbe,
+							StartupProbe:   app_bundle.Spec.StartupProbe,
+						}}}}}}
+
+	if err := UpsertResource(ctx, r, deployment); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *AppBundleReconciler) ReconcileIngressRoute(ctx context.Context, req ctrl.Request, app_bundle *atroxyzv1alpha1.AppBundle) error {
+	mu := getMutex("ingress_route", app_bundle.Name, app_bundle.Namespace)
+	mu.Lock()
+	defer mu.Unlock()
+
+	// Prepare lists
+
+	var ports []corev1.ContainerPort
+	for _, route := range app_bundle.Spec.Routes {
+		ports = append(ports, corev1.ContainerPort{Name: route.Name, HostPort: int32(route.Port), ContainerPort: int32(route.Port), Protocol: "TCP"})
+	}
+
+	var volume_mounts []corev1.VolumeMount
+	for _, volume := range app_bundle.Spec.Volumes {
+		volume_mounts = append(volume_mounts, corev1.VolumeMount{Name: *volume.Name, MountPath: *volume.Path})
+	}
+
+	var volumes []corev1.Volume
+	for _, volume := range app_bundle.Spec.Volumes {
+		volumes = append(volumes, corev1.Volume{Name: *volume.Name, VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: *volume.Name}}})
+	}
+
+	// TESTING ONLY !!!
+	var image_pull_secrets []corev1.LocalObjectReference
+	image_pull_secrets = append(image_pull_secrets, corev1.LocalObjectReference{Name: "regcred"})
+	// TESTING ONLY !!!
+
+	revision_history_limit := int32(3)
+	strategy := appsv1.RecreateDeploymentStrategyType
+
+	deployment := &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{APIVersion: "apps/v1", Kind: "Deployment"},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            app_bundle.Name,
+			Namespace:       app_bundle.Namespace,
+			Labels:          map[string]string{"app": app_bundle.Name},
+			OwnerReferences: []metav1.OwnerReference{app_bundle.OwnerReference()},
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas:             app_bundle.Spec.Replicas,
+			RevisionHistoryLimit: &revision_history_limit,
+			Strategy:             appsv1.DeploymentStrategy{Type: strategy},
+			Selector:             &metav1.LabelSelector{MatchLabels: map[string]string{"app": app_bundle.Name}},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{"app": app_bundle.Name}},
+				Spec: corev1.PodSpec{
+					Volumes:          volumes,
+					ImagePullSecrets: image_pull_secrets,
 					Containers: []corev1.Container{
 						{
 							Name:           app_bundle.Name,

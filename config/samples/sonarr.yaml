@@ -1,9 +1,7 @@
 apiVersion: atro.xyz/v1alpha1
 kind: AppBundle
 metadata:
-  labels:
-    app.kubernetes.io/name: appbundle
-  name: appbundle-sample
+  name: sonarr-atrok-sample
 spec:
   image:
     repository: linuxserver/sonarr
@@ -31,6 +29,9 @@ spec:
         backup:
           frequency: "0 0 * * *"
           retain: 5
+    - name: media
+      path: /media
+      existingClaim: media
   livenessProbe:
     failureThreshold: 5
     initialDelaySeconds: 60

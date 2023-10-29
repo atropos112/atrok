@@ -630,8 +630,6 @@ spec:
                   required:
                   - name
                   - path
-                  - size
-                  - storageClass
                   type: object
                 type: array
             required:

@@ -38,8 +38,8 @@ type AppBundleRouteIngress struct {
 type AppBundleVolume struct {
 	Name          *string                  `json:"name"`
 	Path          *string                  `json:"path"`
-	Size          *string                  `json:"size"`
-	StorageClass  *string                  `json:"storageClass"`
+	Size          *string                  `json:"size,omitempty"`
+	StorageClass  *string                  `json:"storageClass,omitempty"`
 	ExistingClaim *string                  `json:"existingClaim,omitempty"`
 	Longhorn      *AppBundleVolumeLonghorn `json:"longhorn,omitempty"`
 }
@@ -69,6 +69,15 @@ type AppBundle struct {
 
 	Spec   AppBundleSpec   `json:"spec,omitempty"`
 	Status AppBundleStatus `json:"status,omitempty"`
+}
+
+func (ab *AppBundle) OwnerReference() metav1.OwnerReference {
+	return metav1.OwnerReference{
+		APIVersion: ab.APIVersion,
+		Kind:       ab.Kind,
+		Name:       ab.Name,
+		UID:        ab.UID,
+	}
 }
 
 //+kubebuilder:object:root=true
