@@ -6,13 +6,16 @@ import (
 )
 
 type AppBundleSpec struct {
-	Image       *AppBundleImage              `json:"image"`
-	Replicas    *int32                       `json:"replicas,omitempty"`
-	Selector    *metav1.LabelSelector        `json:"selector,omitempty"`
-	Resources   *corev1.ResourceRequirements `json:"resources,omitempty"`
-	ServiceType *corev1.ServiceType          `json:"serviceType,omitempty"`
-	Routes      []*AppBundleRoute            `json:"routes,omitempty"`
-	Volumes     []*AppBundleVolume           `json:"volumes,omitempty"`
+	Image          *AppBundleImage              `json:"image"`
+	Replicas       *int32                       `json:"replicas,omitempty"`
+	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
+	ServiceType    *corev1.ServiceType          `json:"serviceType,omitempty"`
+	Routes         []*AppBundleRoute            `json:"routes,omitempty"`
+	Volumes        []*AppBundleVolume           `json:"volumes,omitempty"`
+	Selector       *metav1.LabelSelector        `json:"selector,omitempty"`
+	LivenessProbe  *corev1.Probe                `json:"livenessProbe,omitempty"`
+	ReadinessProbe *corev1.Probe                `json:"readinessProbe,omitempty"`
+	StartupProbe   *corev1.Probe                `json:"startupProbe,omitempty"`
 }
 
 type AppBundleImage struct {

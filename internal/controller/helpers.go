@@ -2,8 +2,12 @@ package controller
 
 import (
 	"context"
+	"reflect"
 
+	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	"golang.org/x/sync/errgroup"
 	"k8s.io/apimachinery/pkg/api/errors"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
@@ -14,7 +18,7 @@ type ReaderWriter interface {
 }
 
 // UpsertLabel of an existing object
-func UpsertLabelIntoResource(ctx context.Context, r ReaderWriter, key string, value string, obj client.Object, id client.ObjectKey) error {
+func UpsertLabelIntoResource(ctx context.Context, r ReaderWriter, kv map[string]string, obj client.Object, id client.ObjectKey) error {
 	if err := r.Get(ctx, id, obj); err != nil {
 		return err
 	}
@@ -25,7 +29,9 @@ func UpsertLabelIntoResource(ctx context.Context, r ReaderWriter, key string, va
 		labels = make(map[string]string)
 	}
 
-	labels[key] = value
+	for key, value := range kv {
+		labels[key] = value
+	}
 
 	obj.SetLabels(labels)
 
@@ -38,6 +44,7 @@ func UpsertLabelIntoResource(ctx context.Context, r ReaderWriter, key string, va
 
 func UpsertResource(ctx context.Context, r ReaderWriter, obj client.Object) error {
 	l := log.FromContext(ctx)
+	objClone := obj.DeepCopyObject()
 
 	err := r.Get(ctx, client.ObjectKeyFromObject(obj), obj)
 
@@ -45,13 +52,38 @@ func UpsertResource(ctx context.Context, r ReaderWriter, obj client.Object) erro
 		return err
 	}
 
+	if objClone == obj {
+		return nil
+	}
+
 	if errors.IsNotFound(err) {
-		l.Info("Creating resource.", obj.GetName(), obj)
-		defer r.Create(ctx, obj)
+		l.Info("Creating resource.", "type", reflect.TypeOf(obj).String(), "object", obj)
+		if err := r.Create(ctx, obj); err != nil {
+			return err
+		}
 	} else {
-		l.Info("Updating resource.", obj.GetName(), obj)
-		defer r.Update(ctx, obj)
+		l.Info("Updating resource.", "type", reflect.TypeOf(obj).String(), "object", obj)
+		if err := r.Update(ctx, obj); err != nil {
+			return err
+		}
 	}
 
 	return nil
+}
+
+func RunReconciles(
+	ctx context.Context,
+	r ReaderWriter,
+	req ctrl.Request,
+	app_bundle *atroxyzv1alpha1.AppBundle,
+	reconciles ...func(context.Context, ctrl.Request, *atroxyzv1alpha1.AppBundle) error,
+) error {
+	errs, ctx := errgroup.WithContext(ctx)
+
+	for _, reconcile := range reconciles {
+		currentReconcile := reconcile // Capture current value of reconcile
+		errs.Go(func() error { return currentReconcile(ctx, req, app_bundle) })
+	}
+
+	return errs.Wait()
 }

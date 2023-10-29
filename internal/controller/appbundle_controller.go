@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	longhornv1beta2 "github.com/longhorn/longhorn-manager/k8s/pkg/apis/longhorn/v1beta2"
 	appsv1 "k8s.io/api/apps/v1"
@@ -22,6 +23,33 @@ import (
 type AppBundleReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+}
+
+type ResourceMutexes struct {
+	sync.Mutex
+	m map[string]map[string]*sync.Mutex // map[resourceType][resourceName]*sync.Mutex
+}
+
+var resourceMutexes = ResourceMutexes{
+	m: make(map[string]map[string]*sync.Mutex),
+}
+
+func getMutex(resourceType, name, namespace string) *sync.Mutex {
+	resourceMutexes.Lock()
+	defer resourceMutexes.Unlock()
+	fullName := fmt.Sprintf("%s-%s", name, namespace)
+
+	if _, ok := resourceMutexes.m[resourceType]; !ok {
+		resourceMutexes.m[resourceType] = make(map[string]*sync.Mutex)
+	}
+
+	if mu, ok := resourceMutexes.m[resourceType][fullName]; ok {
+		return mu
+	}
+
+	mu := &sync.Mutex{}
+	resourceMutexes.m[resourceType][fullName] = mu
+	return mu
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -52,11 +80,12 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		panic("not devel namespace")
 	}
 
-	if err := r.ReconcileVolumes(ctx, req, app_bundle); err != nil {
-		return ctrl.Result{}, err
-	}
-
-	if err := r.ReconcileService(ctx, req, app_bundle); err != nil {
+	if err := RunReconciles(ctx, r, req, app_bundle,
+		r.ReconcileVolumes,
+		r.ReconcileService,
+		r.ReconcileDeployment,
+	); err != nil {
+		l.Error(err, "Unable to reconcile app bundle.")
 		return ctrl.Result{}, err
 	}
 
@@ -64,6 +93,10 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 }
 
 func (r *AppBundleReconciler) ReconcileService(ctx context.Context, req ctrl.Request, app_bundle *atroxyzv1alpha1.AppBundle) error {
+	mu := getMutex("service", app_bundle.Name, app_bundle.Namespace)
+	mu.Lock()
+	defer mu.Unlock()
+
 	// Ports
 	var ports []corev1.ServicePort
 	for _, route := range app_bundle.Spec.Routes {
@@ -88,26 +121,35 @@ func (r *AppBundleReconciler) ReconcileService(ctx context.Context, req ctrl.Req
 
 // I AM MAKING A SUPER STRONG ASSUMPTION ATM THAT ONLY RESTRICTS THIS TO PVCs (EmpytDir, HostPath, ConfigMap etc. are not supported)
 func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Request, app_bundle *atroxyzv1alpha1.AppBundle) error {
-	for _, volume := range app_bundle.Spec.Volumes {
-		pvc := &corev1.PersistentVolumeClaim{
-			ObjectMeta: metav1.ObjectMeta{Name: *volume.Name, Namespace: app_bundle.Namespace},
-			Spec: corev1.PersistentVolumeClaimSpec{
-				AccessModes:      []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
-				StorageClassName: volume.StorageClass,
-				Resources:        corev1.ResourceRequirements{Requests: corev1.ResourceList{corev1.ResourceStorage: resource.MustParse(*volume.Size)}}}}
+	mu := getMutex("volume", app_bundle.Name, app_bundle.Namespace)
+	mu.Lock()
+	defer mu.Unlock()
 
-		if err := UpsertResource(ctx, r, pvc); err != nil {
-			return err
+	for _, volume := range app_bundle.Spec.Volumes {
+		if volume.ExistingClaim == nil {
+			pvc := &corev1.PersistentVolumeClaim{
+				ObjectMeta: metav1.ObjectMeta{Name: *volume.Name, Namespace: app_bundle.Namespace},
+				Spec: corev1.PersistentVolumeClaimSpec{
+					AccessModes:      []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
+					StorageClassName: volume.StorageClass,
+					Resources:        corev1.ResourceRequirements{Requests: corev1.ResourceList{corev1.ResourceStorage: resource.MustParse(*volume.Size)}}}}
+
+			if err := UpsertResource(ctx, r, pvc); err != nil {
+				return err
+			}
 		}
 
 		if volume.Longhorn != nil {
 			reccuringJobName := fmt.Sprintf("atrok-%s-%s", app_bundle.Name, *volume.Name)
 			key := fmt.Sprintf("recurring-job.longhorn.io/%s", reccuringJobName)
 
-			if err := UpsertLabelIntoResource(ctx, r, key, "enabled", &corev1.PersistentVolumeClaim{}, types.NamespacedName{Name: *volume.Name, Namespace: app_bundle.Namespace}); err != nil {
-				return err
-			}
-			if err := UpsertLabelIntoResource(ctx, r, "recurring-job.longhorn.io/source", "enabled", &corev1.PersistentVolumeClaim{}, types.NamespacedName{Name: *volume.Name, Namespace: app_bundle.Namespace}); err != nil {
+			if err := UpsertLabelIntoResource(
+				ctx,
+				r,
+				map[string]string{key: "enabled", "recurring-job.longhorn.io/source": "enabled"},
+				&corev1.PersistentVolumeClaim{},
+				types.NamespacedName{Name: *volume.Name, Namespace: app_bundle.Namespace},
+			); err != nil {
 				return err
 			}
 
@@ -131,21 +173,48 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 }
 
 func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.Request, app_bundle *atroxyzv1alpha1.AppBundle) error {
+	mu := getMutex("deployment", app_bundle.Name, app_bundle.Namespace)
+	mu.Lock()
+	defer mu.Unlock()
+
+	// Prepare lists
+
 	var ports []corev1.ContainerPort
 	for _, route := range app_bundle.Spec.Routes {
 		ports = append(ports, corev1.ContainerPort{Name: route.Name, HostPort: int32(route.Port), ContainerPort: int32(route.Port), Protocol: "TCP"})
 	}
 
+	var volume_mounts []corev1.VolumeMount
+	for _, volume := range app_bundle.Spec.Volumes {
+		volume_mounts = append(volume_mounts, corev1.VolumeMount{Name: *volume.Name, MountPath: *volume.Path})
+	}
+
+	var volumes []corev1.Volume
+	for _, volume := range app_bundle.Spec.Volumes {
+		volumes = append(volumes, corev1.Volume{Name: *volume.Name, VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: *volume.Name}}})
+	}
+
 	deployment := &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{Name: app_bundle.Name, Namespace: app_bundle.Namespace},
+		TypeMeta:   metav1.TypeMeta{APIVersion: "apps/v1", Kind: "Deployment"},
+		ObjectMeta: metav1.ObjectMeta{Name: app_bundle.Name, Namespace: app_bundle.Namespace, Labels: map[string]string{"app": app_bundle.Name}},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: app_bundle.Spec.Replicas,
-			Selector: app_bundle.Spec.Selector,
-			Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{Containers: []corev1.Container{
-				{
-					Name:  app_bundle.Name,
-					Image: fmt.Sprintf("%s:%s", app_bundle.Spec.Image.Repository, app_bundle.Spec.Image.Tag),
-					Ports: ports}}}}}}
+			Selector: &metav1.LabelSelector{MatchLabels: map[string]string{"app": app_bundle.Name}},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{"app": app_bundle.Name}},
+				Spec: corev1.PodSpec{
+					Volumes: volumes,
+					Containers: []corev1.Container{
+						{
+							Name:           app_bundle.Name,
+							Image:          fmt.Sprintf("%s:%s", app_bundle.Spec.Image.Repository, app_bundle.Spec.Image.Tag),
+							Resources:      *app_bundle.Spec.Resources,
+							Ports:          ports,
+							VolumeMounts:   volume_mounts,
+							LivenessProbe:  app_bundle.Spec.LivenessProbe,
+							ReadinessProbe: app_bundle.Spec.ReadinessProbe,
+							StartupProbe:   app_bundle.Spec.StartupProbe,
+						}}}}}}
 
 	if err := UpsertResource(ctx, r, deployment); err != nil {
 		return err
