@@ -7,6 +7,7 @@ import (
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 	"golang.org/x/sync/errgroup"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -42,21 +43,14 @@ func UpsertLabelIntoResource(ctx context.Context, r ReaderWriter, kv map[string]
 	return nil
 }
 
-func UpsertResource(ctx context.Context, r ReaderWriter, obj client.Object) error {
+func UpsertResource(ctx context.Context, r ReaderWriter, obj client.Object, er error) error {
 	l := log.FromContext(ctx)
-	objClone := obj.DeepCopyObject()
 
-	err := r.Get(ctx, client.ObjectKeyFromObject(obj), obj)
-
-	if err != nil && !errors.IsNotFound(err) {
-		return err
+	if er != nil && !errors.IsNotFound(er) {
+		return er
 	}
 
-	if objClone == obj {
-		return nil
-	}
-
-	if errors.IsNotFound(err) {
+	if errors.IsNotFound(er) {
 		l.Info("Creating resource.", "type", reflect.TypeOf(obj).String(), "object", obj)
 		if err := r.Create(ctx, obj); err != nil {
 			return err
@@ -86,4 +80,13 @@ func RunReconciles(
 	}
 
 	return errs.Wait()
+}
+
+func GetAppBundleObjectMetaWithOwnerReference(app_bundle *atroxyzv1alpha1.AppBundle) metav1.ObjectMeta {
+	return metav1.ObjectMeta{
+		Name:            app_bundle.Name,
+		Namespace:       app_bundle.Namespace,
+		Labels:          app_bundle.GetLabels(),
+		OwnerReferences: []metav1.OwnerReference{app_bundle.OwnerReference()},
+	}
 }

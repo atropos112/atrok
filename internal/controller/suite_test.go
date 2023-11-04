@@ -17,6 +17,7 @@ limitations under the License.
 package controller
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"runtime"
@@ -25,8 +26,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -87,4 +90,30 @@ var _ = AfterSuite(func() {
 	By("tearing down the test environment")
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
+})
+
+var _ = Describe("Basic AppBundle", func() {
+
+	It("Should create a new AppBundle", func() {
+		By("Creating a new AppBundle")
+		ctx := context.Background()
+		image := atroxyzv1alpha1.AppBundleImage{
+			Repository: "nginx",
+			Tag:        "latest",
+		}
+		app_bundle := &atroxyzv1alpha1.AppBundle{
+			ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
+			Spec: atroxyzv1alpha1.AppBundleSpec{
+				Image: &image,
+			},
+		}
+		rec := &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
+		er := rec.Create(ctx, app_bundle)
+
+		_, err := rec.Reconcile(ctx, ctrl.Request{NamespacedName: client.ObjectKey{Name: "test", Namespace: "default"}})
+
+		Expect(er).NotTo(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
+		//Expect(rec.Create(ctx, app_bundle)).To(Succeed())
+	})
 })

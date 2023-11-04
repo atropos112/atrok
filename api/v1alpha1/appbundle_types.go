@@ -11,6 +11,7 @@ type AppBundleSpec struct {
 	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
 	ServiceType    *corev1.ServiceType          `json:"serviceType,omitempty"`
 	Routes         []*AppBundleRoute            `json:"routes,omitempty"`
+	Homepage       *AppBundleHomePage           `json:"homepage,omitempty"`
 	Volumes        []*AppBundleVolume           `json:"volumes,omitempty"`
 	Selector       *metav1.LabelSelector        `json:"selector,omitempty"`
 	LivenessProbe  *corev1.Probe                `json:"livenessProbe,omitempty"`
@@ -25,14 +26,22 @@ type AppBundleImage struct {
 }
 
 type AppBundleRoute struct {
-	Name    string                `json:"name"`
-	Port    int                   `json:"port"`
-	Ingress AppBundleRouteIngress `json:"ingress,omitempty"`
+	Name    string                 `json:"name"`
+	Port    int                    `json:"port"`
+	Ingress *AppBundleRouteIngress `json:"ingress,omitempty"`
 }
 
 type AppBundleRouteIngress struct {
 	Domain string `json:"domain"`
 	Auth   bool   `json:"auth"`
+}
+
+type AppBundleHomePage struct {
+	Description *string `json:"description,omitempty"`
+	Group       *string `json:"group,omitempty"`
+	Href        *string `json:"href,omitempty"`
+	Icon        *string `json:"icon,omitempty"`
+	Name        *string `json:"name,omitempty"`
 }
 
 type AppBundleVolume struct {
@@ -55,6 +64,7 @@ type AppBundleVolumeLonghornBackup struct {
 
 // AppBundleStatus defines the observed state of AppBundle
 type AppBundleStatus struct {
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }

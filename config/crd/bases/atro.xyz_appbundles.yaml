@@ -33,6 +33,19 @@ spec:
             type: object
           spec:
             properties:
+              homepage:
+                properties:
+                  description:
+                    type: string
+                  group:
+                    type: string
+                  href:
+                    type: string
+                  icon:
+                    type: string
+                  name:
+                    type: string
+                type: object
               image:
                 properties:
                   pullPolicy:
@@ -637,6 +650,10 @@ spec:
             type: object
           status:
             description: AppBundleStatus defines the observed state of AppBundle
+            properties:
+              observedGeneration:
+                format: int64
+                type: integer
             type: object
         type: object
     served: true
