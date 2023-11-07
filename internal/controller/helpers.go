@@ -6,8 +6,9 @@ import (
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 	"golang.org/x/sync/errgroup"
-	"k8s.io/apimachinery/pkg/api/errors"
+	k8serror "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -46,11 +47,11 @@ func UpsertLabelIntoResource(ctx context.Context, r ReaderWriter, kv map[string]
 func UpsertResource(ctx context.Context, r ReaderWriter, obj client.Object, er error) error {
 	l := log.FromContext(ctx)
 
-	if er != nil && !errors.IsNotFound(er) {
+	if er != nil && !k8serror.IsNotFound(er) {
 		return er
 	}
 
-	if errors.IsNotFound(er) {
+	if k8serror.IsNotFound(er) {
 		l.Info("Creating resource.", "type", reflect.TypeOf(obj).String(), "object", obj)
 		if err := r.Create(ctx, obj); err != nil {
 			return err
@@ -89,4 +90,8 @@ func GetAppBundleObjectMetaWithOwnerReference(app_bundle *atroxyzv1alpha1.AppBun
 		Labels:          app_bundle.GetLabels(),
 		OwnerReferences: []metav1.OwnerReference{app_bundle.OwnerReference()},
 	}
+}
+
+func GetAppBundleNamespacedName(ab *atroxyzv1alpha1.AppBundle) types.NamespacedName {
+	return types.NamespacedName{Name: ab.Name, Namespace: ab.Namespace}
 }

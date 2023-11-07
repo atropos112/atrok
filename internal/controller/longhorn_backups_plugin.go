@@ -15,30 +15,33 @@ import (
 )
 
 // The recurring jobs are not cleaned up after app bundle is deleted which needs to be fixed
-// GetAppBundleObjectMetaWithOwnerReference(app_bundle).OwnerReferences[] gives a list of owner references (all things i depend on) this might be useful for that
-func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Request, app_bundle *atroxyzv1alpha1.AppBundle, volume *atroxyzv1alpha1.AppBundleVolume) error {
-	reccuringJobName := fmt.Sprintf("%s-%s", app_bundle.Name, *volume.Name)
+// GetAppBundleObjectMetaWithOwnerReference(ab).OwnerReferences[] gives a list of owner references (all things i depend on) this might be useful for that
+func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle, volume *atroxyzv1alpha1.AppBundleVolume) error {
+	reccuringJobName := fmt.Sprintf("%s-%s", ab.Name, *volume.Name)
 	// GET pvc so we know owner reference
-	pvc := &corev1.PersistentVolumeClaim{}
 	pvc_name := *volume.Name
 	if volume.ExistingClaim != nil {
 		pvc_name = *volume.ExistingClaim
 	}
-	if err := r.Get(ctx, client.ObjectKey{Name: pvc_name, Namespace: app_bundle.Namespace}, pvc); err != nil {
+	pvc := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{Name: pvc_name, Namespace: ab.Namespace}}
+
+	if err := r.Get(ctx, client.ObjectKeyFromObject(pvc), pvc); err != nil {
 		return err
 	}
 
-	vol := &longhornv1beta2.Volume{}
-	if err := r.Get(ctx, client.ObjectKey{Name: pvc.Spec.VolumeName, Namespace: "longhorn-system"}, vol); err != nil {
+	vol := &longhornv1beta2.Volume{ObjectMeta: metav1.ObjectMeta{Name: pvc.Spec.VolumeName, Namespace: "longhorn-system"}}
+	if err := r.Get(ctx, client.ObjectKeyFromObject(vol), vol); err != nil {
 		return err
 	}
 
 	// GET the resource
-	// Can't use app bundle as owner reference because it would be instantly GC'd as its in a different namespace
+	// Can't use app bundle as owner reference because it would be instantly GC'd as it's in a different namespace
 	recurringJob := &longhornv1beta2.RecurringJob{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:            reccuringJobName,
-			Namespace:       "longhorn-system",
+			Name:      reccuringJobName,
+			Namespace: "longhorn-system",
+			// Owner ref belongs to the volume which links to PVC
+			// If i delete bundle, GC collects the PVC which in turn causes the Volume to delete (if "Delete" is set instead of "Remain") which will cause this to GC as well.
 			OwnerReferences: []metav1.OwnerReference{{APIVersion: "longhorn.io/v1beta2", Kind: "Volume", Name: vol.Name, UID: vol.UID}}},
 	}
 	er := r.Get(ctx, client.ObjectKeyFromObject(recurringJob), recurringJob)
@@ -59,6 +62,10 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 	labels[job_specific_key] = "enabled"
 	labels[job_generic_key] = "enabled"
 	pvc.ObjectMeta.Labels = labels
+
+	// REGAIN control if lost
+	pvc.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
+
 	if err := UpsertResource(ctx, r, pvc, nil); err != nil {
 		return err
 	}
@@ -70,7 +77,6 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 		Cron:        volume.Longhorn.Backup.Frequency,
 		Retain:      volume.Longhorn.Backup.Retain,
 		Concurrency: 1}
-
 	if err := UpsertResource(ctx, r, recurringJob, er); err != nil {
 		return err
 	}
@@ -78,8 +84,8 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 	// Just so it appears in ArgoCD also
 	recurringJob.ObjectMeta = metav1.ObjectMeta{
 		Name:            reccuringJobName,
-		Namespace:       app_bundle.Namespace,
-		Labels:          app_bundle.Labels,
+		Namespace:       ab.Namespace,
+		Labels:          ab.Labels,
 		OwnerReferences: []metav1.OwnerReference{{APIVersion: "v1", Kind: "PersistentVolumeClaim", Name: pvc.Name, UID: pvc.UID}},
 	}
 	er = r.Get(ctx, client.ObjectKeyFromObject(recurringJob), recurringJob)
