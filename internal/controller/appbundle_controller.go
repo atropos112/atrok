@@ -11,7 +11,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/intstr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -106,61 +105,6 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 
 	return ctrl.Result{}, nil
-}
-
-func (r *AppBundleReconciler) ReconcileService(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
-	// LOCK the resource
-	mu := getMutex("service", ab.Name, ab.Namespace)
-	mu.Lock()
-	defer mu.Unlock()
-
-	// GET the resource
-	service := &corev1.Service{}
-	er := r.Get(ctx, GetAppBundleNamespacedName(ab), service)
-
-	// REGAIN control if lost
-	service.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
-
-	// CHECK and BUILD the resource
-	if ab.Spec.Routes == nil && er == nil {
-		// If no routes, but service exists, delete it
-		if err := r.Delete(ctx, service); err != nil {
-			return err
-		}
-		return nil
-	} else if ab.Spec.Routes != nil {
-
-		// Ports
-		var ports []corev1.ServicePort
-		for _, route := range ab.Spec.Routes {
-			ports = append(ports, corev1.ServicePort{Name: route.Name, Port: int32(route.Port), Protocol: "TCP"})
-		}
-
-		// Defaults to ClusterIP
-		if ab.Spec.ServiceType == nil {
-			ab.Spec.ServiceType = new(corev1.ServiceType)
-			*ab.Spec.ServiceType = corev1.ServiceTypeClusterIP
-		}
-
-		// Labeling to match the deployment
-		labels := make(map[string]string)
-		if !errors.IsNotFound(er) {
-			labels = ab.GetLabels()
-		}
-		labels["app"] = ab.Name
-
-		service.Spec = corev1.ServiceSpec{
-			Ports:    ports,
-			Type:     *ab.Spec.ServiceType,
-			Selector: map[string]string{"app": ab.Name},
-		}
-
-		if err := UpsertResource(ctx, r, service, er); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 // I AM MAKING A SUPER STRONG ASSUMPTION ATM THAT ONLY RESTRICTS THIS TO PVCs (EmpytDir, HostPath, ConfigMap etc. are not supported)
@@ -289,70 +233,6 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	// UPSERT the resource
 	if err := UpsertResource(ctx, r, deployment, er); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func (r *AppBundleReconciler) ReconcileIngressRoute(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
-	// LOCK the resource
-	mu := getMutex("ingress_route", ab.Name, ab.Namespace)
-	mu.Lock()
-	defer mu.Unlock()
-
-	// GET the resource
-	ingress_route := &traefikio.IngressRoute{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
-	er := r.Get(ctx, client.ObjectKeyFromObject(ingress_route), ingress_route)
-
-	// REGAIN control if lost
-	ingress_route.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
-
-	// CHECK and BUILD the resource
-
-	// If no routes, but ingress exists, delete it
-	if ab.Spec.Routes == nil && er == nil {
-
-		if err := r.Delete(ctx, ingress_route); err != nil {
-			return err
-		}
-		return nil
-		// If routes exist and ingress exists, update it
-	} else if ab.Spec.Routes != nil {
-
-		// BUILD the resource
-		routes := []traefikio.Route{}
-		for _, route := range ab.Spec.Routes {
-			middlewares := []traefikio.MiddlewareRef{}
-			if route.Ingress.Auth {
-				middlewares = append(middlewares, auth_middleware)
-			}
-
-			service := traefikio.LoadBalancerSpec{Name: ab.Name, Port: intstr.IntOrString{IntVal: int32(route.Port)}}
-			routes = append(routes, traefikio.Route{
-				Match:       fmt.Sprintf("Host(`%s`)", route.Ingress.Domain),
-				Kind:        "Rule",
-				Services:    []traefikio.Service{{LoadBalancerSpec: service}},
-				Middlewares: middlewares,
-			})
-		}
-
-		ingress_route.Spec = traefikio.IngressRouteSpec{
-			EntryPoints: entry_points,
-			Routes:      routes,
-			TLS:         &traefikio.TLS{SecretName: fmt.Sprintf("%s-%s", ab.Name, ab.Namespace)},
-		}
-
-		// UPSERT the resource
-		if err := UpsertResource(ctx, r, ingress_route, er); err != nil {
-			return err
-		}
-
-		if ab.Spec.Homepage != nil {
-			if err := r.ReconcileHomePage(ctx, req, ab); err != nil {
-				return err
-			}
-		}
-
 	}
 
 	return nil

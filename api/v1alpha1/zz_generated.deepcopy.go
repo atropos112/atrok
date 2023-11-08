@@ -184,13 +184,9 @@ func (in *AppBundleSpec) DeepCopyInto(out *AppBundleSpec) {
 	}
 	if in.Routes != nil {
 		in, out := &in.Routes, &out.Routes
-		*out = make([]*AppBundleRoute, len(*in))
+		*out = make([]AppBundleRoute, len(*in))
 		for i := range *in {
-			if (*in)[i] != nil {
-				in, out := &(*in)[i], &(*out)[i]
-				*out = new(AppBundleRoute)
-				(*in).DeepCopyInto(*out)
-			}
+			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
 	if in.Homepage != nil {
@@ -200,13 +196,9 @@ func (in *AppBundleSpec) DeepCopyInto(out *AppBundleSpec) {
 	}
 	if in.Volumes != nil {
 		in, out := &in.Volumes, &out.Volumes
-		*out = make([]*AppBundleVolume, len(*in))
+		*out = make([]AppBundleVolume, len(*in))
 		for i := range *in {
-			if (*in)[i] != nil {
-				in, out := &(*in)[i], &(*out)[i]
-				*out = new(AppBundleVolume)
-				(*in).DeepCopyInto(*out)
-			}
+			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
 	if in.Selector != nil {

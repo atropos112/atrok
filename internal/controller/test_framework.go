@@ -1,56 +1,30 @@
-/*
-Copyright 2023 atropos.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package controller
 
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"path/filepath"
 	"runtime"
-	"testing"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-
+	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	. "github.com/onsi/ginkgo/v2" //lint:ignore ST1001 we need to use ginkgo
+	. "github.com/onsi/gomega"    //lint:ignore ST1001 we need to use ginkgo
+	corev1 "k8s.io/api/core/v1"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	//+kubebuilder:scaffold:imports
 )
-
-// These tests use Ginkgo (BDD-style Go testing framework). Refer to
-// http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 var cfg *rest.Config
 var k8sClient client.Client
 var testEnv *envtest.Environment
-
-func TestControllers(t *testing.T) {
-	RegisterFailHandler(Fail)
-
-	RunSpecs(t, "Controller Suite")
-}
 
 var _ = BeforeSuite(func() {
 	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
@@ -59,7 +33,6 @@ var _ = BeforeSuite(func() {
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
 		ErrorIfCRDPathMissing: true,
-
 		// The BinaryAssetsDirectory is only required if you want to run the tests directly
 		// without call the makefile target test. If not informed it will look for the
 		// default path defined in controller-runtime which is /usr/local/kubebuilder/.
@@ -84,6 +57,9 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
+	ns := &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "devel"}}
+	err = k8sClient.Create(context.Background(), ns)
+	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterSuite(func() {
@@ -92,28 +68,38 @@ var _ = AfterSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 })
 
-var _ = Describe("Basic AppBundle", func() {
+func GetBasicAppBundle() *atroxyzv1alpha1.AppBundle {
+	basicImage := &atroxyzv1alpha1.AppBundleImage{
+		Repository: "nginx",
+		Tag:        "latest",
+	}
+	name := GetRandomName()
 
-	It("Should create a new AppBundle", func() {
-		By("Creating a new AppBundle")
-		ctx := context.Background()
-		image := atroxyzv1alpha1.AppBundleImage{
-			Repository: "nginx",
-			Tag:        "latest",
-		}
-		app_bundle := &atroxyzv1alpha1.AppBundle{
-			ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
-			Spec: atroxyzv1alpha1.AppBundleSpec{
-				Image: &image,
-			},
-		}
-		rec := &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
-		er := rec.Create(ctx, app_bundle)
+	basicAppBundle := &atroxyzv1alpha1.AppBundle{
+		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "devel"},
+		Spec: atroxyzv1alpha1.AppBundleSpec{
+			Image: basicImage,
+		},
+	}
 
-		_, err := rec.Reconcile(ctx, ctrl.Request{NamespacedName: client.ObjectKey{Name: "test", Namespace: "default"}})
+	return basicAppBundle
+}
 
-		Expect(er).NotTo(HaveOccurred())
-		Expect(err).NotTo(HaveOccurred())
-		//Expect(rec.Create(ctx, app_bundle)).To(Succeed())
-	})
-})
+func ApplyTypeMetaToAppBundleForTesting(ab *atroxyzv1alpha1.AppBundle) *atroxyzv1alpha1.AppBundle {
+	ab.TypeMeta = metav1.TypeMeta{Kind: "AppBundle", APIVersion: "atroxyz.atrok.io/v1alpha1"}
+	return ab
+}
+
+func RandStringRunes(n int) string {
+	letterRunes := []rune("abcdefghijklmnopqrstuvwxyz")
+
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
+func GetRandomName() string {
+	return "tst" + RandStringRunes(5)
+}
