@@ -6,6 +6,8 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -14,137 +16,155 @@ import (
 	//+kubebuilder:scaffold:imports
 )
 
-var _ = Describe("Basic AppBundle reconciling service", func() {
+var _ = Describe("Correctly populated AppBundle with no routes", func() {
+	var ab *atroxyzv1alpha1.AppBundle
+	var rec *AppBundleReconciler
+	var ctx context.Context
+	var fake_req ctrl.Request
+
+	BeforeEach(func() {
+		// SETUP
+		ctx = context.Background()
+		ab = GetBasicAppBundle()
+		rec = &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
+		fake_req = ctrl.Request{NamespacedName: client.ObjectKey{Name: ab.Name, Namespace: ab.Namespace}}
+
+		// CREATE APPBUNDLE
+		er := rec.Create(ctx, ab)
+		Expect(er).NotTo(HaveOccurred())
+		ApplyTypeMetaToAppBundleForTesting(ab)
+	})
+
 	It("Should make no service as there are no routes", func() {
-		By("Creating a new AppBundle and reconciling service")
-		// SETUP
-		ctx := context.Background()
-		ab := GetBasicAppBundle()
-		rec := &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
-
-		// CREATE APPBUNDLE
-		er := rec.Create(ctx, ab) // This will strip the TypeMeta but we don't need it for this scenario as no service is created with this owner ref
-
-		// RECONCILE SERVICE
-		fake_req := ctrl.Request{NamespacedName: client.ObjectKey{Name: ab.Name, Namespace: ab.Namespace}}
+		By("Reconciling service using app bundle")
 		err := rec.ReconcileService(ctx, fake_req, ab)
-
-		Expect(er).NotTo(HaveOccurred())
 		Expect(err).NotTo(HaveOccurred())
+
+		// GET the resource
+		service := &corev1.Service{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+		err = rec.Get(ctx, client.ObjectKeyFromObject(service), service)
+		Expect(errors.IsNotFound(err)).To(BeTrue())
+	})
+
+	Describe("Adding a single route to AppBundle", func() {
+		Context("And updating", func() {
+			BeforeEach(func() {
+				//ADD ROUTE
+				route := atroxyzv1alpha1.AppBundleRoute{Name: "test", Port: 80}
+				ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{route}
+
+				// UPDATE APPBUNDLE
+				er := rec.Update(ctx, ab)
+				Expect(er).NotTo(HaveOccurred())
+				ApplyTypeMetaToAppBundleForTesting(ab)
+			})
+
+			It("Should make a simple service", func() {
+				By("Reconciling service using app bundle")
+				err := rec.ReconcileService(ctx, fake_req, ab)
+				Expect(err).NotTo(HaveOccurred())
+
+				// GET the resource
+				service := &corev1.Service{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+				err = rec.Get(ctx, client.ObjectKeyFromObject(service), service)
+				Expect(err).NotTo(HaveOccurred())
+
+				// CHECK the resource
+				Expect(service.Spec.Ports).To(HaveLen(1))
+				Expect(service.Spec.Ports[0].Port).To(Equal(int32(ab.Spec.Routes[0].Port)))
+				Expect(service.Spec.Ports[0].TargetPort.IntVal).To(Equal(int32(ab.Spec.Routes[0].Port)))
+				Expect(service.Spec.Ports[0].Name).To(Equal(ab.Spec.Routes[0].Name))
+			})
+
+			Describe("With a single route", func() {
+				Context("And created service", func() {
+					BeforeEach(func() {
+						err := rec.ReconcileService(ctx, fake_req, ab)
+						Expect(err).NotTo(HaveOccurred())
+					})
+
+					It("Should not change the service", func() {
+						By("Reconciling service again using app bundle")
+
+						// GET service
+						serviceBefore := &corev1.Service{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+						err := rec.Get(ctx, client.ObjectKeyFromObject(serviceBefore), serviceBefore)
+						Expect(err).NotTo(HaveOccurred())
+
+						// RECONCILE service
+						err = rec.ReconcileService(ctx, fake_req, ab)
+						Expect(err).NotTo(HaveOccurred())
+
+						// GET service
+						serviceAfter := &corev1.Service{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+						err = rec.Get(ctx, client.ObjectKeyFromObject(serviceAfter), serviceAfter)
+						Expect(err).NotTo(HaveOccurred())
+
+						// CHECK service
+						Expect(serviceBefore).To(Equal(serviceAfter))
+					})
+
+					It("Should delete the service", func() {
+						By("By removing routes and reconciling service using app bundle")
+						// DELETE ROUTE
+						ab.Spec.Routes = nil
+
+						// UPDATE APPBUNDLE
+						er := rec.Update(ctx, ab)
+						Expect(er).NotTo(HaveOccurred())
+						ApplyTypeMetaToAppBundleForTesting(ab)
+
+						// GET service
+						serviceBefore := &corev1.Service{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+						err := rec.Get(ctx, client.ObjectKeyFromObject(serviceBefore), serviceBefore)
+						Expect(err).NotTo(HaveOccurred())
+
+						// RECONCILE service
+						err = rec.ReconcileService(ctx, fake_req, ab)
+						Expect(err).NotTo(HaveOccurred())
+
+						// GET service
+						serviceAfter := &corev1.Service{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+						err = rec.Get(ctx, client.ObjectKeyFromObject(serviceAfter), serviceAfter)
+						Expect(errors.IsNotFound(err)).To(BeTrue())
+					})
+				})
+			})
+		})
 	})
 })
 
-var _ = Describe("Basic AppBundle reconciling service with single route", func() {
-	It("Should make a simple service", func() {
-		By("Creating a new AppBundle and reconciling service")
-		// SETUP
-		ctx := context.Background()
-		ab := GetBasicAppBundle()
-		rec := &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
+var _ = Describe("AppBundle with incorrectly populated route", func() {
+	var ab *atroxyzv1alpha1.AppBundle
+	var rec *AppBundleReconciler
+	var ctx context.Context
+	var fake_req ctrl.Request
 
-		// ADD ROUTE
-		route := atroxyzv1alpha1.AppBundleRoute{Name: "test", Port: 80, Ingress: nil}
+	BeforeEach(func() {
+		// SETUP
+		ctx = context.Background()
+		ab = GetBasicAppBundle()
+		rec = &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
+		fake_req = ctrl.Request{NamespacedName: client.ObjectKey{Name: ab.Name, Namespace: ab.Namespace}}
+
+		// CREATE bad route (negative port)
+		route := atroxyzv1alpha1.AppBundleRoute{Name: "test", Port: -19}
 		ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{route}
 
 		// CREATE APPBUNDLE
 		er := rec.Create(ctx, ab)
-		ApplyTypeMetaToAppBundleForTesting(ab)
-
-		// RECONCILE SERVICE
-		fake_req := ctrl.Request{NamespacedName: client.ObjectKey{Name: ab.Name, Namespace: ab.Namespace}}
-		err := rec.ReconcileService(ctx, fake_req, ab)
-
 		Expect(er).NotTo(HaveOccurred())
-		Expect(err).NotTo(HaveOccurred())
+		ApplyTypeMetaToAppBundleForTesting(ab)
 	})
-})
 
-var _ = Describe("Basic AppBundle reconciling service with multiple routes", func() {
-	It("Should make a simple service", func() {
-		By("Creating a new AppBundle and reconciling service")
-		// SETUP
-		ctx := context.Background()
-		ab := GetBasicAppBundle()
-		rec := &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
-
-		// ADD ROUTE
-		ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{
-			{Name: "test", Port: 80, Ingress: nil},
-			{Name: "test2", Port: 81, Ingress: nil},
-		}
-
-		// CREATE APPBUNDLE
-		er := rec.Create(ctx, ab)
-		ApplyTypeMetaToAppBundleForTesting(ab)
-
-		// RECONCILE SERVICE
-		fake_req := ctrl.Request{NamespacedName: client.ObjectKey{Name: ab.Name, Namespace: ab.Namespace}}
+	It("Should not make a service", func() {
+		By("Reconciling service using app bundle")
 		err := rec.ReconcileService(ctx, fake_req, ab)
+		Expect(err).To(HaveOccurred())
 
-		Expect(er).NotTo(HaveOccurred())
-		Expect(err).NotTo(HaveOccurred())
-	})
-})
-
-var _ = Describe("Basic AppBundle with a single route that has ingress route", func() {
-	It("Should make a simple service and reconcille safely again", func() {
-		By("Creating a new AppBundle and reconciling service")
-		// SETUP
-		ctx := context.Background()
-		ab := GetBasicAppBundle()
-		rec := &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
-
-		// ADD ROUTE
-		route := atroxyzv1alpha1.AppBundleRoute{Name: "test", Port: 80, Ingress: &atroxyzv1alpha1.AppBundleRouteIngress{Domain: "test.com", Auth: false}}
-		ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{route}
-
-		// CREATE APPBUNDLE
-		er := rec.Create(ctx, ab)
-		ApplyTypeMetaToAppBundleForTesting(ab)
-		Expect(er).NotTo(HaveOccurred())
-
-		// RECONCILE SERVICE
-		fake_req := ctrl.Request{NamespacedName: client.ObjectKey{Name: ab.Name, Namespace: ab.Namespace}}
-		err := rec.ReconcileService(ctx, fake_req, ab)
-		Expect(err).NotTo(HaveOccurred())
-
-		// RECONCILE SERVICE again
-		err = rec.ReconcileService(ctx, fake_req, ab)
-		Expect(err).NotTo(HaveOccurred())
-	})
-})
-
-var _ = Describe("Basic AppBundle reconciling service with single route that is then removed", func() {
-	It("Should make a simple service and then remove it", func() {
-		By("Creating a new AppBundle and reconciling service twice, once on craete and once on change")
-		// SETUP
-		ctx := context.Background()
-		ab := GetBasicAppBundle()
-		rec := &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
-
-		// ADD ROUTE
-		route := atroxyzv1alpha1.AppBundleRoute{Name: "test", Port: 80, Ingress: &atroxyzv1alpha1.AppBundleRouteIngress{Domain: "test.com", Auth: false}}
-		ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{route}
-
-		// CREATE APPBUNDLE
-		er := rec.Create(ctx, ab)
-		ApplyTypeMetaToAppBundleForTesting(ab)
-		Expect(er).NotTo(HaveOccurred())
-
-		// RECONCILE SERVICE
-		fake_req := ctrl.Request{NamespacedName: client.ObjectKey{Name: ab.Name, Namespace: ab.Namespace}}
-		err := rec.ReconcileService(ctx, fake_req, ab)
-		Expect(err).NotTo(HaveOccurred())
-
-		// CHANGE APPBUNDLE
-		ab.Spec.Routes = nil
-		er = rec.Update(ctx, ab)
-		Expect(er).NotTo(HaveOccurred())
-
-		ApplyTypeMetaToAppBundleForTesting(ab)
-
-		// RECONCILE SERVICE again
-		err = rec.ReconcileService(ctx, fake_req, ab)
-		Expect(err).NotTo(HaveOccurred())
+		// GET the resource
+		service := &corev1.Service{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+		err = rec.Get(ctx, client.ObjectKeyFromObject(service), service)
+		Expect(errors.IsNotFound(err)).To(BeTrue())
 	})
 })
