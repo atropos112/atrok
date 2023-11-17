@@ -43,7 +43,14 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	// Volumes
 	var volumes []corev1.Volume
 	for _, volume := range ab.Spec.Volumes {
-		volumes = append(volumes, corev1.Volume{Name: *volume.Name, VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: *volume.Name}}})
+		name := *volume.Name
+		if volume.ExistingClaim != nil {
+			name = *volume.ExistingClaim
+		}
+		volumes = append(volumes, corev1.Volume{
+			Name:         *volume.Name,
+			VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: name}},
+		})
 	}
 
 	// Small bits
