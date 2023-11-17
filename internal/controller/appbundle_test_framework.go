@@ -15,10 +15,16 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	longhornv1beta2 "github.com/longhorn/longhorn-manager/k8s/pkg/apis/longhorn/v1beta2"
 	. "github.com/onsi/ginkgo/v2" //lint:ignore ST1001 we need to use ginkgo
 	. "github.com/onsi/gomega"    //lint:ignore ST1001 we need to use ginkgo
 	corev1 "k8s.io/api/core/v1"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
+
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+
+	traefikio "github.com/atropos112/atrok.git/external_apis/traefikio/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -49,6 +55,13 @@ var _ = BeforeSuite(func() {
 	Expect(cfg).NotTo(BeNil())
 
 	err = atroxyzv1alpha1.AddToScheme(scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = clientgoscheme.AddToScheme(scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
+	err = longhornv1beta2.AddToScheme(scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
+	err = traefikio.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 
 	//+kubebuilder:scaffold:scheme
