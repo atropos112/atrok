@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.13.0
-  name: appbundles.atro.xyz
+  name: appbundlebases.atro.xyz
 spec:
   group: atro.xyz
   names:
-    kind: AppBundle
-    listKind: AppBundleList
-    plural: appbundles
-    singular: appbundle
-  scope: Namespaced
+    kind: AppBundleBase
+    listKind: AppBundleBaseList
+    plural: appbundlebases
+    singular: appbundlebase
+  scope: Cluster
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: AppBundle is the Schema for the appbundles API
+        description: AppBundleBase is the Schema for the appbundlebases API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -32,6 +32,7 @@ spec:
           metadata:
             type: object
           spec:
+            description: AppBundleBaseSpec defines the desired state of AppBundleBase
             properties:
               base:
                 type: string
@@ -56,9 +57,6 @@ spec:
                     type: string
                   tag:
                     type: string
-                required:
-                - repository
-                - tag
                 type: object
               livenessProbe:
                 description: Probe describes a health check to be performed against
@@ -649,13 +647,7 @@ spec:
                 type: array
             type: object
           status:
-            description: AppBundleStatus defines the observed state of AppBundle
-            properties:
-              appBundleBaseReconciled:
-                type: boolean
-              observedGeneration:
-                format: int64
-                type: integer
+            description: AppBundleBaseStatus defines the observed state of AppBundleBase
             type: object
         type: object
     served: true

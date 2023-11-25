@@ -6,7 +6,8 @@ import (
 )
 
 type AppBundleSpec struct {
-	Image          *AppBundleImage              `json:"image"`
+	Base           *string                      `json:"base,omitempty"`
+	Image          *AppBundleImage              `json:"image,omitempty"`
 	Replicas       *int32                       `json:"replicas,omitempty"`
 	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
 	ServiceType    *corev1.ServiceType          `json:"serviceType,omitempty"`
@@ -20,9 +21,9 @@ type AppBundleSpec struct {
 }
 
 type AppBundleImage struct {
-	Repository string `json:"repository"`
-	Tag        string `json:"tag"`
-	PullPolicy string `json:"pullPolicy,omitempty"`
+	Repository *string `json:"repository"`
+	Tag        *string `json:"tag"`
+	PullPolicy *string `json:"pullPolicy,omitempty"`
 }
 
 type AppBundleRoute struct {
@@ -45,8 +46,8 @@ type AppBundleHomePage struct {
 }
 
 type AppBundleVolume struct {
-	Name          *string                  `json:"name"`
-	Path          *string                  `json:"path"`
+	Name          string                   `json:"name"`
+	Path          string                   `json:"path"`
 	Size          *string                  `json:"size,omitempty"`
 	StorageClass  *string                  `json:"storageClass,omitempty"`
 	ExistingClaim *string                  `json:"existingClaim,omitempty"`
@@ -64,7 +65,8 @@ type AppBundleVolumeLonghornBackup struct {
 
 // AppBundleStatus defines the observed state of AppBundle
 type AppBundleStatus struct {
-	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	ObservedGeneration      int64 `json:"observedGeneration,omitempty"`
+	AppBundleBaseReconciled bool  `json:"appBundleBaseReconciled,omitempty"`
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }

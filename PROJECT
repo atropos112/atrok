@@ -16,4 +16,11 @@ resources:
   kind: AppBundle
   path: github.com/atropos112/atrok.git/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+  controller: true
+  domain: atro.xyz
+  kind: AppBundleBase
+  path: github.com/atropos112/atrok.git/api/v1alpha1
+  version: v1alpha1
 version: "3"

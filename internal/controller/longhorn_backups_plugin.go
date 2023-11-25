@@ -17,9 +17,9 @@ import (
 // The recurring jobs are not cleaned up after app bundle is deleted which needs to be fixed
 // GetAppBundleObjectMetaWithOwnerReference(ab).OwnerReferences[] gives a list of owner references (all things i depend on) this might be useful for that
 func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle, volume atroxyzv1alpha1.AppBundleVolume) error {
-	reccuringJobName := fmt.Sprintf("%s-%s", ab.Name, *volume.Name)
+	reccuringJobName := fmt.Sprintf("%s-%s", ab.Name, volume.Name)
 	// GET pvc so we know owner reference
-	pvc_name := *volume.Name
+	pvc_name := volume.Name
 	if volume.ExistingClaim != nil {
 		pvc_name = *volume.ExistingClaim
 	}

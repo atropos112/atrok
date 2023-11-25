@@ -1,0 +1,149 @@
+package controller
+
+// Test framework setup
+import (
+	"context"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/scheme"
+
+	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	//+kubebuilder:scaffold:imports
+)
+
+var _ = Describe("Correctly populated very basic AppBundle", func() {
+	var ab *atroxyzv1alpha1.AppBundle
+	var rec *AppBundleBaseReconciler
+	var abRec *AppBundleReconciler
+	var ctx context.Context
+
+	BeforeEach(func() {
+		// SETUP
+		ctx = context.Background()
+		ab = GetBasicAppBundle()
+		rec = &AppBundleBaseReconciler{Client: k8sClient, Scheme: scheme.Scheme}
+		abRec = &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
+
+		// CREATE APPBUNDLE
+		er := rec.Create(ctx, ab)
+		Expect(er).NotTo(HaveOccurred())
+		ApplyTypeMetaToAppBundleForTesting(ab)
+	})
+
+	It("Should make no difference when resolving without a base against base", func() {
+		By("Applying base resolver to app bundle")
+
+		beforeAb := ab.DeepCopy()
+		abb := &atroxyzv1alpha1.AppBundleBase{}
+		err := ResolveAppBundleBase(ctx, abRec, ab, abb)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(ab).To(Equal(beforeAb))
+	})
+
+	It("Should append all routes from base to app bundle", func() {
+		By("Applying base resolver to app bundle")
+		abbSpec := atroxyzv1alpha1.AppBundleBaseSpec{
+			Routes: []atroxyzv1alpha1.AppBundleRoute{
+				{Name: "test", Port: 80},
+				{Name: "test2", Port: 8080},
+			},
+		}
+		abb := &atroxyzv1alpha1.AppBundleBase{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "test",
+			},
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "atro.xyz/v1alpha1",
+				Kind:       "AppBundleBase",
+			},
+			Spec: abbSpec,
+		}
+		err := rec.Create(ctx, abb)
+		Expect(err).NotTo(HaveOccurred())
+
+		ab.Spec.Base = &abb.Name
+
+		err = ResolveAppBundleBase(ctx, abRec, ab, abb)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(ab.Spec.Routes).To(HaveLen(2))
+
+	})
+})
+
+var _ = Describe("Correctly populated heavily populated AppBundle", func() {
+	var ab *atroxyzv1alpha1.AppBundle
+	var rec *AppBundleBaseReconciler
+	var abRec *AppBundleReconciler
+	var ctx context.Context
+
+	BeforeEach(func() {
+		// SETUP
+		ctx = context.Background()
+		ab = GetBasicAppBundle()
+		ab.Spec.Volumes = []atroxyzv1alpha1.AppBundleVolume{
+			{Name: "test", Path: "/test"},
+			{Name: "test2", Path: "/test2"},
+		}
+		ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{
+			{Name: "test", Port: 80},
+			{Name: "test2", Port: 8080},
+		}
+		pullPolicy := "Always"
+		ab.Spec.Image.PullPolicy = &pullPolicy
+		group := "test"
+		ab.Spec.Homepage = &atroxyzv1alpha1.AppBundleHomePage{Group: &group}
+
+		rec = &AppBundleBaseReconciler{Client: k8sClient, Scheme: scheme.Scheme}
+		abRec = &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
+
+		// CREATE APPBUNDLE
+		er := rec.Create(ctx, ab)
+		Expect(er).NotTo(HaveOccurred())
+		ApplyTypeMetaToAppBundleForTesting(ab)
+	})
+
+	It("Should make no difference when resolving without a base against base", func() {
+		By("Applying base resolver to app bundle")
+
+		beforeAb := ab.DeepCopy()
+		abb := &atroxyzv1alpha1.AppBundleBase{}
+		err := ResolveAppBundleBase(ctx, abRec, ab, abb)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(ab).To(Equal(beforeAb))
+	})
+
+	It("Should append all routes from base to app bundle", func() {
+		By("Applying base resolver to app bundle")
+		abbSpec := atroxyzv1alpha1.AppBundleBaseSpec{
+			Routes: []atroxyzv1alpha1.AppBundleRoute{
+				{Name: "test", Port: 80},
+				{Name: "test2", Port: 8080},
+			},
+		}
+		abb := &atroxyzv1alpha1.AppBundleBase{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "test",
+			},
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "atro.xyz/v1alpha1",
+				Kind:       "AppBundleBase",
+			},
+			Spec: abbSpec,
+		}
+		err := rec.Create(ctx, abb)
+		Expect(err).NotTo(HaveOccurred())
+
+		ab.Spec.Base = &abb.Name
+
+		err = ResolveAppBundleBase(ctx, abRec, ab, abb)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(ab.Spec.Routes).To(HaveLen(2))
+
+	})
+})

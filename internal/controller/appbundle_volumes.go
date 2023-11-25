@@ -32,7 +32,7 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 
 		// GET the resource
 		pvc := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{
-			Name:      *volume.Name,
+			Name:      volume.Name,
 			Namespace: ab.Namespace,
 		}}
 		er := r.Get(ctx, client.ObjectKeyFromObject(pvc), pvc)

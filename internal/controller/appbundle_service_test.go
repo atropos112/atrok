@@ -16,7 +16,7 @@ import (
 	//+kubebuilder:scaffold:imports
 )
 
-var _ = Describe("Correctly populated AppBundle with no routes", func() {
+var _ = Describe("Correctly populated AppBundle with no routes reconcilling service", func() {
 	var ab *atroxyzv1alpha1.AppBundle
 	var rec *AppBundleReconciler
 	var ctx context.Context

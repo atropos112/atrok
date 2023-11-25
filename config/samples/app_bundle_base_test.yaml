@@ -1,0 +1,12 @@
+apiVersion: atro.xyz/v1alpha1
+kind: AppBundleBase
+metadata:
+  name: atrok-test-base
+spec:
+  resources:
+    requests:
+      cpu: 350m
+      memory: 400Mi
+    limits:
+      cpu: 1000m
+      memory: 1200Mi

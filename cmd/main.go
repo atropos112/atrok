@@ -34,7 +34,6 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
-	traefikio "github.com/atropos112/atrok.git/external_apis/traefikio/v1alpha1"
 
 	"github.com/atropos112/atrok.git/internal/controller"
 	//+kubebuilder:scaffold:imports
@@ -51,8 +50,6 @@ func init() {
 	utilruntime.Must(longhornv1beta2.AddToScheme(scheme))
 
 	utilruntime.Must(atroxyzv1alpha1.AddToScheme(scheme))
-
-	utilruntime.Must(traefikio.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -101,6 +98,13 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "AppBundle")
+		os.Exit(1)
+	}
+	if err = (&controller.AppBundleBaseReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "AppBundleBase")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

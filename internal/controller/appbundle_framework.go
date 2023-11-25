@@ -10,15 +10,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
-	traefikio "github.com/atropos112/atrok.git/external_apis/traefikio/v1alpha1"
 )
 
 // Need to abstract this away into operator install (helm chart install)
 // TESTING ONLY !!!
 var (
 	image_pull_secrets []corev1.LocalObjectReference = []corev1.LocalObjectReference{{Name: "regcred"}}
-	auth_middleware    traefikio.MiddlewareRef       = traefikio.MiddlewareRef{Name: "authelia", Namespace: "auth"}
+	auth_middleware    string                        = "auth-authelia@kubernetescrd"
 	entry_points       []string                      = []string{"websecure"}
+	cluster_issuer     string                        = "switchboard-letsencrypt-issuer"
 )
 
 // TESTING ONLY !!!

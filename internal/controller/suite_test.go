@@ -23,8 +23,6 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-
-	traefikio "github.com/atropos112/atrok.git/external_apis/traefikio/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -61,8 +59,6 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	err = longhornv1beta2.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
-	err = traefikio.AddToScheme(scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
 
 	//+kubebuilder:scaffold:scheme
 
@@ -82,9 +78,11 @@ var _ = AfterSuite(func() {
 })
 
 func GetBasicAppBundle() *atroxyzv1alpha1.AppBundle {
+	rep := "nginx"
+	tag := "latest"
 	basicImage := &atroxyzv1alpha1.AppBundleImage{
-		Repository: "nginx",
-		Tag:        "latest",
+		Repository: &rep,
+		Tag:        &tag,
 	}
 	name := GetRandomName()
 

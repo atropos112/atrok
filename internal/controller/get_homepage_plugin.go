@@ -3,24 +3,24 @@ package controller
 import (
 	"context"
 
+	netv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
-	traefikio "github.com/atropos112/atrok.git/external_apis/traefikio/v1alpha1"
 )
 
 // The recurring jobs are not cleaned up after app bundle is deleted which needs to be fixed
 // GetAppBundleObjectMetaWithOwnerReference(ab).OwnerReferences[] gives a list of owner references (all things i depend on) this might be useful for that
 func (r *AppBundleReconciler) ReconcileHomePage(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
 	annotations := make(map[string]string)
-	ingressRoute := &traefikio.IngressRoute{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
-	er := r.Get(ctx, client.ObjectKeyFromObject(ingressRoute), ingressRoute)
+	ingress := &netv1.Ingress{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+	er := r.Get(ctx, client.ObjectKeyFromObject(ingress), ingress)
 	// REGAIN control if lost
-	ingressRoute.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
+	ingress.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
 
-	for key, value := range ingressRoute.GetAnnotations() {
+	for key, value := range ingress.GetAnnotations() {
 		annotations[key] = value
 	}
 	annotations["gethomepage.dev/enabled"] = "true"
@@ -56,9 +56,9 @@ func (r *AppBundleReconciler) ReconcileHomePage(ctx context.Context, req ctrl.Re
 		annotations["gethomepage.dev/name"] = ab.Name
 	}
 
-	ingressRoute.SetAnnotations(annotations)
+	ingress.SetAnnotations(annotations)
 
-	if UpsertResource(ctx, r, ingressRoute, er) != nil {
+	if UpsertResource(ctx, r, ingress, er) != nil {
 		return er
 	}
 

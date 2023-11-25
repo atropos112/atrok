@@ -37,18 +37,18 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	// Volume Mounts
 	var volume_mounts []corev1.VolumeMount
 	for _, volume := range ab.Spec.Volumes {
-		volume_mounts = append(volume_mounts, corev1.VolumeMount{Name: *volume.Name, MountPath: *volume.Path})
+		volume_mounts = append(volume_mounts, corev1.VolumeMount{Name: volume.Name, MountPath: volume.Path})
 	}
 
 	// Volumes
 	var volumes []corev1.Volume
 	for _, volume := range ab.Spec.Volumes {
-		name := *volume.Name
+		name := volume.Name
 		if volume.ExistingClaim != nil {
 			name = *volume.ExistingClaim
 		}
 		volumes = append(volumes, corev1.Volume{
-			Name:         *volume.Name,
+			Name:         volume.Name,
 			VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: name}},
 		})
 	}
@@ -66,6 +66,8 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 		resources = *ab.Spec.Resources
 	}
 
+	repository := *ab.Spec.Image.Repository
+	tag := *ab.Spec.Image.Tag
 	deployment.Spec = appsv1.DeploymentSpec{
 		Replicas:             ab.Spec.Replicas,
 		RevisionHistoryLimit: &revision_history_limit,
@@ -81,7 +83,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 				Containers: []corev1.Container{
 					{
 						Name:           ab.Name,
-						Image:          fmt.Sprintf("%s:%s", ab.Spec.Image.Repository, ab.Spec.Image.Tag),
+						Image:          fmt.Sprintf("%s:%s", repository, tag),
 						Resources:      resources,
 						Ports:          ports,
 						VolumeMounts:   volume_mounts,

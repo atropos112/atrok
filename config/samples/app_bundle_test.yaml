@@ -1,19 +1,13 @@
 apiVersion: atro.xyz/v1alpha1
 kind: AppBundle
 metadata:
-  name: sonarr-atrok-sample
+  name: atrok-test
 spec:
+  base: atrok-test-base
   image:
     repository: linuxserver/sonarr
     pullPolicy: Always
     tag: 4.0.0-develop
-  resources:
-    requests:
-      cpu: 350m
-      memory: 400Mi
-    limits:
-      cpu: 1000m
-      memory: 1200Mi
   routes:
     - name: web
       port: 8989
