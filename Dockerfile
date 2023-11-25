@@ -13,7 +13,6 @@ RUN go mod download
 # Can do COPY . . but want to be explicit as to what contributes to the build.
 COPY cmd/main.go cmd/main.go
 COPY api/ api/
-COPY external_apis/ external_apis/
 COPY internal/controller/ internal/controller/
 
 # Build
