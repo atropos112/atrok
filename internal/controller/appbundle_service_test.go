@@ -50,7 +50,9 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling serv
 		Context("And updating", func() {
 			BeforeEach(func() {
 				//ADD ROUTE
-				route := atroxyzv1alpha1.AppBundleRoute{Name: "test", Port: 80}
+				route_name := "test"
+				port := 80
+				route := atroxyzv1alpha1.AppBundleRoute{Name: route_name, Port: &port}
 				ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{route}
 
 				// UPDATE APPBUNDLE
@@ -71,8 +73,8 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling serv
 
 				// CHECK the resource
 				Expect(service.Spec.Ports).To(HaveLen(1))
-				Expect(service.Spec.Ports[0].Port).To(Equal(int32(ab.Spec.Routes[0].Port)))
-				Expect(service.Spec.Ports[0].TargetPort.IntVal).To(Equal(int32(ab.Spec.Routes[0].Port)))
+				Expect(service.Spec.Ports[0].Port).To(Equal(int32(*ab.Spec.Routes[0].Port)))
+				Expect(service.Spec.Ports[0].TargetPort.IntVal).To(Equal(int32(*ab.Spec.Routes[0].Port)))
 				Expect(service.Spec.Ports[0].Name).To(Equal(ab.Spec.Routes[0].Name))
 			})
 
@@ -148,7 +150,9 @@ var _ = Describe("AppBundle with incorrectly populated route", func() {
 		fake_req = ctrl.Request{NamespacedName: client.ObjectKey{Name: ab.Name, Namespace: ab.Namespace}}
 
 		// CREATE bad route (negative port)
-		route := atroxyzv1alpha1.AppBundleRoute{Name: "test", Port: -19}
+		route_name := "test"
+		port := -19
+		route := atroxyzv1alpha1.AppBundleRoute{Name: route_name, Port: &port}
 		ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{route}
 
 		// CREATE APPBUNDLE

@@ -406,9 +406,6 @@ spec:
                           type: boolean
                         domain:
                           type: string
-                      required:
-                      - auth
-                      - domain
                       type: object
                     name:
                       type: string
@@ -416,7 +413,6 @@ spec:
                       type: integer
                   required:
                   - name
-                  - port
                   type: object
                 type: array
               selector:
@@ -627,9 +623,6 @@ spec:
                               type: string
                             retain:
                               type: integer
-                          required:
-                          - frequency
-                          - retain
                           type: object
                       type: object
                     name:
@@ -642,12 +635,15 @@ spec:
                       type: string
                   required:
                   - name
-                  - path
                   type: object
                 type: array
             type: object
           status:
             description: AppBundleBaseStatus defines the observed state of AppBundleBase
+            properties:
+              observedGeneration:
+                format: int64
+                type: integer
             type: object
         type: object
     served: true

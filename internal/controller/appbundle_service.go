@@ -36,7 +36,7 @@ func (r *AppBundleReconciler) ReconcileService(ctx context.Context, req ctrl.Req
 		// Ports
 		var ports []corev1.ServicePort
 		for _, route := range ab.Spec.Routes {
-			ports = append(ports, corev1.ServicePort{Name: route.Name, Port: int32(route.Port), Protocol: "TCP"})
+			ports = append(ports, corev1.ServicePort{Name: route.Name, Port: int32(*route.Port), Protocol: "TCP"})
 		}
 
 		// Defaults to ClusterIP

@@ -57,13 +57,13 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 			// Add middleware
 			// This is a bit silly because if we add it for one we add it for all, but it's fine for now
 			// TODO: MAKE SEPARATE INGRESSES FOR EACH ROUTE. THIS IS A HACK
-			if auth_middleware != "" && route.Ingress.Auth {
+			if auth_middleware != "" && *route.Ingress.Auth {
 				ingress.Annotations["traefik.ingress.kubernetes.io/router.middlewares"] = auth_middleware
 			}
 			path_type := netv1.PathTypePrefix
 
 			rules = append(rules, netv1.IngressRule{
-				Host: route.Ingress.Domain,
+				Host: *route.Ingress.Domain,
 				IngressRuleValue: netv1.IngressRuleValue{
 					HTTP: &netv1.HTTPIngressRuleValue{
 						Paths: []netv1.HTTPIngressPath{
@@ -74,7 +74,7 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 									Service: &netv1.IngressServiceBackend{
 										Name: ab.Name,
 										Port: netv1.ServiceBackendPort{
-											Number: int32(route.Port),
+											Number: int32(*route.Port),
 										},
 									},
 								},
@@ -85,7 +85,7 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 			})
 
 			tls = append(tls, netv1.IngressTLS{
-				Hosts:      []string{route.Ingress.Domain},
+				Hosts:      []string{*route.Ingress.Domain},
 				SecretName: fmt.Sprintf("%s-%s-ingress-tls", ab.Name, ab.Namespace),
 			})
 		}

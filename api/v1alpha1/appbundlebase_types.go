@@ -11,7 +11,7 @@ import (
 // AppBundleBaseSpec defines the desired state of AppBundleBase
 type AppBundleBaseSpec struct {
 	Base           *string                      `json:"base,omitempty"`
-	Image          *AppBundleBaseImage          `json:"image,omitempty"`
+	Image          *AppBundleImage              `json:"image,omitempty"`
 	Replicas       *int32                       `json:"replicas,omitempty"`
 	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
 	ServiceType    *corev1.ServiceType          `json:"serviceType,omitempty"`
@@ -22,31 +22,6 @@ type AppBundleBaseSpec struct {
 	LivenessProbe  *corev1.Probe                `json:"livenessProbe,omitempty"`
 	ReadinessProbe *corev1.Probe                `json:"readinessProbe,omitempty"`
 	StartupProbe   *corev1.Probe                `json:"startupProbe,omitempty"`
-}
-
-type AppBundleBaseImage struct {
-	Repository *string `json:"repository,omitempty"`
-	Tag        *string `json:"tag,omitempty"`
-	PullPolicy *string `json:"pullPolicy,omitempty"`
-}
-
-type AppBundleBaseRouteIngress struct {
-	Domain string `json:"domain,omitempty"`
-	Auth   bool   `json:"auth,omitempty"`
-}
-
-type AppBundleBaseVolume struct {
-	Name          *string                  `json:"name,omitempty"`
-	Path          *string                  `json:"path,omitempty"`
-	Size          *string                  `json:"size,omitempty"`
-	StorageClass  *string                  `json:"storageClass,omitempty"`
-	ExistingClaim *string                  `json:"existingClaim,omitempty"`
-	Longhorn      *AppBundleVolumeLonghorn `json:"longhorn,omitempty"`
-}
-
-type AppBundleBaseVolumeLonghornBackup struct {
-	Frequency string `json:"frequency,omitempty"`
-	Retain    int    `json:"retain,omitempty"`
 }
 
 // AppBundleBaseStatus defines the observed state of AppBundleBase

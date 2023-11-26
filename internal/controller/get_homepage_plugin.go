@@ -40,7 +40,7 @@ func (r *AppBundleReconciler) ReconcileHomePage(ctx context.Context, req ctrl.Re
 	} else {
 		for _, route := range ab.Spec.Routes {
 			if route.Ingress != nil {
-				annotations["gethomepage.dev/href"] = "https://" + route.Ingress.Domain // Domain is required so no need to check for nil
+				annotations["gethomepage.dev/href"] = "https://" + *route.Ingress.Domain // Domain is required so no need to check for nil
 				break
 			}
 		}

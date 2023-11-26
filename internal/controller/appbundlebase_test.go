@@ -45,10 +45,17 @@ var _ = Describe("Correctly populated very basic AppBundle", func() {
 
 	It("Should append all routes from base to app bundle", func() {
 		By("Applying base resolver to app bundle")
+		route1_name := "test"
+		route1_port := 80
+		route1 := atroxyzv1alpha1.AppBundleRoute{Name: route1_name, Port: &route1_port}
+		route2_name := "test2"
+		route2_port := 8080
+		route2 := atroxyzv1alpha1.AppBundleRoute{Name: route2_name, Port: &route2_port}
+
 		abbSpec := atroxyzv1alpha1.AppBundleBaseSpec{
 			Routes: []atroxyzv1alpha1.AppBundleRoute{
-				{Name: "test", Port: 80},
-				{Name: "test2", Port: 8080},
+				route1,
+				route2,
 			},
 		}
 		abb := &atroxyzv1alpha1.AppBundleBase{
@@ -84,13 +91,23 @@ var _ = Describe("Correctly populated heavily populated AppBundle", func() {
 		// SETUP
 		ctx = context.Background()
 		ab = GetBasicAppBundle()
+		path1 := "/test"
+		path2 := "/test2"
 		ab.Spec.Volumes = []atroxyzv1alpha1.AppBundleVolume{
-			{Name: "test", Path: "/test"},
-			{Name: "test2", Path: "/test2"},
+			{Name: "test", Path: &path1},
+			{Name: "test2", Path: &path2},
 		}
+
+		route1_name := "test"
+		route1_port := 80
+		route1 := atroxyzv1alpha1.AppBundleRoute{Name: route1_name, Port: &route1_port}
+		route2_name := "test2"
+		route2_port := 8080
+		route2 := atroxyzv1alpha1.AppBundleRoute{Name: route2_name, Port: &route2_port}
+
 		ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{
-			{Name: "test", Port: 80},
-			{Name: "test2", Port: 8080},
+			route1,
+			route2,
 		}
 		pullPolicy := "Always"
 		ab.Spec.Image.PullPolicy = &pullPolicy
@@ -119,10 +136,16 @@ var _ = Describe("Correctly populated heavily populated AppBundle", func() {
 
 	It("Should append all routes from base to app bundle", func() {
 		By("Applying base resolver to app bundle")
+		route1_name := "test"
+		route1_port := 80
+		route1 := atroxyzv1alpha1.AppBundleRoute{Name: route1_name, Port: &route1_port}
+		route2_name := "test2"
+		route2_port := 8080
+		route2 := atroxyzv1alpha1.AppBundleRoute{Name: route2_name, Port: &route2_port}
 		abbSpec := atroxyzv1alpha1.AppBundleBaseSpec{
 			Routes: []atroxyzv1alpha1.AppBundleRoute{
-				{Name: "test", Port: 80},
-				{Name: "test2", Port: 8080},
+				route1,
+				route2,
 			},
 		}
 		abb := &atroxyzv1alpha1.AppBundleBase{

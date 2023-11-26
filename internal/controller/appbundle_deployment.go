@@ -31,13 +31,13 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	// Ports
 	var ports []corev1.ContainerPort
 	for _, route := range ab.Spec.Routes {
-		ports = append(ports, corev1.ContainerPort{Name: route.Name, HostPort: int32(route.Port), ContainerPort: int32(route.Port), Protocol: "TCP"})
+		ports = append(ports, corev1.ContainerPort{Name: route.Name, HostPort: int32(*route.Port), ContainerPort: int32(*route.Port), Protocol: "TCP"})
 	}
 
 	// Volume Mounts
 	var volume_mounts []corev1.VolumeMount
 	for _, volume := range ab.Spec.Volumes {
-		volume_mounts = append(volume_mounts, corev1.VolumeMount{Name: volume.Name, MountPath: volume.Path})
+		volume_mounts = append(volume_mounts, corev1.VolumeMount{Name: volume.Name, MountPath: *volume.Path})
 	}
 
 	// Volumes

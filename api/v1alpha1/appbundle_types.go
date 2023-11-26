@@ -21,20 +21,20 @@ type AppBundleSpec struct {
 }
 
 type AppBundleImage struct {
-	Repository *string `json:"repository"`
-	Tag        *string `json:"tag"`
+	Repository *string `json:"repository,omitempty"`
+	Tag        *string `json:"tag,omitempty"`
 	PullPolicy *string `json:"pullPolicy,omitempty"`
 }
 
 type AppBundleRoute struct {
 	Name    string                 `json:"name"`
-	Port    int                    `json:"port"`
+	Port    *int                   `json:"port,omitempty"`
 	Ingress *AppBundleRouteIngress `json:"ingress,omitempty"`
 }
 
 type AppBundleRouteIngress struct {
-	Domain string `json:"domain"`
-	Auth   bool   `json:"auth"`
+	Domain *string `json:"domain,omitempty"`
+	Auth   *bool   `json:"auth,omitempty"`
 }
 
 type AppBundleHomePage struct {
@@ -47,7 +47,7 @@ type AppBundleHomePage struct {
 
 type AppBundleVolume struct {
 	Name          string                   `json:"name"`
-	Path          string                   `json:"path"`
+	Path          *string                  `json:"path,omitempty"`
 	Size          *string                  `json:"size,omitempty"`
 	StorageClass  *string                  `json:"storageClass,omitempty"`
 	ExistingClaim *string                  `json:"existingClaim,omitempty"`
@@ -59,8 +59,8 @@ type AppBundleVolumeLonghorn struct {
 }
 
 type AppBundleVolumeLonghornBackup struct {
-	Frequency string `json:"frequency"`
-	Retain    int    `json:"retain"`
+	Frequency string `json:"frequency,omitempty"`
+	Retain    int    `json:"retain,omitempty"`
 }
 
 // AppBundleStatus defines the observed state of AppBundle

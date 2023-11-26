@@ -50,7 +50,12 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling ingr
 		Context("And updating", func() {
 			BeforeEach(func() {
 				//ADD ROUTE
-				route := atroxyzv1alpha1.AppBundleRoute{Name: "test", Port: 80, Ingress: &atroxyzv1alpha1.AppBundleRouteIngress{Domain: "test.com", Auth: true}}
+				route_name := "test"
+				port := 80
+				domain := "test.com"
+				auth := true
+
+				route := atroxyzv1alpha1.AppBundleRoute{Name: route_name, Port: &port, Ingress: &atroxyzv1alpha1.AppBundleRouteIngress{Domain: &domain, Auth: &auth}}
 				ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{route}
 
 				// UPDATE APPBUNDLE
