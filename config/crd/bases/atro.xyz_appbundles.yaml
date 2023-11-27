@@ -35,6 +35,10 @@ spec:
             properties:
               base:
                 type: string
+              envs:
+                additionalProperties:
+                  type: string
+                type: object
               homepage:
                 properties:
                   description:

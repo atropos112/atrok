@@ -119,6 +119,13 @@ func (in *AppBundleBaseSpec) DeepCopyInto(out *AppBundleBaseSpec) {
 		*out = new(v1.ResourceRequirements)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.Envs != nil {
+		in, out := &in.Envs, &out.Envs
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	if in.ServiceType != nil {
 		in, out := &in.ServiceType, &out.ServiceType
 		*out = new(v1.ServiceType)
@@ -364,6 +371,13 @@ func (in *AppBundleSpec) DeepCopyInto(out *AppBundleSpec) {
 		in, out := &in.Resources, &out.Resources
 		*out = new(v1.ResourceRequirements)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.Envs != nil {
+		in, out := &in.Envs, &out.Envs
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
 	}
 	if in.ServiceType != nil {
 		in, out := &in.ServiceType, &out.ServiceType
