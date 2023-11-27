@@ -68,6 +68,13 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 
 	repository := *ab.Spec.Image.Repository
 	tag := *ab.Spec.Image.Tag
+	env := []corev1.EnvVar{}
+	if ab.Spec.Envs != nil {
+		for key, value := range ab.Spec.Envs {
+			env = append(env, corev1.EnvVar{Name: key, Value: value})
+		}
+	}
+
 	deployment.Spec = appsv1.DeploymentSpec{
 		Replicas:             ab.Spec.Replicas,
 		RevisionHistoryLimit: &revision_history_limit,
@@ -86,6 +93,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 						Image:          fmt.Sprintf("%s:%s", repository, tag),
 						Resources:      resources,
 						Ports:          ports,
+						Env:            env,
 						VolumeMounts:   volume_mounts,
 						LivenessProbe:  ab.Spec.LivenessProbe,
 						ReadinessProbe: ab.Spec.ReadinessProbe,
