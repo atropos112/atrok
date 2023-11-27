@@ -6,6 +6,7 @@ import (
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 	netv1 "k8s.io/api/networking/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -35,8 +36,22 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls"] = "true"
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls.certresolver"] = cluster_issuer
 
+	no_of_ingresses := 0
+	if ab.Spec.Routes != nil {
+		for _, route := range ab.Spec.Routes {
+			if route.Ingress != nil {
+				no_of_ingresses++
+			}
+		}
+	}
+
+	// No ingresses exist and there is no ingress just leave.
+	if no_of_ingresses == 0 && errors.IsNotFound(er) {
+		return nil
+	}
+
 	// If no routes, but ingress exists, delete it
-	if ab.Spec.Routes == nil && er == nil {
+	if (ab.Spec.Routes == nil || no_of_ingresses == 0) && er == nil {
 
 		if err := r.Delete(ctx, ingress); err != nil {
 			return err
