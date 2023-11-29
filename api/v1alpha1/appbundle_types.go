@@ -74,6 +74,7 @@ type AppBundleStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:resource:shortName=ab,path=appbundles,singular=appbundle,scope=Namespaced
 
 // AppBundle is the Schema for the appbundles API
 type AppBundle struct {

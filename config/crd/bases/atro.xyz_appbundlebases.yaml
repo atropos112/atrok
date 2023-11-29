@@ -11,6 +11,8 @@ spec:
     kind: AppBundleBase
     listKind: AppBundleBaseList
     plural: appbundlebases
+    shortNames:
+    - ab
     singular: appbundlebase
   scope: Cluster
   versions:

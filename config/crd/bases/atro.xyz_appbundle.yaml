@@ -4,13 +4,13 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.13.0
-  name: appbundles.atro.xyz
+  name: appbundle.atro.xyz
 spec:
   group: atro.xyz
   names:
     kind: AppBundle
     listKind: AppBundleList
-    plural: appbundles
+    plural: appbundle
     shortNames:
     - ab
     singular: appbundle
@@ -412,12 +412,8 @@ spec:
                         domain:
                           type: string
                       type: object
-                    name:
-                      type: string
                     port:
                       type: integer
-                  required:
-                  - name
                   type: object
                 type: array
               selector:
@@ -630,16 +626,12 @@ spec:
                               type: integer
                           type: object
                       type: object
-                    name:
-                      type: string
                     path:
                       type: string
                     size:
                       type: string
                     storageClass:
                       type: string
-                  required:
-                  - name
                   type: object
                 type: array
             type: object
