@@ -35,6 +35,7 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.entryPoints"] = fmt.Sprintf("%v", entry_points)
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls"] = "true"
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls.certresolver"] = cluster_issuer
+	ingress.Annotations["cert-manager.io/cluster-issuer"] = cluster_issuer
 
 	no_of_ingresses := 0
 	if ab.Spec.Routes != nil {

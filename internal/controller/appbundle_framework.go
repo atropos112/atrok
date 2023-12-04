@@ -18,7 +18,7 @@ var (
 	image_pull_secrets []corev1.LocalObjectReference = []corev1.LocalObjectReference{{Name: "regcred"}}
 	auth_middleware    string                        = "auth-authelia@kubernetescrd"
 	entry_points       []string                      = []string{"websecure"}
-	cluster_issuer     string                        = "switchboard-letsencrypt-issuer"
+	cluster_issuer     string                        = "letsencrypt"
 )
 
 // TESTING ONLY !!!
