@@ -32,7 +32,7 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 
 	// CHECK and BUILD the resource
 
-	ingress.Annotations["traefik.ingress.kubernetes.io/router.entryPoints"] = fmt.Sprintf("%v", entry_points)
+	ingress.Annotations["traefik.ingress.kubernetes.io/router.entryPoints"] = entry_point
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls"] = "true"
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls.certresolver"] = cluster_issuer
 	ingress.Annotations["cert-manager.io/cluster-issuer"] = cluster_issuer

@@ -17,7 +17,7 @@ import (
 var (
 	image_pull_secrets []corev1.LocalObjectReference = []corev1.LocalObjectReference{{Name: "regcred"}}
 	auth_middleware    string                        = "auth-authelia@kubernetescrd"
-	entry_points       []string                      = []string{"websecure"}
+	entry_point        string                        = "websecure"
 	cluster_issuer     string                        = "letsencrypt"
 )
 
