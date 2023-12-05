@@ -53,9 +53,9 @@ var _ = Describe("Correctly populated very basic AppBundle", func() {
 		route2 := atroxyzv1alpha1.AppBundleRoute{Name: route2_name, Port: &route2_port}
 
 		abbSpec := atroxyzv1alpha1.AppBundleBaseSpec{
-			Routes: []atroxyzv1alpha1.AppBundleRoute{
-				route1,
-				route2,
+			Routes: []*atroxyzv1alpha1.AppBundleRoute{
+				&route1,
+				&route2,
 			},
 		}
 		abb := &atroxyzv1alpha1.AppBundleBase{
@@ -93,7 +93,7 @@ var _ = Describe("Correctly populated heavily populated AppBundle", func() {
 		ab = GetBasicAppBundle()
 		path1 := "/test"
 		path2 := "/test2"
-		ab.Spec.Volumes = []atroxyzv1alpha1.AppBundleVolume{
+		ab.Spec.Volumes = []*atroxyzv1alpha1.AppBundleVolume{
 			{Name: "test", Path: &path1},
 			{Name: "test2", Path: &path2},
 		}
@@ -105,9 +105,9 @@ var _ = Describe("Correctly populated heavily populated AppBundle", func() {
 		route2_port := 8080
 		route2 := atroxyzv1alpha1.AppBundleRoute{Name: route2_name, Port: &route2_port}
 
-		ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{
-			route1,
-			route2,
+		ab.Spec.Routes = []*atroxyzv1alpha1.AppBundleRoute{
+			&route1,
+			&route2,
 		}
 		pullPolicy := "Always"
 		ab.Spec.Image.PullPolicy = &pullPolicy
@@ -143,9 +143,9 @@ var _ = Describe("Correctly populated heavily populated AppBundle", func() {
 		route2_port := 8080
 		route2 := atroxyzv1alpha1.AppBundleRoute{Name: route2_name, Port: &route2_port}
 		abbSpec := atroxyzv1alpha1.AppBundleBaseSpec{
-			Routes: []atroxyzv1alpha1.AppBundleRoute{
-				route1,
-				route2,
+			Routes: []*atroxyzv1alpha1.AppBundleRoute{
+				&route1,
+				&route2,
 			},
 		}
 		abb := &atroxyzv1alpha1.AppBundleBase{

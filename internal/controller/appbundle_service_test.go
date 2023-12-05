@@ -53,7 +53,7 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling serv
 				route_name := "test"
 				port := 80
 				route := atroxyzv1alpha1.AppBundleRoute{Name: route_name, Port: &port}
-				ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{route}
+				ab.Spec.Routes = []*atroxyzv1alpha1.AppBundleRoute{&route}
 
 				// UPDATE APPBUNDLE
 				er := rec.Update(ctx, ab)
@@ -153,7 +153,7 @@ var _ = Describe("AppBundle with incorrectly populated route", func() {
 		route_name := "test"
 		port := -19
 		route := atroxyzv1alpha1.AppBundleRoute{Name: route_name, Port: &port}
-		ab.Spec.Routes = []atroxyzv1alpha1.AppBundleRoute{route}
+		ab.Spec.Routes = []*atroxyzv1alpha1.AppBundleRoute{&route}
 
 		// CREATE APPBUNDLE
 		er := rec.Create(ctx, ab)

@@ -57,7 +57,7 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 
 		// LONGHORN backup plugin reconciliation
 		if volume.Longhorn != nil {
-			if err := r.ReconcileBackup(ctx, req, ab, volume); err != nil {
+			if err := r.ReconcileBackup(ctx, req, ab, *volume); err != nil {
 				return err
 			}
 		}
