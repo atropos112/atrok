@@ -14,15 +14,34 @@ import (
 // The recurring jobs are not cleaned up after app bundle is deleted which needs to be fixed
 // GetAppBundleObjectMetaWithOwnerReference(ab).OwnerReferences[] gives a list of owner references (all things i depend on) this might be useful for that
 func (r *AppBundleReconciler) ReconcileHomePage(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
-	annotations := make(map[string]string)
-	ingress := &netv1.Ingress{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
-	er := r.Get(ctx, client.ObjectKeyFromObject(ingress), ingress)
+	// GET the resources
+	ingresses := &netv1.IngressList{}
+	if err := r.List(ctx, ingresses, client.InNamespace(ab.Namespace), client.MatchingLabels{"appbundle": ab.Name}); err != nil {
+		return err
+	}
+
+	if len(ingresses.Items) == 0 {
+		return nil
+	}
+
+	mu := getMutex("ingress", ab.Name, ab.Namespace)
+	mu.Lock()
+	defer mu.Unlock()
+
+	ingress := &netv1.Ingress{}
+	er := r.Get(ctx, client.ObjectKey{Name: ingresses.Items[0].Name, Namespace: ingresses.Items[0].Namespace}, ingress)
+	if er != nil {
+		return er
+	}
+
 	// REGAIN control if lost
 	ingress.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
+	annotations := make(map[string]string)
 
 	for key, value := range ingress.GetAnnotations() {
 		annotations[key] = value
 	}
+
 	annotations["gethomepage.dev/enabled"] = "true"
 
 	if ab.Spec.Homepage.Description != nil {
@@ -57,9 +76,15 @@ func (r *AppBundleReconciler) ReconcileHomePage(ctx context.Context, req ctrl.Re
 	}
 
 	ingress.SetAnnotations(annotations)
+	ingress.ObjectMeta = metav1.ObjectMeta{
+		Name:            ingress.Name,
+		Namespace:       ingress.Namespace,
+		Labels:          ingress.GetLabels(),
+		OwnerReferences: []metav1.OwnerReference{ab.OwnerReference()},
+	}
 
-	if UpsertResource(ctx, r, ingress, er) != nil {
-		return er
+	if err := UpsertResource(ctx, r, ingress, er); err != nil {
+		return err
 	}
 
 	return nil

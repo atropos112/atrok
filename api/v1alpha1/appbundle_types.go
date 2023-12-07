@@ -66,8 +66,7 @@ type AppBundleVolumeLonghornBackup struct {
 
 // AppBundleStatus defines the observed state of AppBundle
 type AppBundleStatus struct {
-	ObservedGeneration      int64 `json:"observedGeneration,omitempty"`
-	AppBundleBaseReconciled bool  `json:"appBundleBaseReconciled,omitempty"`
+	HashedSpec string `json:"hashedSpec,omitempty"`
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }

@@ -2,14 +2,16 @@ package controller
 
 import (
 	"context"
+	"sync"
+	"time"
 
+	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	rxhash "github.com/rxwycdh/rxhash"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-
-	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 )
 
 // AppBundleBaseReconciler reconciles a AppBundleBase object
@@ -17,6 +19,8 @@ type AppBundleBaseReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 }
+
+var last_reconcilliation_abb map[string]int64 = make(map[string]int64)
 
 //+kubebuilder:rbac:groups=atro.xyz,resources=appbundlebases,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=atro.xyz,resources=appbundlebases/status,verbs=get;update;patch
@@ -32,7 +36,13 @@ type AppBundleBaseReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.3/pkg/reconcile
 func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+
+	l := log.FromContext(ctx)
+
+	// LOCK the resource
+	mu := getMutex("app_bundle_base", req.Name, req.Namespace)
+	mu.Lock()
+	defer mu.Unlock()
 
 	// Get app bundle base
 	abb := &atroxyzv1alpha1.AppBundleBase{}
@@ -40,10 +50,26 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if abb.Status.ObservedGeneration != abb.ObjectMeta.Generation {
-		abb.Status.ObservedGeneration = abb.ObjectMeta.Generation
-	} else {
-		return ctrl.Result{}, nil
+	// Reconcile only if the observed generation is not the same as the current generation or
+	// if the app bundle base has not been reconciled yet after it was updated
+	abb_hash, err := rxhash.HashStruct(abb.Spec)
+	if err != nil {
+		l.Error(err, "Unable to hash app bundle.")
+		return ctrl.Result{}, err
+	}
+
+	if recon_time, ok := last_reconcilliation_abb[abb.Name]; ok && (time.Now().Unix()-recon_time < 60) && abb.Status.HashedSpec == abb_hash {
+		return ctrl.Result{RequeueAfter: 60 * time.Second}, nil
+	}
+
+	// We now update the last reconcilliation time and hash and reconcile
+	last_reconcilliation_abb[abb.Name] = time.Now().Unix()
+	if abb.Status.HashedSpec != abb_hash {
+		abb.Status.HashedSpec = abb_hash
+		if err := r.Status().Update(ctx, abb); err != nil {
+			l.Error(err, "Unable to update app bundle status.")
+			return ctrl.Result{}, err
+		}
 	}
 
 	// Get all app bundles
@@ -53,12 +79,18 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, err
 	}
 
+	mus_ab := make(map[string]*sync.Mutex)
+
 	for _, ab := range abList.Items {
 		if ab.Spec.Base != nil && *ab.Spec.Base == abb.Name {
-			ab.Status.AppBundleBaseReconciled = false
+			mus_ab[ab.Name] = getMutex("app_bundle", ab.Name, ab.Namespace)
+			mus_ab[ab.Name].Lock()
+			ab.Status.HashedSpec = "" // Force update
 			if err := r.Status().Update(ctx, &ab); err != nil {
 				return ctrl.Result{}, err
 			}
+
+			mus_ab[ab.Name].Unlock()
 		}
 	}
 

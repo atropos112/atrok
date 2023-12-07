@@ -647,9 +647,8 @@ spec:
           status:
             description: AppBundleBaseStatus defines the observed state of AppBundleBase
             properties:
-              observedGeneration:
-                format: int64
-                type: integer
+              hashedSpec:
+                type: string
             type: object
         type: object
     served: true
