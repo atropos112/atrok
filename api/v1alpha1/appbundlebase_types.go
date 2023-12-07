@@ -34,7 +34,7 @@ type AppBundleBaseStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:resource:shortName=ab,path=appbundlebases,singular=appbundlebase,scope=Cluster
+//+kubebuilder:resource:shortName=abb,path=appbundlebases,singular=appbundlebase,scope=Cluster
 
 // AppBundleBase is the Schema for the appbundlebases API
 type AppBundleBase struct {

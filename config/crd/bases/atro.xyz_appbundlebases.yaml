@@ -12,7 +12,7 @@ spec:
     listKind: AppBundleBaseList
     plural: appbundlebases
     shortNames:
-    - ab
+    - abb
     singular: appbundlebase
   scope: Cluster
   versions:
