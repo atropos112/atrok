@@ -20,7 +20,7 @@ type AppBundleBaseReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-var last_reconcilliation_abb map[string]int64 = make(map[string]int64)
+var hashedSpecAbb map[string]string = make(map[string]string)
 
 //+kubebuilder:rbac:groups=atro.xyz,resources=appbundlebases,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=atro.xyz,resources=appbundlebases/status,verbs=get;update;patch
@@ -47,7 +47,7 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	// Get app bundle base
 	abb := &atroxyzv1alpha1.AppBundleBase{}
 	if err := r.Get(ctx, req.NamespacedName, abb); err != nil {
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+		return ctrl.Result{}, err
 	}
 
 	// Reconcile only if the observed generation is not the same as the current generation or
@@ -58,18 +58,35 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, err
 	}
 
-	if recon_time, ok := last_reconcilliation_abb[abb.Name]; ok && (time.Now().Unix()-recon_time < 60) && abb.Status.HashedSpec == abb_hash {
-		return ctrl.Result{RequeueAfter: 60 * time.Second}, nil
+	var lastRecon = time.Unix(0, 0)
+
+	if abb.Status.LastReconciliation != nil {
+		lastRecon, err = time.Parse(time.UnixDate, *abb.Status.LastReconciliation)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 	}
 
-	// We now update the last reconcilliation time and hash and reconcile
-	last_reconcilliation_abb[abb.Name] = time.Now().Unix()
-	if abb.Status.HashedSpec != abb_hash {
-		abb.Status.HashedSpec = abb_hash
+	if hash, ok := hashedSpecAbb[abb.Name]; !ok || // If the hash is not in the map
+		hash != abb_hash || // If the hash is not the same
+		abb.Status.LastReconciliation == nil || // If the last reconcilliation is nil
+		time.Now().Unix()-lastRecon.Unix() > 30 { // If the last reconcilliation is more than 30 seconds ago
+
+		hashedSpecAbb[abb.Name] = abb_hash
+		nowTime := time.Now().UTC().Format(time.UnixDate)
+		abb.Status.LastReconciliation = &nowTime
 		if err := r.Status().Update(ctx, abb); err != nil {
 			l.Error(err, "Unable to update app bundle status.")
 			return ctrl.Result{}, err
 		}
+
+	} else {
+		return ctrl.Result{RequeueAfter: 60 * time.Second}, nil
+	}
+
+	// Get the object AGAIN as we re-upserted it above.
+	if err := r.Get(ctx, req.NamespacedName, abb); err != nil {
+		return ctrl.Result{}, err
 	}
 
 	// Get all app bundles
@@ -85,7 +102,7 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		if ab.Spec.Base != nil && *ab.Spec.Base == abb.Name {
 			mus_ab[ab.Name] = getMutex("app_bundle", ab.Name, ab.Namespace)
 			mus_ab[ab.Name].Lock()
-			ab.Status.HashedSpec = "" // Force update
+			hashedSpecAb[ab.Name] = "" // Force update by reseting the hashed spec
 			if err := r.Status().Update(ctx, &ab); err != nil {
 				return ctrl.Result{}, err
 			}
@@ -94,7 +111,7 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		}
 	}
 
-	return ctrl.Result{}, nil
+	return ctrl.Result{RequeueAfter: 60 * time.Second}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

@@ -27,7 +27,7 @@ type AppBundleBaseSpec struct {
 
 // AppBundleBaseStatus defines the observed state of AppBundleBase
 type AppBundleBaseStatus struct {
-	HashedSpec string `json:"hashedSpec,omitempty"`
+	LastReconciliation *string `json:"lastReconciliation,omitempty"`
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }

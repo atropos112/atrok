@@ -3,9 +3,11 @@ package controller
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 	netv1 "k8s.io/api/networking/v1"
+	k8serror "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -15,14 +17,15 @@ import (
 func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
 	l := log.FromContext(ctx)
 	// LOCK the resource
-	mu := getMutex("ingress", ab.Name, ab.Namespace)
+	mu := getMutex("ingresses", ab.Name, ab.Namespace)
 	mu.Lock()
+	defer mu.Unlock()
 
 	names := []string{}
 	if ab.Spec.Routes != nil {
 		for _, route := range ab.Spec.Routes {
 			if route.Ingress != nil {
-				names = append(names, route.Name)
+				names = append(names, ab.Name+"-"+route.Name)
 			}
 		}
 	}
@@ -39,6 +42,10 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 	for _, ingress := range ingresses.Items {
 		if !contains(names, ingress.Name) {
 			l.Info("Deleting ingress " + ingress.Name)
+			fmt.Print("\n--------\n")
+			fmt.Print("Deleting OBJ " + ingress.GetName() + " " + reflect.TypeOf(ingress).String())
+			fmt.Print("\n--------\n")
+
 			if err := r.Delete(ctx, &ingress); err != nil {
 				l.Error(err, "Unable to delete ingress "+ingress.Name)
 				return err
@@ -65,6 +72,11 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 
 		l.Info("Getting ingress " + ingress.Name)
 		er := r.Get(ctx, client.ObjectKeyFromObject(ingress), ingress)
+
+		if er != nil && !k8serror.IsNotFound(er) {
+			l.Error(er, "Unable to get ingress "+ingress.Name)
+			return er
+		}
 
 		// If no annotation, add it
 		if ingress.Annotations == nil {
@@ -127,19 +139,13 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 			TLS:   tls,
 		}
 
+		if ingress.Name == "web" && ab.Spec.Homepage != nil {
+			ingress.SetAnnotations(GetHomePageAnnotations(ingress.Annotations, ab))
+		}
+
 		// UPSERT the resource
 		if err := UpsertResource(ctx, r, ingress, er); err != nil {
 			l.Error(err, "Unable to upsert ingress "+ingress.Name)
-			return err
-		}
-	}
-
-	mu.Unlock()
-
-	if ab.Spec.Homepage != nil {
-		l.Info("Reconciling homepage for " + ab.Name)
-		if err := r.ReconcileHomePage(ctx, req, ab); err != nil {
-			l.Error(err, "Unable to reconcile homepage for "+ab.Name)
 			return err
 		}
 	}

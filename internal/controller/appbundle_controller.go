@@ -14,7 +14,7 @@ import (
 // +kubebuilder:rbac:groups=atro.xyz,resources=appbundles,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=atro.xyz,resources=appbundles/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=atro.xyz,resources=appbundles/finalizers,verbs=update
-var last_reconcilliation_ab map[string]int64 = make(map[string]int64)
+var hashedSpecAb map[string]string = make(map[string]string)
 
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.0/pkg/reconcile
@@ -42,18 +42,34 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
-	if recon_time, ok := last_reconcilliation_ab[ab.Name]; ok && (time.Now().Unix()-recon_time < 60) && ab.Status.HashedSpec == ab_hash {
-		return ctrl.Result{RequeueAfter: 60 * time.Second}, nil
+	var lastRecon = time.Unix(0, 0)
+
+	if ab.Status.LastReconciliation != nil {
+		lastRecon, err = time.Parse(time.UnixDate, *ab.Status.LastReconciliation)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 	}
 
-	// We now update the last reconcilliation time and hash and reconcile
-	last_reconcilliation_ab[ab.Name] = time.Now().Unix()
-	if ab.Status.HashedSpec != ab_hash {
-		ab.Status.HashedSpec = ab_hash
+	if hash, ok := hashedSpecAb[ab.Name]; !ok || // If the hash is not in the map
+		hash != ab_hash || // If the hash is not the same
+		ab.Status.LastReconciliation == nil || // If the last reconcilliation is nil
+		time.Now().Unix()-lastRecon.Unix() > 30 { // If the last reconcilliation is more than 30 seconds ago
+
+		hashedSpecAb[ab.Name] = ab_hash
+		nowTime := time.Now().UTC().Format(time.UnixDate)
+		ab.Status.LastReconciliation = &nowTime
 		if err := r.Status().Update(ctx, ab); err != nil {
 			l.Error(err, "Unable to update app bundle status.")
 			return ctrl.Result{}, err
 		}
+	} else {
+		return ctrl.Result{RequeueAfter: 60 * time.Second}, nil
+	}
+
+	// Get the object AGAIN as we re-upserted it above.
+	if err := r.Get(ctx, req.NamespacedName, ab); err != nil {
+		return ctrl.Result{}, err
 	}
 
 	// Resolve app bundle base
@@ -69,6 +85,8 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 			return ctrl.Result{}, err
 		}
 	}
+
+	l.Info("Reconciling for " + ab.Name)
 
 	if err := RunReconciles(ctx, r, req, ab,
 		r.ReconcileVolumes,
