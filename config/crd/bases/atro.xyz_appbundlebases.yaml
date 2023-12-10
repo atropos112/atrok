@@ -647,7 +647,7 @@ spec:
           status:
             description: AppBundleBaseStatus defines the observed state of AppBundleBase
             properties:
-              hashedSpec:
+              lastReconciliation:
                 type: string
             type: object
         type: object

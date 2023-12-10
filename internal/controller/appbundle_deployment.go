@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -11,6 +12,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	rxhash "github.com/rxwycdh/rxhash"
 )
 
 func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
@@ -22,6 +24,10 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	// GET the resource
 	deployment := &appsv1.Deployment{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
 	er := r.Get(ctx, client.ObjectKeyFromObject(deployment), deployment)
+	hashBeforeChanges, err := rxhash.HashStruct(deployment.Spec)
+	if err != nil {
+		return err
+	}
 
 	// REGAIN control if lost
 	deployment.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
@@ -69,9 +75,19 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	repository := *ab.Spec.Image.Repository
 	tag := *ab.Spec.Image.Tag
 	env := []corev1.EnvVar{}
+
+	// Have to sort keys otherwise get infinite loop of updating
 	if ab.Spec.Envs != nil {
-		for key, value := range ab.Spec.Envs {
-			env = append(env, corev1.EnvVar{Name: key, Value: value})
+		// Collect keys and sort them
+		var keys []string
+		for key := range ab.Spec.Envs {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+
+		// Iterate through sorted keys
+		for _, key := range keys {
+			env = append(env, corev1.EnvVar{Name: key, Value: ab.Spec.Envs[key]})
 		}
 	}
 
@@ -100,9 +116,16 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 						StartupProbe:   ab.Spec.StartupProbe,
 					}}}}}
 
-	// UPSERT the resource
-	if err := UpsertResource(ctx, r, deployment, er); err != nil {
+	hashAfterChanges, err := rxhash.HashStruct(deployment.Spec)
+	if err != nil {
 		return err
+	}
+
+	if hashBeforeChanges != hashAfterChanges {
+		// UPSERT the resource
+		if err := UpsertResource(ctx, r, deployment, er); err != nil {
+			return err
+		}
 	}
 
 	return nil
