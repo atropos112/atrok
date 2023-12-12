@@ -91,8 +91,8 @@ func (r *AppBundleReconciler) ReconcileRecurringBackupJob(ctx context.Context, r
 		Name:        reccuringJobName,
 		Groups:      []string{},
 		Task:        longhornv1beta2.RecurringJobTypeBackup,
-		Cron:        ab.Spec.Backup.Frequency,
-		Retain:      ab.Spec.Backup.Retain,
+		Cron:        *ab.Spec.Backup.Frequency,
+		Retain:      *ab.Spec.Backup.Retain,
 		Concurrency: 1,
 	}
 

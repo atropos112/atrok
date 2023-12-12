@@ -135,6 +135,19 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 		}
 	}
 
+	if abbSpec.Backup != nil {
+		if abSpec.Backup == nil {
+			abSpec.Backup = abbSpec.Backup
+		} else {
+			if abbSpec.Backup.Frequency != nil && abSpec.Backup.Frequency == nil {
+				abSpec.Backup.Frequency = abbSpec.Backup.Frequency
+			}
+			if abbSpec.Backup.Retain != nil && abSpec.Backup.Retain == nil {
+				abSpec.Backup.Retain = abbSpec.Backup.Retain
+			}
+		}
+	}
+
 	if abbSpec.Envs != nil {
 		if abSpec.Envs == nil {
 			abSpec.Envs = abbSpec.Envs

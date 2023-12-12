@@ -56,8 +56,8 @@ type AppBundleVolume struct {
 }
 
 type AppBundleVolumeLonghornBackup struct {
-	Frequency string `json:"frequency,omitempty"`
-	Retain    int    `json:"retain,omitempty"`
+	Frequency *string `json:"frequency,omitempty"`
+	Retain    *int    `json:"retain,omitempty"`
 }
 
 // AppBundleStatus defines the observed state of AppBundle
