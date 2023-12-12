@@ -25,9 +25,9 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 	}
 	for _, volume := range ab.Spec.Volumes {
 		// CHECK if we need to continue
-		if volume.Longhorn == nil && volume.ExistingClaim == nil {
-			// If its an existing claim, and no longhorn plugin is used, we leave it alone
-			return nil
+		if volume.ExistingClaim == nil {
+			// If its an existing claim, we leave it alone
+			continue
 		}
 
 		// GET the resource
@@ -54,12 +54,12 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 				return err
 			}
 		}
+	}
 
-		// LONGHORN backup plugin reconciliation
-		if volume.Longhorn != nil {
-			if err := r.ReconcileBackup(ctx, req, ab, *volume); err != nil {
-				return err
-			}
+	// LONGHORN backup plugin reconciliation
+	if ab.Spec.Backup != nil {
+		if err := r.ReconcileBackup(ctx, req, ab); err != nil {
+			return err
 		}
 	}
 

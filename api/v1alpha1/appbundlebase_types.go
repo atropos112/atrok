@@ -10,19 +10,20 @@ import (
 
 // AppBundleBaseSpec defines the desired state of AppBundleBase
 type AppBundleBaseSpec struct {
-	Base           *string                      `json:"base,omitempty"`
-	Image          *AppBundleImage              `json:"image,omitempty"`
-	Replicas       *int32                       `json:"replicas,omitempty"`
-	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
-	Envs           map[string]string            `json:"envs,omitempty"`
-	ServiceType    *corev1.ServiceType          `json:"serviceType,omitempty"`
-	Routes         []*AppBundleRoute            `json:"routes,omitempty"`
-	Homepage       *AppBundleHomePage           `json:"homepage,omitempty"`
-	Volumes        []*AppBundleVolume           `json:"volumes,omitempty"`
-	Selector       *metav1.LabelSelector        `json:"selector,omitempty"`
-	LivenessProbe  *corev1.Probe                `json:"livenessProbe,omitempty"`
-	ReadinessProbe *corev1.Probe                `json:"readinessProbe,omitempty"`
-	StartupProbe   *corev1.Probe                `json:"startupProbe,omitempty"`
+	Base           *string                        `json:"base,omitempty"`
+	Image          *AppBundleImage                `json:"image,omitempty"`
+	Replicas       *int32                         `json:"replicas,omitempty"`
+	Resources      *corev1.ResourceRequirements   `json:"resources,omitempty"`
+	Envs           map[string]string              `json:"envs,omitempty"`
+	ServiceType    *corev1.ServiceType            `json:"serviceType,omitempty"`
+	Routes         []*AppBundleRoute              `json:"routes,omitempty"`
+	Homepage       *AppBundleHomePage             `json:"homepage,omitempty"`
+	Volumes        []*AppBundleVolume             `json:"volumes,omitempty"`
+	Backup         *AppBundleVolumeLonghornBackup `json:"backup,omitempty"`
+	Selector       *metav1.LabelSelector          `json:"selector,omitempty"`
+	LivenessProbe  *corev1.Probe                  `json:"livenessProbe,omitempty"`
+	ReadinessProbe *corev1.Probe                  `json:"readinessProbe,omitempty"`
+	StartupProbe   *corev1.Probe                  `json:"startupProbe,omitempty"`
 }
 
 // AppBundleBaseStatus defines the observed state of AppBundleBase

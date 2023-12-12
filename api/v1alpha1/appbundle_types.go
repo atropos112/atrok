@@ -6,19 +6,20 @@ import (
 )
 
 type AppBundleSpec struct {
-	Base           *string                      `json:"base,omitempty"`
-	Image          *AppBundleImage              `json:"image,omitempty"`
-	Replicas       *int32                       `json:"replicas,omitempty"`
-	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
-	Envs           map[string]string            `json:"envs,omitempty"`
-	ServiceType    *corev1.ServiceType          `json:"serviceType,omitempty"`
-	Routes         []*AppBundleRoute            `json:"routes,omitempty"`
-	Homepage       *AppBundleHomePage           `json:"homepage,omitempty"`
-	Volumes        []*AppBundleVolume           `json:"volumes,omitempty"`
-	Selector       *metav1.LabelSelector        `json:"selector,omitempty"`
-	LivenessProbe  *corev1.Probe                `json:"livenessProbe,omitempty"`
-	ReadinessProbe *corev1.Probe                `json:"readinessProbe,omitempty"`
-	StartupProbe   *corev1.Probe                `json:"startupProbe,omitempty"`
+	Base           *string                        `json:"base,omitempty"`
+	Image          *AppBundleImage                `json:"image,omitempty"`
+	Replicas       *int32                         `json:"replicas,omitempty"`
+	Resources      *corev1.ResourceRequirements   `json:"resources,omitempty"`
+	Envs           map[string]string              `json:"envs,omitempty"`
+	ServiceType    *corev1.ServiceType            `json:"serviceType,omitempty"`
+	Routes         []*AppBundleRoute              `json:"routes,omitempty"`
+	Homepage       *AppBundleHomePage             `json:"homepage,omitempty"`
+	Volumes        []*AppBundleVolume             `json:"volumes,omitempty"`
+	Backup         *AppBundleVolumeLonghornBackup `json:"backup,omitempty"`
+	Selector       *metav1.LabelSelector          `json:"selector,omitempty"`
+	LivenessProbe  *corev1.Probe                  `json:"livenessProbe,omitempty"`
+	ReadinessProbe *corev1.Probe                  `json:"readinessProbe,omitempty"`
+	StartupProbe   *corev1.Probe                  `json:"startupProbe,omitempty"`
 }
 
 type AppBundleImage struct {
@@ -47,16 +48,11 @@ type AppBundleHomePage struct {
 }
 
 type AppBundleVolume struct {
-	Name          string                   `json:"name"`
-	Path          *string                  `json:"path,omitempty"`
-	Size          *string                  `json:"size,omitempty"`
-	StorageClass  *string                  `json:"storageClass,omitempty"`
-	ExistingClaim *string                  `json:"existingClaim,omitempty"`
-	Longhorn      *AppBundleVolumeLonghorn `json:"longhorn,omitempty"`
-}
-
-type AppBundleVolumeLonghorn struct {
-	Backup AppBundleVolumeLonghornBackup `json:"backup,omitempty"`
+	Name          string  `json:"name"`
+	Path          *string `json:"path,omitempty"`
+	Size          *string `json:"size,omitempty"`
+	StorageClass  *string `json:"storageClass,omitempty"`
+	ExistingClaim *string `json:"existingClaim,omitempty"`
 }
 
 type AppBundleVolumeLonghornBackup struct {

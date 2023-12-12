@@ -36,6 +36,13 @@ spec:
           spec:
             description: AppBundleBaseSpec defines the desired state of AppBundleBase
             properties:
+              backup:
+                properties:
+                  frequency:
+                    type: string
+                  retain:
+                    type: integer
+                type: object
               base:
                 type: string
               envs:
@@ -621,16 +628,6 @@ spec:
                   properties:
                     existingClaim:
                       type: string
-                    longhorn:
-                      properties:
-                        backup:
-                          properties:
-                            frequency:
-                              type: string
-                            retain:
-                              type: integer
-                          type: object
-                      type: object
                     name:
                       type: string
                     path:
