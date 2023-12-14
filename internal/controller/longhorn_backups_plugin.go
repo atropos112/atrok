@@ -43,11 +43,9 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 		}
 
 		// If the key is not there we dont delete the generic key as it might be part of other backup place.
-		_, ok := labels[job_generic_key]
-		if abVol.Backup != nil && !*abVol.Backup && ok {
+		if abVol.Backup != nil && !*abVol.Backup {
 			delete(labels, job_specific_key)
-			delete(labels, job_generic_key)
-		} else if !ok {
+		} else {
 			labels[job_specific_key] = "enabled"
 			labels[job_generic_key] = "enabled"
 		}
