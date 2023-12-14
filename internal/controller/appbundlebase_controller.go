@@ -129,9 +129,34 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 
 	if abbSpec.Volumes != nil {
 		if abSpec.Volumes == nil {
-			abSpec.Volumes = append(abSpec.Volumes, abbSpec.Volumes...)
-		} else {
 			abSpec.Volumes = abbSpec.Volumes
+		} else {
+			for _, abbVol := range abbSpec.Volumes {
+				found := false
+				for _, abVol := range abSpec.Volumes {
+					if abbVol.Name == abVol.Name {
+						found = true
+						if abbVol.Path != nil && abVol.Path == nil {
+							abVol.Path = abbVol.Path
+						}
+						if abbVol.Size != nil && abVol.Size == nil {
+							abVol.Size = abbVol.Size
+						}
+						if abbVol.StorageClass != nil && abVol.StorageClass == nil {
+							abVol.StorageClass = abbVol.StorageClass
+						}
+						if abbVol.ExistingClaim != nil && abVol.ExistingClaim == nil {
+							abVol.ExistingClaim = abbVol.ExistingClaim
+						}
+						if abbVol.Backup != nil && abVol.Backup == nil {
+							abVol.Backup = abbVol.Backup
+						}
+					}
+				}
+				if !found {
+					abSpec.Volumes = append(abSpec.Volumes, abbVol)
+				}
+			}
 		}
 	}
 

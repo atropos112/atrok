@@ -41,8 +41,17 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 		for key, value := range pvc.GetLabels() {
 			labels[key] = value
 		}
-		labels[job_specific_key] = "enabled"
-		labels[job_generic_key] = "enabled"
+
+		// If the key is not there we dont delete the generic key as it might be part of other backup place.
+		_, ok := labels[job_generic_key]
+		if abVol.Backup != nil && !*abVol.Backup && ok {
+			delete(labels, job_specific_key)
+			delete(labels, job_generic_key)
+		} else {
+			labels[job_specific_key] = "enabled"
+			labels[job_generic_key] = "enabled"
+		}
+
 		pvc.ObjectMeta.Labels = labels
 
 		// REGAIN control if lost

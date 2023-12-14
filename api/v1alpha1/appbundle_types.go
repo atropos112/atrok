@@ -53,6 +53,7 @@ type AppBundleVolume struct {
 	Size          *string `json:"size,omitempty"`
 	StorageClass  *string `json:"storageClass,omitempty"`
 	ExistingClaim *string `json:"existingClaim,omitempty"`
+	Backup        *bool   `json:"backup,omitempty"`
 }
 
 type AppBundleVolumeLonghornBackup struct {

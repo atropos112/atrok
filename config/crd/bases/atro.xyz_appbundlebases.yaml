@@ -626,6 +626,8 @@ spec:
               volumes:
                 items:
                   properties:
+                    backup:
+                      type: boolean
                     existingClaim:
                       type: string
                     name:
