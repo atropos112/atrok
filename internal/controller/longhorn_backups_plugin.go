@@ -47,7 +47,7 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 		if abVol.Backup != nil && !*abVol.Backup && ok {
 			delete(labels, job_specific_key)
 			delete(labels, job_generic_key)
-		} else {
+		} else if !ok {
 			labels[job_specific_key] = "enabled"
 			labels[job_generic_key] = "enabled"
 		}
