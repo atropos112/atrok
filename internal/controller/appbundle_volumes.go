@@ -25,7 +25,7 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 	}
 	for _, volume := range ab.Spec.Volumes {
 		// CHECK if we need to continue
-		if volume.ExistingClaim == nil {
+		if volume.ExistingClaim != nil {
 			// If its an existing claim, we leave it alone
 			continue
 		}
@@ -42,7 +42,7 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 
 		// If not existing claim, its up to us to create and manage it
 		// Can only change spec of an existing PVC
-		if volume.ExistingClaim == nil && errors.IsNotFound(er) {
+		if errors.IsNotFound(er) {
 			// BUILD the resource
 			pvc.Spec = corev1.PersistentVolumeClaimSpec{
 				AccessModes:      []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},

@@ -53,7 +53,10 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 		pvc.ObjectMeta.Labels = labels
 
 		// REGAIN control if lost
-		pvc.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
+		if abVol.ExistingClaim == nil {
+			pvc.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
+		}
+
 		if err := UpsertResource(ctx, r, pvc, nil); err != nil {
 			return err
 		}
