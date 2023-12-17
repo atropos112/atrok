@@ -139,7 +139,8 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 			TLS:   tls,
 		}
 
-		if ingress.Name == "web" && ab.Spec.Homepage != nil {
+		// check if ingress.Name ends on "web" and if ab.Spec.Homepage is not nil
+		if len(ingress.Name) > 3 && ingress.Name[len(ingress.Name)-3:] == "web" && ab.Spec.Homepage != nil {
 			ingress.SetAnnotations(GetHomePageAnnotations(ingress.Annotations, ab))
 		}
 
