@@ -19,7 +19,7 @@ var (
 	auth_middleware        string                        = "auth-authelia@kubernetescrd"
 	entry_point            string                        = "websecure"
 	cluster_issuer         string                        = "letsencrypt"
-	base_homepage_instance *string                       = "atro"
+	base_homepage_instance string                        = "atro"
 )
 
 // TESTING ONLY !!!
