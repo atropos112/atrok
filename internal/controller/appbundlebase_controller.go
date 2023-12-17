@@ -258,6 +258,10 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 		if abbSpec.Homepage.Icon != nil && abSpec.Homepage.Icon == nil {
 			abSpec.Homepage.Icon = abbSpec.Homepage.Icon
 		}
+
+		if abbSpec.Homepage.Instance != nil && abSpec.Homepage.Instance == nil {
+			abSpec.Homepage.Instance = abbSpec.Homepage.Instance
+		}
 	}
 
 	if abbSpec.Image != nil {

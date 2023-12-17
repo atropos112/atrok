@@ -17,6 +17,10 @@ func GetHomePageAnnotations(ingress_annotations map[string]string, ab *atroxyzv1
 		annotations["gethomepage.dev/description"] = *ab.Spec.Homepage.Description
 	}
 
+	if ab.Spec.Homepage.Instance != nil {
+		annotations["gethomepage.dev/instance"] = *ab.Spec.Homepage.Instance
+	}
+
 	if ab.Spec.Homepage.Group != nil {
 		annotations["gethomepage.dev/group"] = *ab.Spec.Homepage.Group
 	} else {

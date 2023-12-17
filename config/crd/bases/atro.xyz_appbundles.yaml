@@ -58,6 +58,8 @@ spec:
                     type: string
                   icon:
                     type: string
+                  instance:
+                    type: string
                   name:
                     type: string
                 type: object

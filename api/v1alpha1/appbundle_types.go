@@ -45,6 +45,7 @@ type AppBundleHomePage struct {
 	Href        *string `json:"href,omitempty"`
 	Icon        *string `json:"icon,omitempty"`
 	Name        *string `json:"name,omitempty"`
+	Instance    *string `json:"instance,omitempty"`
 }
 
 type AppBundleVolume struct {
