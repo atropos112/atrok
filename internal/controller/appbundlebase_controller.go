@@ -212,6 +212,10 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 						if route.Port != nil && abRoute.Port == nil {
 							abRoute.Port = route.Port
 						}
+						if route.Protocol != nil && abRoute.Protocol == nil {
+							abRoute.Protocol = route.Protocol
+						}
+
 						if route.Ingress != nil && abRoute.Ingress == nil {
 							abRoute.Ingress = route.Ingress
 						} else if route.Ingress != nil && abRoute.Ingress != nil {

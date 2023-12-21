@@ -352,6 +352,11 @@ func (in *AppBundleRoute) DeepCopyInto(out *AppBundleRoute) {
 		*out = new(int)
 		**out = **in
 	}
+	if in.Protocol != nil {
+		in, out := &in.Protocol, &out.Protocol
+		*out = new(string)
+		**out = **in
+	}
 	if in.Ingress != nil {
 		in, out := &in.Ingress, &out.Ingress
 		*out = new(AppBundleRouteIngress)
