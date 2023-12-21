@@ -354,7 +354,7 @@ func (in *AppBundleRoute) DeepCopyInto(out *AppBundleRoute) {
 	}
 	if in.Protocol != nil {
 		in, out := &in.Protocol, &out.Protocol
-		*out = new(string)
+		*out = new(v1.Protocol)
 		**out = **in
 	}
 	if in.Ingress != nil {

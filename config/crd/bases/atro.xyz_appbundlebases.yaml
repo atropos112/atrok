@@ -435,6 +435,7 @@ spec:
                     port:
                       type: integer
                     protocol:
+                      default: TCP
                       type: string
                   required:
                   - name
