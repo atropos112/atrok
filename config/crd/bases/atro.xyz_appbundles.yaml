@@ -35,6 +35,10 @@ spec:
             type: object
           spec:
             properties:
+              args:
+                items:
+                  type: string
+                type: array
               backup:
                 properties:
                   frequency:
@@ -44,6 +48,10 @@ spec:
                 type: object
               base:
                 type: string
+              command:
+                items:
+                  type: string
+                type: array
               envs:
                 additionalProperties:
                   type: string
@@ -624,6 +632,8 @@ spec:
                     format: int32
                     type: integer
                 type: object
+              tailscaleName:
+                type: string
               volumes:
                 items:
                   properties:

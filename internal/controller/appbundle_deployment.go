@@ -91,6 +91,38 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 		}
 	}
 
+	container := corev1.Container{
+		Name:           ab.Name,
+		Image:          fmt.Sprintf("%s:%s", repository, tag),
+		Resources:      resources,
+		Ports:          ports,
+		Env:            env,
+		VolumeMounts:   volume_mounts,
+		LivenessProbe:  ab.Spec.LivenessProbe,
+		ReadinessProbe: ab.Spec.ReadinessProbe,
+		StartupProbe:   ab.Spec.StartupProbe,
+	}
+
+	if ab.Spec.Command != nil {
+		if container.Command == nil {
+			container.Command = []string{}
+		}
+
+		for _, command := range ab.Spec.Command {
+			container.Command = append(container.Command, *command)
+		}
+	}
+
+	if ab.Spec.Args != nil {
+		if container.Args == nil {
+			container.Args = []string{}
+		}
+
+		for _, arg := range ab.Spec.Args {
+			container.Args = append(container.Args, *arg)
+		}
+	}
+
 	deployment.Spec = appsv1.DeploymentSpec{
 		Replicas:             ab.Spec.Replicas,
 		RevisionHistoryLimit: &revision_history_limit,
@@ -103,18 +135,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 			Spec: corev1.PodSpec{
 				Volumes:          volumes,
 				ImagePullSecrets: image_pull_secrets,
-				Containers: []corev1.Container{
-					{
-						Name:           ab.Name,
-						Image:          fmt.Sprintf("%s:%s", repository, tag),
-						Resources:      resources,
-						Ports:          ports,
-						Env:            env,
-						VolumeMounts:   volume_mounts,
-						LivenessProbe:  ab.Spec.LivenessProbe,
-						ReadinessProbe: ab.Spec.ReadinessProbe,
-						StartupProbe:   ab.Spec.StartupProbe,
-					}}}}}
+				Containers:       []corev1.Container{container}}}}
 
 	hashAfterChanges, err := rxhash.HashStruct(deployment.Spec)
 	if err != nil {

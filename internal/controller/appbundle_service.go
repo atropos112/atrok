@@ -54,6 +54,21 @@ func (r *AppBundleReconciler) ReconcileService(ctx context.Context, req ctrl.Req
 		}
 		labels["app"] = ab.Name
 
+		annotations := make(map[string]string)
+		// If no annotation, add it
+		if service.Annotations != nil {
+			for k, v := range service.Annotations {
+				annotations[k] = v
+			}
+		}
+
+		if ab.Spec.TailscaleName != nil {
+			annotations["tailscale.com/hostname"] = *ab.Spec.TailscaleName
+			annotations["tailscale.com/expose"] = "true"
+		}
+
+		service.ObjectMeta.Annotations = annotations
+
 		service.Spec = corev1.ServiceSpec{
 			Ports:    ports,
 			Type:     *ab.Spec.ServiceType,

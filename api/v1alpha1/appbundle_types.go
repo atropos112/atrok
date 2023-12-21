@@ -20,6 +20,9 @@ type AppBundleSpec struct {
 	LivenessProbe  *corev1.Probe                  `json:"livenessProbe,omitempty"`
 	ReadinessProbe *corev1.Probe                  `json:"readinessProbe,omitempty"`
 	StartupProbe   *corev1.Probe                  `json:"startupProbe,omitempty"`
+	TailscaleName  *string                        `json:"tailscaleName,omitempty"`
+	Command        []*string                      `json:"command,omitempty"`
+	Args           []*string                      `json:"args,omitempty"`
 }
 
 type AppBundleImage struct {

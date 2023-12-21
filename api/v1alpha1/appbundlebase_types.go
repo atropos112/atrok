@@ -24,6 +24,8 @@ type AppBundleBaseSpec struct {
 	LivenessProbe  *corev1.Probe                  `json:"livenessProbe,omitempty"`
 	ReadinessProbe *corev1.Probe                  `json:"readinessProbe,omitempty"`
 	StartupProbe   *corev1.Probe                  `json:"startupProbe,omitempty"`
+	Command        []*string                      `json:"command,omitempty"`
+	Args           []*string                      `json:"args,omitempty"`
 }
 
 // AppBundleBaseStatus defines the observed state of AppBundleBase

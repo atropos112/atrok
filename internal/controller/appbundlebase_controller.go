@@ -127,6 +127,14 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 
 	// By hand merge, can do with reflection but then its not clear when to override, when to append etc.
 
+	if abb.Spec.Command != nil && abSpec.Command == nil {
+		abSpec.Command = abbSpec.Command
+	}
+
+	if abbSpec.Args != nil && abSpec.Args == nil {
+		abSpec.Args = abbSpec.Args
+	}
+
 	if abbSpec.Volumes != nil {
 		if abSpec.Volumes == nil {
 			abSpec.Volumes = abbSpec.Volumes

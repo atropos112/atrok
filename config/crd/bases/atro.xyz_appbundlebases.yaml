@@ -36,6 +36,10 @@ spec:
           spec:
             description: AppBundleBaseSpec defines the desired state of AppBundleBase
             properties:
+              args:
+                items:
+                  type: string
+                type: array
               backup:
                 properties:
                   frequency:
@@ -45,6 +49,10 @@ spec:
                 type: object
               base:
                 type: string
+              command:
+                items:
+                  type: string
+                type: array
               envs:
                 additionalProperties:
                   type: string
