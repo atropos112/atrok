@@ -109,6 +109,22 @@ func (in *AppBundleBaseSpec) DeepCopyInto(out *AppBundleBaseSpec) {
 		*out = new(AppBundleImage)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.NodeSelector != nil {
+		in, out := &in.NodeSelector, &out.NodeSelector
+		*out = new(map[string]string)
+		if **in != nil {
+			in, out := *in, *out
+			*out = make(map[string]string, len(*in))
+			for key, val := range *in {
+				(*out)[key] = val
+			}
+		}
+	}
+	if in.UseNvidia != nil {
+		in, out := &in.UseNvidia, &out.UseNvidia
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Replicas != nil {
 		in, out := &in.Replicas, &out.Replicas
 		*out = new(int32)
@@ -411,6 +427,22 @@ func (in *AppBundleSpec) DeepCopyInto(out *AppBundleSpec) {
 		in, out := &in.Image, &out.Image
 		*out = new(AppBundleImage)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.NodeSelector != nil {
+		in, out := &in.NodeSelector, &out.NodeSelector
+		*out = new(map[string]string)
+		if **in != nil {
+			in, out := *in, *out
+			*out = make(map[string]string, len(*in))
+			for key, val := range *in {
+				(*out)[key] = val
+			}
+		}
+	}
+	if in.UseNvidia != nil {
+		in, out := &in.UseNvidia, &out.UseNvidia
+		*out = new(bool)
+		**out = **in
 	}
 	if in.Replicas != nil {
 		in, out := &in.Replicas, &out.Replicas

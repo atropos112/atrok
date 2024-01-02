@@ -27,6 +27,10 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 	job_generic_key := "recurring-job.longhorn.io/source"
 
 	for _, abVol := range ab.Spec.Volumes {
+		if abVol.HostPath != nil {
+			continue
+		}
+
 		volName := abVol.Name
 		if abVol.ExistingClaim != nil {
 			volName = *abVol.ExistingClaim

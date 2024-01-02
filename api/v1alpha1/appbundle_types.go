@@ -10,6 +10,7 @@ type AppBundleSpec struct {
 	Base           *string                        `json:"base,omitempty"`
 	Image          *AppBundleImage                `json:"image,omitempty"`
 	NodeSelector   *map[string]string             `json:"nodeSelector,omitempty"`
+	UseNvidia      *bool                          `json:"useNvidia,omitempty"`
 	Replicas       *int32                         `json:"replicas,omitempty"`
 	Resources      *corev1.ResourceRequirements   `json:"resources,omitempty"`
 	Envs           map[string]string              `json:"envs,omitempty"`

@@ -201,6 +201,10 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 		abSpec.NodeSelector = abbSpec.NodeSelector
 	}
 
+	if abbSpec.UseNvidia != nil && abSpec.UseNvidia == nil {
+		abSpec.UseNvidia = abbSpec.UseNvidia
+	}
+
 	if abbSpec.Routes != nil {
 		if abSpec.Routes == nil {
 			// If the app bundle has no routes, then we can just set it to the base routes

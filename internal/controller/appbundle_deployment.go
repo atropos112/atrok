@@ -37,7 +37,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	// Ports
 	var ports []corev1.ContainerPort
 	for _, route := range ab.Spec.Routes {
-		ports = append(ports, corev1.ContainerPort{Name: route.Name, HostPort: int32(*route.Port), ContainerPort: int32(*route.Port), Protocol: "TCP"})
+		ports = append(ports, corev1.ContainerPort{Name: route.Name, ContainerPort: int32(*route.Port), Protocol: "TCP"})
 	}
 
 	// Volume Mounts
@@ -139,6 +139,24 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 		}
 	}
 
+	if ab.Spec.UseNvidia != nil && *ab.Spec.UseNvidia {
+		envs := []corev1.EnvVar{}
+		if container.Env != nil {
+			envs = container.Env
+		}
+		foundNvidiaEnv := false
+
+		for _, env := range container.Env {
+			if env.Name == "NVIDIA_VISIBLE_DEVICES" {
+				foundNvidiaEnv = true
+			}
+		}
+		if !foundNvidiaEnv {
+			envs = append(envs, corev1.EnvVar{Name: "NVIDIA_VISIBLE_DEVICES", Value: "all"})
+		}
+		container.Env = envs
+	}
+
 	deployment.Spec = appsv1.DeploymentSpec{
 		Replicas:             ab.Spec.Replicas,
 		RevisionHistoryLimit: &revision_history_limit,
@@ -155,6 +173,27 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 
 	if ab.Spec.NodeSelector != nil {
 		deployment.Spec.Template.Spec.NodeSelector = *ab.Spec.NodeSelector
+	}
+
+	if ab.Spec.UseNvidia != nil && *ab.Spec.UseNvidia {
+		tolerations := []corev1.Toleration{}
+		if deployment.Spec.Template.Spec.Tolerations != nil {
+			tolerations = deployment.Spec.Template.Spec.Tolerations
+		}
+		foundNvidiaToleration := false
+		for _, toleration := range tolerations {
+			if toleration.Key == "nvidia.com/gpu" {
+				foundNvidiaToleration = true
+			}
+		}
+		if !foundNvidiaToleration {
+			tolerations = append(tolerations, corev1.Toleration{Key: "nvidia.com/gpu", Operator: corev1.TolerationOpExists, Effect: corev1.TaintEffectNoSchedule})
+		}
+
+		deployment.Spec.Template.Spec.Tolerations = tolerations
+
+		nvidiaRuntimeClass := "nvidia"
+		deployment.Spec.Template.Spec.RuntimeClassName = &nvidiaRuntimeClass
 	}
 
 	hashAfterChanges, err := rxhash.HashStruct(deployment.Spec)
