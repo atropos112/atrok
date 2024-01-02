@@ -643,6 +643,8 @@ spec:
                       type: boolean
                     existingClaim:
                       type: string
+                    hostPath:
+                      type: string
                     name:
                       type: string
                     path:

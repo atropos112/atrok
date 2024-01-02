@@ -159,6 +159,10 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 						if abbVol.Backup != nil && abVol.Backup == nil {
 							abVol.Backup = abbVol.Backup
 						}
+						if abbVol.HostPath != nil && abVol.HostPath == nil {
+							abVol.HostPath = abbVol.HostPath
+						}
+
 					}
 				}
 				if !found {

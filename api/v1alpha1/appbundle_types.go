@@ -55,6 +55,7 @@ type AppBundleHomePage struct {
 
 type AppBundleVolume struct {
 	Name          string  `json:"name"`
+	HostPath      *string `json:"hostPath,omitempty"`
 	Path          *string `json:"path,omitempty"`
 	Size          *string `json:"size,omitempty"`
 	StorageClass  *string `json:"storageClass,omitempty"`
