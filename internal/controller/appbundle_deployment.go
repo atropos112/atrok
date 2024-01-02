@@ -153,6 +153,10 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 				ImagePullSecrets: image_pull_secrets,
 				Containers:       []corev1.Container{container}}}}
 
+	if ab.Spec.NodeSelector != nil {
+		deployment.Spec.Template.Spec.NodeSelector = *ab.Spec.NodeSelector
+	}
+
 	hashAfterChanges, err := rxhash.HashStruct(deployment.Spec)
 	if err != nil {
 		return err
