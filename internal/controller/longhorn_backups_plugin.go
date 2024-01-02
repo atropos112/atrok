@@ -108,6 +108,10 @@ func (r *AppBundleReconciler) ReconcileRecurringBackupJob(ctx context.Context, r
 
 	pvc := &corev1.PersistentVolumeClaim{}
 	for _, abVol := range ab.Spec.Volumes {
+		if abVol.HostPath != nil {
+			continue
+		}
+
 		volName := abVol.Name
 		if abVol.ExistingClaim != nil {
 			volName = *abVol.ExistingClaim
