@@ -25,6 +25,7 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 
 	job_specific_key := fmt.Sprintf("recurring-job.longhorn.io/%s", reccuringJobName)
 	job_generic_key := "recurring-job.longhorn.io/source"
+	default_group_key := "recurring-job-group.longhorn.io/default"
 
 	for _, abVol := range ab.Spec.Volumes {
 		if abVol.HostPath != nil {
@@ -56,6 +57,7 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 		} else {
 			labels[job_specific_key] = "enabled"
 			labels[job_generic_key] = "enabled"
+			labels[default_group_key] = "enabled"
 		}
 
 		pvc.ObjectMeta.Labels = labels
