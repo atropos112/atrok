@@ -35,10 +35,14 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 			continue
 		}
 
+		if volume.EmptyDir != nil && *volume.EmptyDir {
+			// If its an emptydir volume, we leave it alone
+			continue
+		}
+
 		if err := r.ReconcilePVC(ctx, req, ab, volume); err != nil {
 			return err
 		}
-
 	}
 
 	// LONGHORN backup plugin reconciliation

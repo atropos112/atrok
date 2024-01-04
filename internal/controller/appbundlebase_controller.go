@@ -162,6 +162,9 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 						if abbVol.HostPath != nil && abVol.HostPath == nil {
 							abVol.HostPath = abbVol.HostPath
 						}
+						if abbVol.EmptyDir != nil && abVol.EmptyDir == nil {
+							abVol.EmptyDir = abbVol.EmptyDir
+						}
 
 					}
 				}

@@ -648,6 +648,8 @@ spec:
                   properties:
                     backup:
                       type: boolean
+                    emptyDir:
+                      type: boolean
                     existingClaim:
                       type: string
                     hostPath:

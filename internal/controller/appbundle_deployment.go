@@ -67,6 +67,11 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 				Name:         volume.Name,
 				VolumeSource: corev1.VolumeSource{HostPath: &hostPath},
 			})
+		} else if volume.EmptyDir != nil && *volume.EmptyDir {
+			volumes = append(volumes, corev1.Volume{
+				Name:         volume.Name,
+				VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+			})
 		} else {
 			volumes = append(volumes, corev1.Volume{
 				Name:         volume.Name,

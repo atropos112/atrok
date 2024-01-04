@@ -31,6 +31,10 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 			continue
 		}
 
+		if abVol.EmptyDir != nil && *abVol.EmptyDir {
+			continue
+		}
+
 		volName := abVol.Name
 		if abVol.ExistingClaim != nil {
 			volName = *abVol.ExistingClaim

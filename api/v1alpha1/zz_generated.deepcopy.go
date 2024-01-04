@@ -585,6 +585,11 @@ func (in *AppBundleVolume) DeepCopyInto(out *AppBundleVolume) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.EmptyDir != nil {
+		in, out := &in.EmptyDir, &out.EmptyDir
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Path != nil {
 		in, out := &in.Path, &out.Path
 		*out = new(string)
