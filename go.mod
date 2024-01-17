@@ -14,6 +14,11 @@ require (
 )
 
 require (
+	github.com/grafana/pyroscope-go v1.0.4 // indirect
+	github.com/grafana/pyroscope-go/godeltaprof v0.1.4 // indirect
+)
+
+require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
