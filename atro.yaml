@@ -1,0 +1,4 @@
+copyToRepo:
+  - sourcePath: "."
+    destinationRepo: "git@github.com:atropos112/images"
+    destinationPath: "other/atrok"

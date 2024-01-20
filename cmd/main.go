@@ -68,7 +68,10 @@ func main() {
 		Logger: pyroscope.StandardLogger,
 
 		// you can provide static tags via a map:
-		Tags: map[string]string{"hostname": os.Getenv("HOSTNAME")},
+		Tags: map[string]string{
+			"pod": os.Getenv("HOSTNAME"),
+			"app": "atrok",
+		},
 
 		ProfileTypes: []pyroscope.ProfileType{
 			// these profile types are enabled by default:
