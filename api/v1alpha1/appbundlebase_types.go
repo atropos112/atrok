@@ -17,6 +17,7 @@ type AppBundleBaseSpec struct {
 	Replicas       *int32                         `json:"replicas,omitempty"`
 	Resources      *corev1.ResourceRequirements   `json:"resources,omitempty"`
 	Envs           map[string]string              `json:"envs,omitempty"`
+	SourcedEnvs    map[string]AppBundleSourcedEnv `json:"sourcedEnvs,omitempty"`
 	ServiceType    *corev1.ServiceType            `json:"serviceType,omitempty"`
 	Routes         []*AppBundleRoute              `json:"routes,omitempty"`
 	Homepage       *AppBundleHomePage             `json:"homepage,omitempty"`

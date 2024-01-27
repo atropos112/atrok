@@ -99,8 +99,8 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 
 	// Have to sort keys otherwise get infinite loop of updating
 	if ab.Spec.Envs != nil {
-		// Collect keys and sort them
 		var keys []string
+		// Collect keys and sort them
 		for key := range ab.Spec.Envs {
 			keys = append(keys, key)
 		}
@@ -109,6 +109,35 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 		// Iterate through sorted keys
 		for _, key := range keys {
 			env = append(env, corev1.EnvVar{Name: key, Value: ab.Spec.Envs[key]})
+		}
+	}
+
+	if ab.Spec.SourcedEnvs != nil {
+		var keys []string
+		// Collect keys and sort them
+		for key := range ab.Spec.SourcedEnvs {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+
+		// Iterate through sorted keys
+		for _, key := range keys {
+			envVarSource := corev1.EnvVarSource{}
+			if ab.Spec.SourcedEnvs[key].Secret != "" {
+				envVarSource.SecretKeyRef = &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: ab.Spec.SourcedEnvs[key].Secret},
+					Key:                  ab.Spec.SourcedEnvs[key].Key,
+				}
+			} else if ab.Spec.SourcedEnvs[key].ConfigMap != "" {
+				envVarSource.ConfigMapKeyRef = &corev1.ConfigMapKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: ab.Spec.SourcedEnvs[key].ConfigMap},
+					Key:                  ab.Spec.SourcedEnvs[key].Key,
+				}
+			} else {
+				return fmt.Errorf("SourcedEnv %s has neither Secret nor ConfigMap", key)
+			}
+
+			env = append(env, corev1.EnvVar{Name: key, ValueFrom: &envVarSource})
 		}
 	}
 

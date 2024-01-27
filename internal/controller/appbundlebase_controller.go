@@ -200,6 +200,18 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 		}
 	}
 
+	if abbSpec.SourcedEnvs != nil {
+		if abSpec.SourcedEnvs == nil {
+			abSpec.SourcedEnvs = abbSpec.SourcedEnvs
+		} else {
+			for key, value := range abbSpec.SourcedEnvs {
+				if _, ok := abSpec.SourcedEnvs[key]; !ok {
+					abSpec.SourcedEnvs[key] = value
+				}
+			}
+		}
+	}
+
 	if abbSpec.NodeSelector != nil && abSpec.NodeSelector == nil {
 		abSpec.NodeSelector = abbSpec.NodeSelector
 	}

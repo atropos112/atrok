@@ -14,6 +14,7 @@ type AppBundleSpec struct {
 	Replicas       *int32                         `json:"replicas,omitempty"`
 	Resources      *corev1.ResourceRequirements   `json:"resources,omitempty"`
 	Envs           map[string]string              `json:"envs,omitempty"`
+	SourcedEnvs    map[string]AppBundleSourcedEnv `json:"sourcedEnvs,omitempty"`
 	ServiceType    *corev1.ServiceType            `json:"serviceType,omitempty"`
 	Routes         []*AppBundleRoute              `json:"routes,omitempty"`
 	Homepage       *AppBundleHomePage             `json:"homepage,omitempty"`
@@ -26,6 +27,12 @@ type AppBundleSpec struct {
 	TailscaleName  *string                        `json:"tailscaleName,omitempty"`
 	Command        []*string                      `json:"command,omitempty"`
 	Args           []*string                      `json:"args,omitempty"`
+}
+
+type AppBundleSourcedEnv struct {
+	Secret    string `json:"secret,omitempty"`
+	ConfigMap string `json:"configMap,omitempty"`
+	Key       string `json:"key,omitempty"`
 }
 
 type AppBundleImage struct {
