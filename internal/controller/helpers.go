@@ -92,6 +92,15 @@ func GetAppBundleObjectMetaWithOwnerReference(app_bundle *atroxyzv1alpha1.AppBun
 	}
 }
 
+func GetAppBundleObjectMetaWithOwnerReferenceForIngress(app_bundle *atroxyzv1alpha1.AppBundle) metav1.ObjectMeta {
+	return metav1.ObjectMeta{
+		Name:            app_bundle.Name + "-" + app_bundle.Spec.Routes[0].Name,
+		Namespace:       app_bundle.Namespace,
+		Labels:          app_bundle.GetLabels(),
+		OwnerReferences: []metav1.OwnerReference{app_bundle.OwnerReference()},
+	}
+}
+
 func GetAppBundleNamespacedName(ab *atroxyzv1alpha1.AppBundle) types.NamespacedName {
 	return types.NamespacedName{Name: ab.Name, Namespace: ab.Namespace}
 }

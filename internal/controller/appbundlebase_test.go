@@ -60,7 +60,7 @@ var _ = Describe("Correctly populated very basic AppBundle", func() {
 		}
 		abb := &atroxyzv1alpha1.AppBundleBase{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "test",
+				Name: GetRandomName(),
 			},
 			TypeMeta: metav1.TypeMeta{
 				APIVersion: "atro.xyz/v1alpha1",

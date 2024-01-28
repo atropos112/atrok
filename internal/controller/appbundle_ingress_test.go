@@ -64,13 +64,13 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling ingr
 				ApplyTypeMetaToAppBundleForTesting(ab)
 			})
 
-			It("Should make a simple ingress route", func() {
-				By("Reconciling ingerss route using app bundle")
+			It("Should make a simple ingress", func() {
+				By("Reconciling ingress using app bundle")
 				err := rec.ReconcileIngress(ctx, fake_req, ab)
 				Expect(err).NotTo(HaveOccurred())
 
 				// GET the resource
-				ingress := &netv1.Ingress{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+				ingress := &netv1.Ingress{ObjectMeta: GetAppBundleObjectMetaWithOwnerReferenceForIngress(ab)}
 				err = rec.Get(ctx, client.ObjectKeyFromObject(ingress), ingress)
 				Expect(err).NotTo(HaveOccurred())
 
@@ -91,7 +91,7 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling ingr
 						By("Reconciling ingress route again using app bundle")
 
 						// GET ingress
-						ingressBefore := &netv1.Ingress{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+						ingressBefore := &netv1.Ingress{ObjectMeta: GetAppBundleObjectMetaWithOwnerReferenceForIngress(ab)}
 						err := rec.Get(ctx, client.ObjectKeyFromObject(ingressBefore), ingressBefore)
 						Expect(err).NotTo(HaveOccurred())
 
@@ -100,7 +100,7 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling ingr
 						Expect(err).NotTo(HaveOccurred())
 
 						// GET ingress
-						ingressAfter := &netv1.Ingress{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+						ingressAfter := &netv1.Ingress{ObjectMeta: GetAppBundleObjectMetaWithOwnerReferenceForIngress(ab)}
 						err = rec.Get(ctx, client.ObjectKeyFromObject(ingressAfter), ingressAfter)
 						Expect(err).NotTo(HaveOccurred())
 
@@ -110,6 +110,8 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling ingr
 
 					It("Should delete the ingress route", func() {
 						By("By removing routes and reconciling ingress route using app bundle")
+						objectMetaForIngress := GetAppBundleObjectMetaWithOwnerReferenceForIngress(ab)
+
 						// DELETE ROUTE
 						ab.Spec.Routes = nil
 
@@ -119,7 +121,7 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling ingr
 						ApplyTypeMetaToAppBundleForTesting(ab)
 
 						// GET ingress route
-						ingressBefore := &netv1.Ingress{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+						ingressBefore := &netv1.Ingress{ObjectMeta: objectMetaForIngress}
 						err := rec.Get(ctx, client.ObjectKeyFromObject(ingressBefore), ingressBefore)
 						Expect(err).NotTo(HaveOccurred())
 
@@ -128,7 +130,7 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling ingr
 						Expect(err).NotTo(HaveOccurred())
 
 						// GET ingress
-						ingressAfter := &netv1.Ingress{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+						ingressAfter := &netv1.Ingress{ObjectMeta: objectMetaForIngress}
 						err = rec.Get(ctx, client.ObjectKeyFromObject(ingressAfter), ingressAfter)
 						Expect(errors.IsNotFound(err)).To(BeTrue())
 					})
