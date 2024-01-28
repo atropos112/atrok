@@ -1,3 +1,4 @@
+origin: git@github.com:atropos112/atrok.git 
 copyToRepo:
   - sourcePath: "."
     destinationRepo: "git@github.com:atropos112/images"
