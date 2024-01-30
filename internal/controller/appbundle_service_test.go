@@ -52,8 +52,13 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling serv
 				//ADD ROUTE
 				route_name := "test"
 				port := 80
-				route := atroxyzv1alpha1.AppBundleRoute{Name: route_name, Port: &port}
-				ab.Spec.Routes = []*atroxyzv1alpha1.AppBundleRoute{&route}
+				route := atroxyzv1alpha1.AppBundleRoute{Port: &port}
+
+				if ab.Spec.Routes == nil {
+					ab.Spec.Routes = map[string]atroxyzv1alpha1.AppBundleRoute{}
+				}
+
+				ab.Spec.Routes[route_name] = route
 
 				// UPDATE APPBUNDLE
 				er := rec.Update(ctx, ab)
@@ -72,10 +77,11 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling serv
 				Expect(err).NotTo(HaveOccurred())
 
 				// CHECK the resource
+				route_name := "test"
 				Expect(service.Spec.Ports).To(HaveLen(1))
-				Expect(service.Spec.Ports[0].Port).To(Equal(int32(*ab.Spec.Routes[0].Port)))
-				Expect(service.Spec.Ports[0].TargetPort.IntVal).To(Equal(int32(*ab.Spec.Routes[0].Port)))
-				Expect(service.Spec.Ports[0].Name).To(Equal(ab.Spec.Routes[0].Name))
+				Expect(service.Spec.Ports[0].Port).To(Equal(int32(*ab.Spec.Routes[route_name].Port)))
+				Expect(service.Spec.Ports[0].TargetPort.IntVal).To(Equal(int32(*ab.Spec.Routes[route_name].Port)))
+				Expect(service.Spec.Ports[0].Name).To(Equal(route_name))
 			})
 
 			Describe("With a single route", func() {
@@ -152,8 +158,13 @@ var _ = Describe("AppBundle with incorrectly populated route", func() {
 		// CREATE bad route (negative port)
 		route_name := "test"
 		port := -19
-		route := atroxyzv1alpha1.AppBundleRoute{Name: route_name, Port: &port}
-		ab.Spec.Routes = []*atroxyzv1alpha1.AppBundleRoute{&route}
+		route := atroxyzv1alpha1.AppBundleRoute{Port: &port}
+
+		if ab.Spec.Routes == nil {
+			ab.Spec.Routes = map[string]atroxyzv1alpha1.AppBundleRoute{}
+		}
+
+		ab.Spec.Routes[route_name] = route
 
 		// CREATE APPBUNDLE
 		er := rec.Create(ctx, ab)

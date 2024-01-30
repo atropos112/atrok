@@ -23,9 +23,12 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 
 	names := []string{}
 	if ab.Spec.Routes != nil {
-		for _, route := range ab.Spec.Routes {
+		routeKeys := getSortedKeys(ab.Spec.Routes)
+
+		for _, key := range routeKeys {
+			route := ab.Spec.Routes[key]
 			if route.Ingress != nil {
-				names = append(names, ab.Name+"-"+route.Name)
+				names = append(names, ab.Name+"-"+key)
 			}
 		}
 	}
@@ -57,15 +60,17 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 	if len(names) == 0 {
 		return nil
 	}
+	routeKeys := getSortedKeys(ab.Spec.Routes)
 
-	for _, route := range ab.Spec.Routes {
+	for _, key := range routeKeys {
+		route := ab.Spec.Routes[key]
 		if route.Ingress == nil {
 			continue
 		}
 
 		// GET the resource
 		ingress := &netv1.Ingress{ObjectMeta: metav1.ObjectMeta{
-			Name:            ab.Name + "-" + route.Name,
+			Name:            ab.Name + "-" + key,
 			Namespace:       ab.Namespace,
 			OwnerReferences: []metav1.OwnerReference{ab.OwnerReference()},
 		}}
@@ -131,7 +136,7 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 
 		tls = append(tls, netv1.IngressTLS{
 			Hosts:      []string{*route.Ingress.Domain},
-			SecretName: fmt.Sprintf("%s-%s-%s-ingress-tls", ab.Name, route.Name, ab.Namespace),
+			SecretName: fmt.Sprintf("%s-%s-%s-ingress-tls", ab.Name, key, ab.Namespace),
 		})
 
 		ingress.Spec = netv1.IngressSpec{

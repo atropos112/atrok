@@ -55,8 +55,13 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling ingr
 				domain := "test.com"
 				auth := true
 
-				route := atroxyzv1alpha1.AppBundleRoute{Name: route_name, Port: &port, Ingress: &atroxyzv1alpha1.AppBundleRouteIngress{Domain: &domain, Auth: &auth}}
-				ab.Spec.Routes = []*atroxyzv1alpha1.AppBundleRoute{&route}
+				route := atroxyzv1alpha1.AppBundleRoute{Port: &port, Ingress: &atroxyzv1alpha1.AppBundleRouteIngress{Domain: &domain, Auth: &auth}}
+
+				if ab.Spec.Routes == nil {
+					ab.Spec.Routes = make(map[string]atroxyzv1alpha1.AppBundleRoute)
+				}
+
+				ab.Spec.Routes[route_name] = route
 
 				// UPDATE APPBUNDLE
 				er := rec.Update(ctx, ab)

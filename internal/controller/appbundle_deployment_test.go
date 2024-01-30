@@ -17,7 +17,7 @@ import (
 	//+kubebuilder:scaffold:imports
 )
 
-var _ = Describe("Correctly populated AppBundle", func() {
+var _ = Describe("Correctly populated AppBundle for just deplyoment", func() {
 	var ab *atroxyzv1alpha1.AppBundle
 	var rec *AppBundleReconciler
 	var ctx context.Context
@@ -115,15 +115,6 @@ var _ = Describe("Correctly populated AppBundle", func() {
 					},
 				}
 
-				size1 := "1Gi"
-				size2 := "2Gi"
-				emptyDir := true
-
-				ab.Spec.Volumes = []*atroxyzv1alpha1.AppBundleVolume{
-					{Name: "test", Size: &size1},
-					{Name: "test2", Size: &size2},
-					{Name: "test3", EmptyDir: &emptyDir},
-				}
 			})
 		})
 	})

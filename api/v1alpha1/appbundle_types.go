@@ -16,9 +16,9 @@ type AppBundleSpec struct {
 	Envs           map[string]string              `json:"envs,omitempty"`
 	SourcedEnvs    map[string]AppBundleSourcedEnv `json:"sourcedEnvs,omitempty"`
 	ServiceType    *corev1.ServiceType            `json:"serviceType,omitempty"`
-	Routes         []*AppBundleRoute              `json:"routes,omitempty"`
+	Routes         map[string]AppBundleRoute      `json:"routes,omitempty"`
 	Homepage       *AppBundleHomePage             `json:"homepage,omitempty"`
-	Volumes        []*AppBundleVolume             `json:"volumes,omitempty"`
+	Volumes        map[string]AppBundleVolume     `json:"volumes,omitempty"`
 	Backup         *AppBundleVolumeLonghornBackup `json:"backup,omitempty"`
 	Selector       *metav1.LabelSelector          `json:"selector,omitempty"`
 	LivenessProbe  *corev1.Probe                  `json:"livenessProbe,omitempty"`
@@ -42,7 +42,6 @@ type AppBundleImage struct {
 }
 
 type AppBundleRoute struct {
-	Name     string                 `json:"name"`
 	Port     *int                   `json:"port,omitempty"`
 	Protocol *v1.Protocol           `json:"protocol,omitempty"`
 	Ingress  *AppBundleRouteIngress `json:"ingress,omitempty"`
@@ -63,7 +62,6 @@ type AppBundleHomePage struct {
 }
 
 type AppBundleVolume struct {
-	Name          string  `json:"name"`
 	HostPath      *string `json:"hostPath,omitempty"`
 	EmptyDir      *bool   `json:"emptyDir,omitempty"`
 	Path          *string `json:"path,omitempty"`

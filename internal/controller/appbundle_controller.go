@@ -31,7 +31,7 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	ab := &atroxyzv1alpha1.AppBundle{}
 	if err := r.Get(ctx, req.NamespacedName, ab); err != nil {
 		l.Error(err, "Unable to fetch app bundle, it was probably deleted, if not its a problem.")
-		return ctrl.Result{}, err
+		return ctrl.Result{RequeueAfter: 10 * time.Second}, err
 	}
 
 	// Reconcile only if the observed generation is not the same as the current generation or
@@ -39,7 +39,7 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	ab_hash, err := rxhash.HashStruct(ab.Spec)
 	if err != nil {
 		l.Error(err, "Unable to hash app bundle.")
-		return ctrl.Result{}, err
+		return ctrl.Result{RequeueAfter: 10 * time.Second}, err
 	}
 
 	var lastRecon = time.Unix(0, 0)
@@ -47,7 +47,7 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	if ab.Status.LastReconciliation != nil {
 		lastRecon, err = time.Parse(time.UnixDate, *ab.Status.LastReconciliation)
 		if err != nil {
-			return ctrl.Result{}, err
+			return ctrl.Result{RequeueAfter: 10 * time.Second}, err
 		}
 	}
 
@@ -61,15 +61,15 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		ab.Status.LastReconciliation = &nowTime
 		if err := r.Status().Update(ctx, ab); err != nil {
 			l.Error(err, "Unable to update app bundle status.")
-			return ctrl.Result{}, err
+			return ctrl.Result{RequeueAfter: 10 * time.Second}, err
 		}
 	} else {
-		return ctrl.Result{RequeueAfter: 60 * time.Second}, nil
+		return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
 	}
 
 	// Get the object AGAIN as we re-upserted it above.
 	if err := r.Get(ctx, req.NamespacedName, ab); err != nil {
-		return ctrl.Result{}, err
+		return ctrl.Result{RequeueAfter: 10 * time.Second}, err
 	}
 
 	// Resolve app bundle base
@@ -77,12 +77,12 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		abb := &atroxyzv1alpha1.AppBundleBase{}
 		if err := r.Get(ctx, client.ObjectKey{Name: *ab.Spec.Base}, abb); err != nil {
 			l.Error(err, "Unable to fetch app bundle base, it was probably deleted, if not its a problem.")
-			return ctrl.Result{}, err
+			return ctrl.Result{RequeueAfter: 10 * time.Second}, err
 		}
 		err := ResolveAppBundleBase(ctx, r, ab, abb)
 		if err != nil {
 			l.Error(err, "Unable to resolve app bundle bases.")
-			return ctrl.Result{}, err
+			return ctrl.Result{RequeueAfter: 10 * time.Second}, err
 		}
 	}
 
@@ -95,8 +95,8 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		r.ReconcileIngress,
 	); err != nil {
 		l.Error(err, "Unable to reconcile app bundle.")
-		return ctrl.Result{}, err
+		return ctrl.Result{RequeueAfter: 10 * time.Second}, err
 	}
 
-	return ctrl.Result{RequeueAfter: 60 * time.Second}, nil
+	return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
 }

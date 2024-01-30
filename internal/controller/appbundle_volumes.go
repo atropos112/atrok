@@ -22,7 +22,11 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 	if ab.Spec.Volumes == nil {
 		return nil
 	}
-	for _, volume := range ab.Spec.Volumes {
+
+	volumeKeys := getSortedKeys(ab.Spec.Volumes)
+
+	for _, key := range volumeKeys {
+		volume := ab.Spec.Volumes[key]
 		// IF an Existing PVC then nothing to be done here
 		if volume.ExistingClaim != nil {
 			// If its an existing claim, we leave it alone
@@ -40,7 +44,7 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 			continue
 		}
 
-		if err := r.ReconcilePVC(ctx, req, ab, volume); err != nil {
+		if err := r.ReconcilePVC(ctx, req, ab, &volume, key); err != nil {
 			return err
 		}
 	}
@@ -55,10 +59,10 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 	return nil
 }
 
-func (r *AppBundleReconciler) ReconcilePVC(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle, volume *atroxyzv1alpha1.AppBundleVolume) error {
+func (r *AppBundleReconciler) ReconcilePVC(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle, volume *atroxyzv1alpha1.AppBundleVolume, volumeName string) error {
 	// GET the resource
 	pvc := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{
-		Name:      volume.Name,
+		Name:      volumeName,
 		Namespace: ab.Namespace,
 	}}
 	er := r.Get(ctx, client.ObjectKeyFromObject(pvc), pvc)

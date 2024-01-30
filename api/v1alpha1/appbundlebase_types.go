@@ -19,9 +19,9 @@ type AppBundleBaseSpec struct {
 	Envs           map[string]string              `json:"envs,omitempty"`
 	SourcedEnvs    map[string]AppBundleSourcedEnv `json:"sourcedEnvs,omitempty"`
 	ServiceType    *corev1.ServiceType            `json:"serviceType,omitempty"`
-	Routes         []*AppBundleRoute              `json:"routes,omitempty"`
+	Routes         map[string]AppBundleRoute      `json:"routes,omitempty"`
 	Homepage       *AppBundleHomePage             `json:"homepage,omitempty"`
-	Volumes        []*AppBundleVolume             `json:"volumes,omitempty"`
+	Volumes        map[string]AppBundleVolume     `json:"volumes,omitempty"`
 	Backup         *AppBundleVolumeLonghornBackup `json:"backup,omitempty"`
 	Selector       *metav1.LabelSelector          `json:"selector,omitempty"`
 	LivenessProbe  *corev1.Probe                  `json:"livenessProbe,omitempty"`

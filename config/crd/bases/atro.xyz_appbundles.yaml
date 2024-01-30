@@ -424,7 +424,7 @@ spec:
                     type: object
                 type: object
               routes:
-                items:
+                additionalProperties:
                   properties:
                     ingress:
                       properties:
@@ -433,17 +433,13 @@ spec:
                         domain:
                           type: string
                       type: object
-                    name:
-                      type: string
                     port:
                       type: integer
                     protocol:
                       default: TCP
                       type: string
-                  required:
-                  - name
                   type: object
-                type: array
+                type: object
               selector:
                 description: A label selector is a label query over a set of resources.
                   The result of matchLabels and matchExpressions are ANDed. An empty
@@ -655,7 +651,7 @@ spec:
               useNvidia:
                 type: boolean
               volumes:
-                items:
+                additionalProperties:
                   properties:
                     backup:
                       type: boolean
@@ -665,18 +661,14 @@ spec:
                       type: string
                     hostPath:
                       type: string
-                    name:
-                      type: string
                     path:
                       type: string
                     size:
                       type: string
                     storageClass:
                       type: string
-                  required:
-                  - name
                   type: object
-                type: array
+                type: object
             type: object
           status:
             description: AppBundleStatus defines the observed state of AppBundle

@@ -136,40 +136,40 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 	}
 
 	if abbSpec.Volumes != nil {
+
 		if abSpec.Volumes == nil {
 			abSpec.Volumes = abbSpec.Volumes
 		} else {
-			for _, abbVol := range abbSpec.Volumes {
-				found := false
-				for _, abVol := range abSpec.Volumes {
-					if abbVol.Name == abVol.Name {
-						found = true
-						if abbVol.Path != nil && abVol.Path == nil {
-							abVol.Path = abbVol.Path
-						}
-						if abbVol.Size != nil && abVol.Size == nil {
-							abVol.Size = abbVol.Size
-						}
-						if abbVol.StorageClass != nil && abVol.StorageClass == nil {
-							abVol.StorageClass = abbVol.StorageClass
-						}
-						if abbVol.ExistingClaim != nil && abVol.ExistingClaim == nil {
-							abVol.ExistingClaim = abbVol.ExistingClaim
-						}
-						if abbVol.Backup != nil && abVol.Backup == nil {
-							abVol.Backup = abbVol.Backup
-						}
-						if abbVol.HostPath != nil && abVol.HostPath == nil {
-							abVol.HostPath = abbVol.HostPath
-						}
-						if abbVol.EmptyDir != nil && abVol.EmptyDir == nil {
-							abVol.EmptyDir = abbVol.EmptyDir
-						}
+			abbVolumeKeys := getSortedKeys(abbSpec.Volumes)
 
+			for _, abbVolKey := range abbVolumeKeys {
+				abbVol := abbSpec.Volumes[abbVolKey]
+
+				if abVol, ok := abSpec.Volumes[abbVolKey]; ok {
+					if abbVol.Path != nil && abVol.Path == nil {
+						abVol.Path = abbVol.Path
 					}
-				}
-				if !found {
-					abSpec.Volumes = append(abSpec.Volumes, abbVol)
+					if abbVol.Size != nil && abVol.Size == nil {
+						abVol.Size = abbVol.Size
+					}
+					if abbVol.StorageClass != nil && abVol.StorageClass == nil {
+						abVol.StorageClass = abbVol.StorageClass
+					}
+					if abbVol.ExistingClaim != nil && abVol.ExistingClaim == nil {
+						abVol.ExistingClaim = abbVol.ExistingClaim
+					}
+					if abbVol.Backup != nil && abVol.Backup == nil {
+						abVol.Backup = abbVol.Backup
+					}
+					if abbVol.HostPath != nil && abVol.HostPath == nil {
+						abVol.HostPath = abbVol.HostPath
+					}
+					if abbVol.EmptyDir != nil && abVol.EmptyDir == nil {
+						abVol.EmptyDir = abbVol.EmptyDir
+					}
+					abSpec.Volumes[abbVolKey] = abVol
+				} else {
+					abSpec.Volumes[abbVolKey] = abbVol
 				}
 			}
 		}
@@ -225,43 +225,32 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 			// If the app bundle has no routes, then we can just set it to the base routes
 			abSpec.Routes = abbSpec.Routes
 		} else {
-			// We smart merge here,
-			// Matching by names.
+			abbRouteKeys := getSortedKeys(abbSpec.Routes)
 
-			for _, route := range abbSpec.Routes {
-				found := false
+			for _, key := range abbRouteKeys {
+				abbRoute := abbSpec.Routes[key]
 
-				// Searching if ab has same name route
-				for _, abRoute := range abSpec.Routes {
-					if route.Name == abRoute.Name {
-						found = true
-						// if yes merge it
-						if route.Port != nil && abRoute.Port == nil {
-							abRoute.Port = route.Port
-						}
-						if route.Protocol != nil && abRoute.Protocol == nil {
-							abRoute.Protocol = route.Protocol
-						}
-
-						if route.Ingress != nil && abRoute.Ingress == nil {
-							abRoute.Ingress = route.Ingress
-						} else if route.Ingress != nil && abRoute.Ingress != nil {
-							// Merge ingress
-							if route.Ingress.Auth != nil && abRoute.Ingress.Auth == nil {
-								abRoute.Ingress.Auth = route.Ingress.Auth
-							}
-							if route.Ingress.Domain != nil && abRoute.Ingress.Domain == nil {
-								abRoute.Ingress.Domain = route.Ingress.Domain
-							}
-						}
-
-						break
+				if abRoute, ok := abSpec.Routes[key]; ok {
+					if abbRoute.Port != nil && abRoute.Port == nil {
+						abRoute.Port = abbRoute.Port
 					}
-				}
-
-				// If not found, append it
-				if !found {
-					abSpec.Routes = append(abSpec.Routes, route)
+					if abbRoute.Protocol != nil && abRoute.Protocol == nil {
+						abRoute.Protocol = abbRoute.Protocol
+					}
+					if abbRoute.Ingress != nil && abRoute.Ingress == nil {
+						abRoute.Ingress = abbRoute.Ingress
+					} else if abbRoute.Ingress != nil && abRoute.Ingress != nil {
+						// Merge ingress
+						if abbRoute.Ingress.Auth != nil && abRoute.Ingress.Auth == nil {
+							abRoute.Ingress.Auth = abbRoute.Ingress.Auth
+						}
+						if abbRoute.Ingress.Domain != nil && abRoute.Ingress.Domain == nil {
+							abRoute.Ingress.Domain = abbRoute.Ingress.Domain
+						}
+					}
+					abSpec.Routes[key] = abRoute
+				} else {
+					abSpec.Routes[key] = abbRoute
 				}
 			}
 		}
@@ -353,7 +342,6 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 	}
 
 	// Recurse
-
 	if abb.Spec.Base == nil {
 		return nil
 	}

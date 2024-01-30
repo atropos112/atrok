@@ -27,7 +27,11 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 	job_generic_key := "recurring-job.longhorn.io/source"
 	default_group_key := "recurring-job-group.longhorn.io/default"
 
-	for _, abVol := range ab.Spec.Volumes {
+	volumeKeys := getSortedKeys(ab.Spec.Volumes)
+
+	for _, key := range volumeKeys {
+		abVol := ab.Spec.Volumes[key]
+
 		if abVol.HostPath != nil {
 			continue
 		}
@@ -36,7 +40,7 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 			continue
 		}
 
-		volName := abVol.Name
+		volName := key
 		if abVol.ExistingClaim != nil {
 			volName = *abVol.ExistingClaim
 		}
@@ -117,12 +121,15 @@ func (r *AppBundleReconciler) ReconcileRecurringBackupJob(ctx context.Context, r
 	}
 
 	pvc := &corev1.PersistentVolumeClaim{}
-	for _, abVol := range ab.Spec.Volumes {
+	volumeKeys := getSortedKeys(ab.Spec.Volumes)
+	for _, key := range volumeKeys {
+		abVol := ab.Spec.Volumes[key]
+
 		if abVol.HostPath != nil {
 			continue
 		}
 
-		volName := abVol.Name
+		volName := key
 		if abVol.ExistingClaim != nil {
 			volName = *abVol.ExistingClaim
 		}

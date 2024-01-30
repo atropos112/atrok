@@ -47,15 +47,16 @@ var _ = Describe("Correctly populated very basic AppBundle", func() {
 		By("Applying base resolver to app bundle")
 		route1_name := "test"
 		route1_port := 80
-		route1 := atroxyzv1alpha1.AppBundleRoute{Name: route1_name, Port: &route1_port}
+		route1 := atroxyzv1alpha1.AppBundleRoute{Port: &route1_port}
+
 		route2_name := "test2"
 		route2_port := 8080
-		route2 := atroxyzv1alpha1.AppBundleRoute{Name: route2_name, Port: &route2_port}
+		route2 := atroxyzv1alpha1.AppBundleRoute{Port: &route2_port}
 
 		abbSpec := atroxyzv1alpha1.AppBundleBaseSpec{
-			Routes: []*atroxyzv1alpha1.AppBundleRoute{
-				&route1,
-				&route2,
+			Routes: map[string]atroxyzv1alpha1.AppBundleRoute{
+				route1_name: route1,
+				route2_name: route2,
 			},
 		}
 		abb := &atroxyzv1alpha1.AppBundleBase{
@@ -93,22 +94,26 @@ var _ = Describe("Correctly populated heavily populated AppBundle", func() {
 		ab = GetBasicAppBundle()
 		path1 := "/test"
 		path2 := "/test2"
-		ab.Spec.Volumes = []*atroxyzv1alpha1.AppBundleVolume{
-			{Name: "test", Path: &path1},
-			{Name: "test2", Path: &path2},
+
+		if ab.Spec.Volumes == nil {
+			ab.Spec.Volumes = make(map[string]atroxyzv1alpha1.AppBundleVolume)
 		}
+
+		ab.Spec.Volumes["test"] = atroxyzv1alpha1.AppBundleVolume{Path: &path1}
+		ab.Spec.Volumes["test2"] = atroxyzv1alpha1.AppBundleVolume{Path: &path2}
 
 		route1_name := "test"
 		route1_port := 80
-		route1 := atroxyzv1alpha1.AppBundleRoute{Name: route1_name, Port: &route1_port}
+		route1 := atroxyzv1alpha1.AppBundleRoute{Port: &route1_port}
 		route2_name := "test2"
 		route2_port := 8080
-		route2 := atroxyzv1alpha1.AppBundleRoute{Name: route2_name, Port: &route2_port}
+		route2 := atroxyzv1alpha1.AppBundleRoute{Port: &route2_port}
 
-		ab.Spec.Routes = []*atroxyzv1alpha1.AppBundleRoute{
-			&route1,
-			&route2,
+		ab.Spec.Routes = map[string]atroxyzv1alpha1.AppBundleRoute{
+			route1_name: route1,
+			route2_name: route2,
 		}
+
 		pullPolicy := "Always"
 		ab.Spec.Image.PullPolicy = &pullPolicy
 		group := "test"
@@ -138,14 +143,14 @@ var _ = Describe("Correctly populated heavily populated AppBundle", func() {
 		By("Applying base resolver to app bundle")
 		route1_name := "test"
 		route1_port := 80
-		route1 := atroxyzv1alpha1.AppBundleRoute{Name: route1_name, Port: &route1_port}
+		route1 := atroxyzv1alpha1.AppBundleRoute{Port: &route1_port}
 		route2_name := "test2"
 		route2_port := 8080
-		route2 := atroxyzv1alpha1.AppBundleRoute{Name: route2_name, Port: &route2_port}
+		route2 := atroxyzv1alpha1.AppBundleRoute{Port: &route2_port}
 		abbSpec := atroxyzv1alpha1.AppBundleBaseSpec{
-			Routes: []*atroxyzv1alpha1.AppBundleRoute{
-				&route1,
-				&route2,
+			Routes: map[string]atroxyzv1alpha1.AppBundleRoute{
+				route1_name: route1,
+				route2_name: route2,
 			},
 		}
 		abb := &atroxyzv1alpha1.AppBundleBase{

@@ -35,8 +35,10 @@ func (r *AppBundleReconciler) ReconcileService(ctx context.Context, req ctrl.Req
 
 		// Ports
 		var ports []corev1.ServicePort
-		for _, route := range ab.Spec.Routes {
-			port := corev1.ServicePort{Name: route.Name, Port: int32(*route.Port), Protocol: "TCP"}
+		routeKeys := getSortedKeys(ab.Spec.Routes)
+		for _, key := range routeKeys {
+			route := ab.Spec.Routes[key]
+			port := corev1.ServicePort{Name: key, Port: int32(*route.Port), Protocol: "TCP"}
 
 			if route.Protocol != nil {
 				port.Protocol = *route.Protocol

@@ -36,7 +36,6 @@ import (
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 
 	"github.com/atropos112/atrok.git/internal/controller"
-	"github.com/grafana/pyroscope-go"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -58,37 +57,37 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
-	pyroscope.Start(pyroscope.Config{
-		ApplicationName: "atrok",
+	// pyroscope.Start(pyroscope.Config{
+	// 	ApplicationName: "atrok",
 
-		// replace this with the address of pyroscope server
-		ServerAddress: "http://pyroscope.traces:4040",
+	// 	// replace this with the address of pyroscope server
+	// 	ServerAddress: "http://pyroscope.traces:4040",
 
-		// you can disable logging by setting this to nil
-		Logger: pyroscope.StandardLogger,
+	// 	// you can disable logging by setting this to nil
+	// 	Logger: pyroscope.StandardLogger,
 
-		// you can provide static tags via a map:
-		Tags: map[string]string{
-			"pod": os.Getenv("HOSTNAME"),
-			"app": "atrok",
-		},
+	// 	// you can provide static tags via a map:
+	// 	Tags: map[string]string{
+	// 		"pod": os.Getenv("HOSTNAME"),
+	// 		"app": "atrok",
+	// 	},
 
-		ProfileTypes: []pyroscope.ProfileType{
-			// these profile types are enabled by default:
-			pyroscope.ProfileCPU,
-			pyroscope.ProfileAllocObjects,
-			pyroscope.ProfileAllocSpace,
-			pyroscope.ProfileInuseObjects,
-			pyroscope.ProfileInuseSpace,
+	// 	ProfileTypes: []pyroscope.ProfileType{
+	// 		// these profile types are enabled by default:
+	// 		pyroscope.ProfileCPU,
+	// 		pyroscope.ProfileAllocObjects,
+	// 		pyroscope.ProfileAllocSpace,
+	// 		pyroscope.ProfileInuseObjects,
+	// 		pyroscope.ProfileInuseSpace,
 
-			// these profile types are optional:
-			pyroscope.ProfileGoroutines,
-			pyroscope.ProfileMutexCount,
-			pyroscope.ProfileMutexDuration,
-			pyroscope.ProfileBlockCount,
-			pyroscope.ProfileBlockDuration,
-		},
-	})
+	// 		// these profile types are optional:
+	// 		pyroscope.ProfileGoroutines,
+	// 		pyroscope.ProfileMutexCount,
+	// 		pyroscope.ProfileMutexDuration,
+	// 		pyroscope.ProfileBlockCount,
+	// 		pyroscope.ProfileBlockDuration,
+	// 	},
+	// })
 
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":9080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":9081", "The address the probe endpoint binds to.")

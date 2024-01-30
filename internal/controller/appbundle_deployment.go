@@ -35,22 +35,39 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	// CHECK and BUILD the resource
 
 	// Ports
+
 	var ports []corev1.ContainerPort
-	for _, route := range ab.Spec.Routes {
-		ports = append(ports, corev1.ContainerPort{Name: route.Name, ContainerPort: int32(*route.Port), Protocol: "TCP"})
+
+	// sort the keys
+	routeKeys := getSortedKeys(ab.Spec.Routes)
+	for _, key := range routeKeys {
+		route := ab.Spec.Routes[key]
+		ports = append(ports, corev1.ContainerPort{Name: key, ContainerPort: int32(*route.Port), Protocol: "TCP"})
 	}
 
 	// Volume Mounts
-	var volume_mounts []corev1.VolumeMount
-	for _, volume := range ab.Spec.Volumes {
-		volume_mounts = append(volume_mounts, corev1.VolumeMount{Name: volume.Name, MountPath: *volume.Path})
+	var volumeMounts []corev1.VolumeMount
+	volumeKeys := getSortedKeys(ab.Spec.Volumes)
+
+	for _, key := range volumeKeys {
+		volumeName := key
+		if ab.Spec.Volumes[key].ExistingClaim != nil {
+			volumeName = *ab.Spec.Volumes[key].ExistingClaim
+		}
+
+		volume := ab.Spec.Volumes[key]
+		if volume.Path == nil {
+			return fmt.Errorf("volume %s has no path", key)
+		}
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{Name: volumeName, MountPath: *volume.Path})
 	}
 
 	// Volumes
 	var volumes []corev1.Volume
-	for _, volume := range ab.Spec.Volumes {
+	for _, key := range volumeKeys {
 		// If PVC we control then we get name from volume name, for hostPath we do the same.
-		name := volume.Name
+		name := key
+		volume := ab.Spec.Volumes[key]
 
 		// If existing PVC then we get name from existing claim
 		if volume.ExistingClaim != nil {
@@ -64,17 +81,17 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 				Type: &pathType,
 			}
 			volumes = append(volumes, corev1.Volume{
-				Name:         volume.Name,
+				Name:         name,
 				VolumeSource: corev1.VolumeSource{HostPath: &hostPath},
 			})
 		} else if volume.EmptyDir != nil && *volume.EmptyDir {
 			volumes = append(volumes, corev1.Volume{
-				Name:         volume.Name,
+				Name:         name,
 				VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
 			})
 		} else {
 			volumes = append(volumes, corev1.Volume{
-				Name:         volume.Name,
+				Name:         name,
 				VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: name}},
 			})
 		}
@@ -147,7 +164,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 		Resources:      resources,
 		Ports:          ports,
 		Env:            env,
-		VolumeMounts:   volume_mounts,
+		VolumeMounts:   volumeMounts,
 		LivenessProbe:  ab.Spec.LivenessProbe,
 		ReadinessProbe: ab.Spec.ReadinessProbe,
 		StartupProbe:   ab.Spec.StartupProbe,

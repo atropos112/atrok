@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"reflect"
+	"sort"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 	"golang.org/x/sync/errgroup"
@@ -93,8 +94,9 @@ func GetAppBundleObjectMetaWithOwnerReference(app_bundle *atroxyzv1alpha1.AppBun
 }
 
 func GetAppBundleObjectMetaWithOwnerReferenceForIngress(app_bundle *atroxyzv1alpha1.AppBundle) metav1.ObjectMeta {
+	firstKey := getSortedKeys(app_bundle.Spec.Routes)[0]
 	return metav1.ObjectMeta{
-		Name:            app_bundle.Name + "-" + app_bundle.Spec.Routes[0].Name,
+		Name:            app_bundle.Name + "-" + firstKey,
 		Namespace:       app_bundle.Namespace,
 		Labels:          app_bundle.GetLabels(),
 		OwnerReferences: []metav1.OwnerReference{app_bundle.OwnerReference()},
@@ -103,4 +105,14 @@ func GetAppBundleObjectMetaWithOwnerReferenceForIngress(app_bundle *atroxyzv1alp
 
 func GetAppBundleNamespacedName(ab *atroxyzv1alpha1.AppBundle) types.NamespacedName {
 	return types.NamespacedName{Name: ab.Name, Namespace: ab.Namespace}
+}
+
+// Function to get sorted keys from a map with string keys
+func getSortedKeys[V any](m map[string]V) []string {
+	var keys []string
+	for key := range m {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
 }
