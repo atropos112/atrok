@@ -44,7 +44,8 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 			continue
 		}
 
-		if err := r.ReconcilePVC(ctx, req, ab, &volume, key); err != nil {
+		volumeName := ab.Name + "-" + key
+		if err := r.ReconcilePVC(ctx, req, ab, &volume, volumeName); err != nil {
 			return err
 		}
 	}
@@ -59,6 +60,7 @@ func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Req
 	return nil
 }
 
+// / ReconcilePVC reconciles the PVC for the volume
 func (r *AppBundleReconciler) ReconcilePVC(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle, volume *atroxyzv1alpha1.AppBundleVolume, volumeName string) error {
 	// GET the resource
 	pvc := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{

@@ -40,7 +40,7 @@ func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Requ
 			continue
 		}
 
-		volName := key
+		volName := ab.Name + "-" + key
 		if abVol.ExistingClaim != nil {
 			volName = *abVol.ExistingClaim
 		}
@@ -129,7 +129,7 @@ func (r *AppBundleReconciler) ReconcileRecurringBackupJob(ctx context.Context, r
 			continue
 		}
 
-		volName := key
+		volName := ab.Name + "-" + key
 		if abVol.ExistingClaim != nil {
 			volName = *abVol.ExistingClaim
 		}

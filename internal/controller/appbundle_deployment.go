@@ -67,11 +67,13 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	for _, key := range volumeKeys {
 		// If PVC we control then we get name from volume name, for hostPath we do the same.
 		name := key
+		volName := ab.Name + "-" + key
 		volume := ab.Spec.Volumes[key]
 
 		// If existing PVC then we get name from existing claim
 		if volume.ExistingClaim != nil {
 			name = *volume.ExistingClaim
+			volName = *volume.ExistingClaim
 		}
 
 		if volume.HostPath != nil {
@@ -92,7 +94,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 		} else {
 			volumes = append(volumes, corev1.Volume{
 				Name:         name,
-				VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: name}},
+				VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: volName}},
 			})
 		}
 	}
