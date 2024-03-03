@@ -7,7 +7,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
@@ -15,7 +14,7 @@ import (
 )
 
 // CreateExpectedDeployment creates expected deployment from appbundle
-func CreateExpectedDeployment(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment, error) {
+func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment, error) {
 	deployment := &appsv1.Deployment{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
 
 	// Ports
@@ -216,7 +215,7 @@ func CreateExpectedDeployment(ctx context.Context, req ctrl.Request, ab *atroxyz
 }
 
 // ReconcileDeployment checks currently existing deployment with the expected deployment and updates it if necessary. If no deployment exists, it creates one.
-func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
+func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, ab *atroxyzv1alpha1.AppBundle) error {
 	// LOCK APPBUNDLE DEPLOYMENT MUTEX
 	mu := getMutex("deployment", ab.Name, ab.Namespace)
 	mu.Lock()
@@ -227,7 +226,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	er := r.Get(ctx, client.ObjectKeyFromObject(currentDeployment), currentDeployment)
 
 	// GET EXPECTED DEPLOYMENT
-	expectedDeployment, err := CreateExpectedDeployment(ctx, req, ab)
+	expectedDeployment, err := CreateExpectedDeployment(ab)
 	if err != nil {
 		return err
 	}

@@ -13,7 +13,14 @@ import (
 // +kubebuilder:rbac:groups=atro.xyz,resources=appbundles,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=atro.xyz,resources=appbundles/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=atro.xyz,resources=appbundles/finalizers,verbs=update
-var hashedSpecAb map[string]string = make(map[string]string)
+
+type AppBundleState struct {
+	SpecHash           string
+	LastReconciliation time.Time
+	NextBackoffInSec   int16
+}
+
+var appBundleStates = make(map[string]AppBundleState)
 
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.0/pkg/reconcile
@@ -77,12 +84,13 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	}
 
-	if err := RunReconciles(ctx, r, req, ab,
+	if err := RunReconciles(ctx, ab,
 		r.ReconcileVolumes,
 		r.ReconcileService,
 		r.ReconcileDeployment,
 		r.ReconcileIngress,
 	); err != nil {
+		// TODO: Given an error, we should consider running exponential backoff here.
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, err
 	}
 

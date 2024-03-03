@@ -7,7 +7,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	equality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -56,7 +55,7 @@ func CreateExpectedService(ab *atroxyzv1alpha1.AppBundle) (*corev1.Service, erro
 }
 
 // ReconcileService reconciles the service for the appbundle
-func (r *AppBundleReconciler) ReconcileService(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
+func (r *AppBundleReconciler) ReconcileService(ctx context.Context, ab *atroxyzv1alpha1.AppBundle) error {
 	// LOCK the resource
 	mu := getMutex("service", ab.Name, ab.Namespace)
 	mu.Lock()
@@ -83,9 +82,8 @@ func (r *AppBundleReconciler) ReconcileService(ctx context.Context, req ctrl.Req
 	}
 
 	if expectedService != nil && !equality.Semantic.DeepDerivative(expectedService.Spec, currentService.Spec) {
-		if err := UpsertResource(ctx, r, expectedService, er); err != nil {
-			return err
-		}
+		return UpsertResource(ctx, r, expectedService, er)
 	}
+
 	return nil
 }

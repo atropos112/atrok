@@ -29,7 +29,7 @@ func CreateExpectedPVC(ab *atroxyzv1alpha1.AppBundle, volume *atroxyzv1alpha1.Ap
 }
 
 // ReconcileVolumes is a generic function that takes in a volume, checks if its a hostPath, emptyDir or a PVC. If hostPath or a emptyDir it just returns, if a PVC it reconciles it using ReconcilePVC function. If backup is requested it is also reconciled using ReconcileBackup function.
-func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
+func (r *AppBundleReconciler) ReconcileVolumes(ctx context.Context, ab *atroxyzv1alpha1.AppBundle) error {
 	// LOCK the resource
 	mu := getMutex("volume", ab.Name, ab.Namespace)
 	mu.Lock()

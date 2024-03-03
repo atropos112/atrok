@@ -10,7 +10,6 @@ import (
 	k8serror "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
@@ -67,18 +66,17 @@ func UpsertResource(ctx context.Context, r ReaderWriter, obj client.Object, er e
 	return nil
 }
 
+// RunReconciles takes in a list of reconcile functions, passes argument into each one and runs concurrently.
 func RunReconciles(
 	ctx context.Context,
-	r ReaderWriter,
-	req ctrl.Request,
 	app_bundle *atroxyzv1alpha1.AppBundle,
-	reconciles ...func(context.Context, ctrl.Request, *atroxyzv1alpha1.AppBundle) error,
+	reconciles ...func(context.Context, *atroxyzv1alpha1.AppBundle) error,
 ) error {
 	errs, ctx := errgroup.WithContext(ctx)
 
 	for _, reconcile := range reconciles {
 		currentReconcile := reconcile // Capture current value of reconcile
-		errs.Go(func() error { return currentReconcile(ctx, req, app_bundle) })
+		errs.Go(func() error { return currentReconcile(ctx, app_bundle) })
 	}
 
 	return errs.Wait()
