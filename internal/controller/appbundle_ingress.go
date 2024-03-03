@@ -3,29 +3,105 @@ package controller
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 	netv1 "k8s.io/api/networking/v1"
-	k8serror "k8s.io/apimachinery/pkg/api/errors"
+	equality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
+// CreateExpectedIngress creates the expected ingress from the appbundle and the name given
+func CreateExpectedIngress(ab *atroxyzv1alpha1.AppBundle, name string, route *atroxyzv1alpha1.AppBundleRoute) (*netv1.Ingress, error) {
+	ingress := &netv1.Ingress{ObjectMeta: metav1.ObjectMeta{
+		Name:            name,
+		Namespace:       ab.Namespace,
+		OwnerReferences: []metav1.OwnerReference{ab.OwnerReference()},
+	}}
+
+	// If no annotation, add it
+	if ingress.Annotations == nil {
+		ingress.Annotations = make(map[string]string)
+	}
+	if ingress.Labels == nil {
+		ingress.Labels = make(map[string]string)
+	}
+
+	// REGAIN control if lost
+	ingress.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
+
+	// CHECK and BUILD the resource
+	ingress.Labels["appbundle"] = ab.Name
+	ingress.Annotations["traefik.ingress.kubernetes.io/router.entryPoints"] = entry_point
+	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls"] = "true"
+	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls.certresolver"] = cluster_issuer
+	ingress.Annotations["cert-manager.io/cluster-issuer"] = cluster_issuer
+	if auth_middleware != "" && *route.Ingress.Auth {
+		ingress.Annotations["traefik.ingress.kubernetes.io/router.middlewares"] = auth_middleware
+	}
+
+	// BUILD the resource
+	rules := []netv1.IngressRule{}
+	tls := []netv1.IngressTLS{}
+
+	// Add middleware
+
+	path_type := netv1.PathTypePrefix
+
+	rules = append(rules, netv1.IngressRule{
+		Host: *route.Ingress.Domain,
+		IngressRuleValue: netv1.IngressRuleValue{
+			HTTP: &netv1.HTTPIngressRuleValue{
+				Paths: []netv1.HTTPIngressPath{
+					{
+						Path:     "/", // This is a uneccessary limitation to simplify the controller
+						PathType: &path_type,
+						Backend: netv1.IngressBackend{
+							Service: &netv1.IngressServiceBackend{
+								Name: ab.Name,
+								Port: netv1.ServiceBackendPort{
+									Number: int32(*route.Port),
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+
+	tls = append(tls, netv1.IngressTLS{
+		Hosts:      []string{*route.Ingress.Domain},
+		SecretName: fmt.Sprintf("%s-%s-ingress-tls", name, ab.Namespace),
+	})
+
+	ingress.Spec = netv1.IngressSpec{
+		Rules: rules,
+		TLS:   tls,
+	}
+
+	// check if ingress.Name ends on "web" and if ab.Spec.Homepage is not nil
+	if len(ingress.Name) > 3 && ingress.Name[len(ingress.Name)-3:] == "web" && ab.Spec.Homepage != nil {
+		ingress.SetAnnotations(GetHomePageAnnotations(ingress.Annotations, ab))
+	}
+
+	return ingress, nil
+}
+
 func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
 	l := log.FromContext(ctx)
-	// LOCK the resource
+
+	// LOCK THE APP BUNDLE INGRESS MUTEX
 	mu := getMutex("ingresses", ab.Name, ab.Namespace)
 	mu.Lock()
 	defer mu.Unlock()
 
+	// GET NAMES OF EXPECTED INGRESSES
 	names := []string{}
 	if ab.Spec.Routes != nil {
-		routeKeys := getSortedKeys(ab.Spec.Routes)
-
-		for _, key := range routeKeys {
+		for _, key := range getSortedKeys(ab.Spec.Routes) {
 			route := ab.Spec.Routes[key]
 			if route.Ingress != nil {
 				names = append(names, ab.Name+"-"+key)
@@ -33,126 +109,56 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 		}
 	}
 
-	// GET all ingresses with correct labels
+	// GET CURRENT INGRESSES
 	ingresses := &netv1.IngressList{}
-	l.Info("Listing ingresses for " + ab.Name)
 	if err := r.List(ctx, ingresses, client.InNamespace(ab.Namespace), client.MatchingLabels{"appbundle": ab.Name}); err != nil {
-		l.Error(err, "Unable to list ingresses for "+ab.Name)
 		return err
 	}
 
-	// DELETE ingresses that are not in the list
+	// DELETE CURRENT INGRESSES THAT ARE NOT IN THE EXPECTED NAMES LIST
 	for _, ingress := range ingresses.Items {
 		if !contains(names, ingress.Name) {
 			l.Info("Deleting ingress " + ingress.Name)
-			fmt.Print("\n--------\n")
-			fmt.Print("Deleting OBJ " + ingress.GetName() + " " + reflect.TypeOf(ingress).String())
-			fmt.Print("\n--------\n")
-
 			if err := r.Delete(ctx, &ingress); err != nil {
-				l.Error(err, "Unable to delete ingress "+ingress.Name)
 				return err
 			}
 		}
 	}
 
-	// No ingresses exist and clean up happened by now, just leave.
+	// IF EXPECTED NUMBER OF INGRESSES IS 0 THEN RETURN
 	if len(names) == 0 {
 		return nil
 	}
-	routeKeys := getSortedKeys(ab.Spec.Routes)
 
-	for _, key := range routeKeys {
+	// ITERATE OVER THE EXPECTED INGRESSES
+	for _, key := range getSortedKeys(ab.Spec.Routes) {
 		route := ab.Spec.Routes[key]
 		if route.Ingress == nil {
+			// If no ingress, continue
 			continue
 		}
 
-		// GET the resource
-		ingress := &netv1.Ingress{ObjectMeta: metav1.ObjectMeta{
-			Name:            ab.Name + "-" + key,
+		ingressName := ab.Name + "-" + key
+
+		// GET THE EXPECTED INGRESS
+		expectedIngress, err := CreateExpectedIngress(ab, ingressName, &route)
+		if err != nil {
+			return err
+		}
+
+		// GET THE CURRENT INGRESS
+		currentIngress := &netv1.Ingress{ObjectMeta: metav1.ObjectMeta{
+			Name:            ingressName,
 			Namespace:       ab.Namespace,
 			OwnerReferences: []metav1.OwnerReference{ab.OwnerReference()},
 		}}
+		er := r.Get(ctx, client.ObjectKeyFromObject(currentIngress), currentIngress)
 
-		l.Info("Getting ingress " + ingress.Name)
-		er := r.Get(ctx, client.ObjectKeyFromObject(ingress), ingress)
-
-		if er != nil && !k8serror.IsNotFound(er) {
-			l.Error(er, "Unable to get ingress "+ingress.Name)
-			return er
-		}
-
-		// If no annotation, add it
-		if ingress.Annotations == nil {
-			ingress.Annotations = make(map[string]string)
-		}
-		if ingress.Labels == nil {
-			ingress.Labels = make(map[string]string)
-		}
-
-		// REGAIN control if lost
-		ingress.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
-
-		// CHECK and BUILD the resource
-		ingress.Labels["appbundle"] = ab.Name
-		ingress.Annotations["traefik.ingress.kubernetes.io/router.entryPoints"] = entry_point
-		ingress.Annotations["traefik.ingress.kubernetes.io/router.tls"] = "true"
-		ingress.Annotations["traefik.ingress.kubernetes.io/router.tls.certresolver"] = cluster_issuer
-		ingress.Annotations["cert-manager.io/cluster-issuer"] = cluster_issuer
-		if auth_middleware != "" && *route.Ingress.Auth {
-			ingress.Annotations["traefik.ingress.kubernetes.io/router.middlewares"] = auth_middleware
-		}
-
-		// BUILD the resource
-		rules := []netv1.IngressRule{}
-		tls := []netv1.IngressTLS{}
-
-		// Add middleware
-
-		path_type := netv1.PathTypePrefix
-
-		rules = append(rules, netv1.IngressRule{
-			Host: *route.Ingress.Domain,
-			IngressRuleValue: netv1.IngressRuleValue{
-				HTTP: &netv1.HTTPIngressRuleValue{
-					Paths: []netv1.HTTPIngressPath{
-						{
-							Path:     "/", // This is a uneccessary limitation to simplify the controller
-							PathType: &path_type,
-							Backend: netv1.IngressBackend{
-								Service: &netv1.IngressServiceBackend{
-									Name: ab.Name,
-									Port: netv1.ServiceBackendPort{
-										Number: int32(*route.Port),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		})
-
-		tls = append(tls, netv1.IngressTLS{
-			Hosts:      []string{*route.Ingress.Domain},
-			SecretName: fmt.Sprintf("%s-%s-%s-ingress-tls", ab.Name, key, ab.Namespace),
-		})
-
-		ingress.Spec = netv1.IngressSpec{
-			Rules: rules,
-			TLS:   tls,
-		}
-
-		// check if ingress.Name ends on "web" and if ab.Spec.Homepage is not nil
-		if len(ingress.Name) > 3 && ingress.Name[len(ingress.Name)-3:] == "web" && ab.Spec.Homepage != nil {
-			ingress.SetAnnotations(GetHomePageAnnotations(ingress.Annotations, ab))
-		}
-
-		// UPSERT the resource
-		if err := UpsertResource(ctx, r, ingress, er); err != nil {
-			l.Error(err, "Unable to upsert ingress "+ingress.Name)
-			return err
+		// IF CURRENT != EXPECTED THEN UPSERT
+		if !equality.Semantic.DeepDerivative(expectedIngress.Spec, currentIngress.Spec) {
+			if err := UpsertResource(ctx, r, expectedIngress, er); err != nil {
+				return err
+			}
 		}
 	}
 

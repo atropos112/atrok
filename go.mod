@@ -18,6 +18,10 @@ require (
 require (
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.7 // indirect
 	github.com/klauspost/compress v1.17.5 // indirect
+	github.com/r3labs/diff v1.1.0 // indirect
+	github.com/r3labs/diff/v3 v3.0.1 // indirect
+	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
+	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 )
 
 require (

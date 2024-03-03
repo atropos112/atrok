@@ -3,7 +3,6 @@ package controller
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -12,35 +11,16 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
-	rxhash "github.com/rxwycdh/rxhash"
+	equality "k8s.io/apimachinery/pkg/api/equality"
 )
 
-func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
-	// LOCK the resource
-	mu := getMutex("deployment", ab.Name, ab.Namespace)
-	mu.Lock()
-	defer mu.Unlock()
-
-	// GET the resource
+// CreateExpectedDeployment creates expected deployment from appbundle
+func CreateExpectedDeployment(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment, error) {
 	deployment := &appsv1.Deployment{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
-	er := r.Get(ctx, client.ObjectKeyFromObject(deployment), deployment)
-	hashBeforeChanges, err := rxhash.HashStruct(deployment.Spec)
-	if err != nil {
-		return err
-	}
-
-	// REGAIN control if lost
-	deployment.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
-
-	// CHECK and BUILD the resource
 
 	// Ports
-
 	var ports []corev1.ContainerPort
-
-	// sort the keys
-	routeKeys := getSortedKeys(ab.Spec.Routes)
-	for _, key := range routeKeys {
+	for _, key := range getSortedKeys(ab.Spec.Routes) {
 		route := ab.Spec.Routes[key]
 		ports = append(ports, corev1.ContainerPort{Name: key, ContainerPort: int32(*route.Port), Protocol: "TCP"})
 	}
@@ -48,7 +28,6 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	// Volume Mounts
 	var volumeMounts []corev1.VolumeMount
 	volumeKeys := getSortedKeys(ab.Spec.Volumes)
-
 	for _, key := range volumeKeys {
 		volumeName := key
 		if ab.Spec.Volumes[key].ExistingClaim != nil {
@@ -57,7 +36,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 
 		volume := ab.Spec.Volumes[key]
 		if volume.Path == nil {
-			return fmt.Errorf("volume %s has no path", key)
+			return nil, fmt.Errorf("volume %s has no path", key)
 		}
 		volumeMounts = append(volumeMounts, corev1.VolumeMount{Name: volumeName, MountPath: *volume.Path})
 	}
@@ -118,29 +97,18 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 
 	// Have to sort keys otherwise get infinite loop of updating
 	if ab.Spec.Envs != nil {
-		var keys []string
-		// Collect keys and sort them
-		for key := range ab.Spec.Envs {
-			keys = append(keys, key)
-		}
-		sort.Strings(keys)
-
+		sortedKeys := getSortedKeys(ab.Spec.Envs)
 		// Iterate through sorted keys
-		for _, key := range keys {
+		for _, key := range sortedKeys {
 			env = append(env, corev1.EnvVar{Name: key, Value: ab.Spec.Envs[key]})
 		}
 	}
 
 	if ab.Spec.SourcedEnvs != nil {
-		var keys []string
-		// Collect keys and sort them
-		for key := range ab.Spec.SourcedEnvs {
-			keys = append(keys, key)
-		}
-		sort.Strings(keys)
+		sortedKeys := getSortedKeys(ab.Spec.SourcedEnvs)
 
 		// Iterate through sorted keys
-		for _, key := range keys {
+		for _, key := range sortedKeys {
 			envVarSource := corev1.EnvVarSource{}
 			if ab.Spec.SourcedEnvs[key].Secret != "" {
 				envVarSource.SecretKeyRef = &corev1.SecretKeySelector{
@@ -153,13 +121,12 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 					Key:                  ab.Spec.SourcedEnvs[key].Key,
 				}
 			} else {
-				return fmt.Errorf("SourcedEnv %s has neither Secret nor ConfigMap", key)
+				return nil, fmt.Errorf("SourcedEnv %s has neither Secret nor ConfigMap", key)
 			}
 
 			env = append(env, corev1.EnvVar{Name: key, ValueFrom: &envVarSource})
 		}
 	}
-
 	container := corev1.Container{
 		Name:           ab.Name,
 		Image:          fmt.Sprintf("%s:%s", repository, tag),
@@ -173,9 +140,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	}
 
 	if ab.Spec.Command != nil {
-		if container.Command == nil {
-			container.Command = []string{}
-		}
+		container.Command = []string{}
 
 		for _, command := range ab.Spec.Command {
 			container.Command = append(container.Command, *command)
@@ -183,9 +148,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 	}
 
 	if ab.Spec.Args != nil {
-		if container.Args == nil {
-			container.Args = []string{}
-		}
+		container.Args = []string{}
 
 		for _, arg := range ab.Spec.Args {
 			container.Args = append(container.Args, *arg)
@@ -249,14 +212,29 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.
 		deployment.Spec.Template.Spec.RuntimeClassName = &nvidiaRuntimeClass
 	}
 
-	hashAfterChanges, err := rxhash.HashStruct(deployment.Spec)
+	return deployment, nil
+}
+
+// ReconcileDeployment checks currently existing deployment with the expected deployment and updates it if necessary. If no deployment exists, it creates one.
+func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
+	// LOCK APPBUNDLE DEPLOYMENT MUTEX
+	mu := getMutex("deployment", ab.Name, ab.Namespace)
+	mu.Lock()
+	defer mu.Unlock()
+
+	// GET CURRENT DEPLOYMENT
+	currentDeployment := &appsv1.Deployment{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+	er := r.Get(ctx, client.ObjectKeyFromObject(currentDeployment), currentDeployment)
+
+	// GET EXPECTED DEPLOYMENT
+	expectedDeployment, err := CreateExpectedDeployment(ctx, req, ab)
 	if err != nil {
 		return err
 	}
 
-	if hashBeforeChanges != hashAfterChanges {
-		// UPSERT the resource
-		if err := UpsertResource(ctx, r, deployment, er); err != nil {
+	// IF CURRENT != EXPECTED THEN UPSERT
+	if !equality.Semantic.DeepDerivative(expectedDeployment.Spec, currentDeployment.Spec) {
+		if err := UpsertResource(ctx, r, expectedDeployment, er); err != nil {
 			return err
 		}
 	}

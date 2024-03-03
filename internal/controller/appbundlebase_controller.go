@@ -40,9 +40,13 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	l := log.FromContext(ctx)
 
 	// LOCK the resource
-	mu := getMutex("app_bundle_base", req.Name, req.Namespace)
-	mu.Lock()
-	defer mu.Unlock()
+	muBase := getMutex("appBundleBase", req.Name, req.Namespace)
+	muBase.Lock()
+	defer muBase.Unlock()
+
+	if req.Name != "blahtus" {
+		return ctrl.Result{}, nil
+	}
 
 	// Get app bundle base
 	abb := &atroxyzv1alpha1.AppBundleBase{}
@@ -100,7 +104,7 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 
 	for _, ab := range abList.Items {
 		if ab.Spec.Base != nil && *ab.Spec.Base == abb.Name {
-			mus_ab[ab.Name] = getMutex("app_bundle", ab.Name, ab.Namespace)
+			mus_ab[ab.Name] = getMutex("appBundle", ab.Name, ab.Namespace)
 			mus_ab[ab.Name].Lock()
 			hashedSpecAb[ab.Name] = "" // Force update by reseting the hashed spec
 			if err := r.Status().Update(ctx, &ab); err != nil {
@@ -121,6 +125,7 @@ func (r *AppBundleBaseReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
+// ResolveAppBundleBase
 func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atroxyzv1alpha1.AppBundle, abb *atroxyzv1alpha1.AppBundleBase) error {
 	abSpec := &ab.Spec
 	abbSpec := &abb.Spec
