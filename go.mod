@@ -16,6 +16,7 @@ require (
 )
 
 require (
+	github.com/getsentry/sentry-go v0.27.0 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.7 // indirect
 	github.com/klauspost/compress v1.17.5 // indirect
 	github.com/r3labs/diff v1.1.0 // indirect

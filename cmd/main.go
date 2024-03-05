@@ -18,10 +18,13 @@ package main
 
 import (
 	"flag"
+	"log"
 	"os"
+	"time"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
+	"github.com/getsentry/sentry-go"
 	longhornv1beta2 "github.com/longhorn/longhorn-manager/k8s/pkg/apis/longhorn/v1beta2"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
@@ -88,6 +91,18 @@ func main() {
 	// 		pyroscope.ProfileBlockDuration,
 	// 	},
 	// })
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn: "https://18d3749094d5f09ceed1b5363756bd0c@o4506860165398528.ingest.us.sentry.io/4506860202295296",
+		// Set TracesSampleRate to 1.0 to capture 100%
+		// of transactions for performance monitoring.
+		// We recommend adjusting this value in production,
+		TracesSampleRate: 1.0,
+	})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
+	// Flush buffered events before the program terminates.
+	defer sentry.Flush(2 * time.Second)
 
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":9080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":9081", "The address the probe endpoint binds to.")
