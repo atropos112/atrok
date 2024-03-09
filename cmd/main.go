@@ -112,8 +112,14 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
+
+	development := true
+	if os.Getenv("ATROK_ENV") == "production" {
+		development = false
+	}
+
 	opts := zap.Options{
-		Development: true,
+		Development: development,
 	}
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
