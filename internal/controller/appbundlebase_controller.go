@@ -106,7 +106,13 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		if ab.Spec.Base != nil && *ab.Spec.Base == abb.Name {
 			mus_ab[ab.Name] = getMutex("appBundle", ab.Name, ab.Namespace)
 			mus_ab[ab.Name].Lock()
-			hashedSpecAb[ab.Name] = "" // Force update by reseting the hashed spec
+			stateAb, err := GetState(ctx, &ab)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+			stateAb.SpecHash = "" // Force update by reseting the hashed spec
+			ctx = context.WithValue(ctx, ab.ID(), stateAb)
+
 			if err := r.Status().Update(ctx, &ab); err != nil {
 				return ctrl.Result{}, err
 			}

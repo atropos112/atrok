@@ -8,7 +8,6 @@ import (
 	netv1 "k8s.io/api/networking/v1"
 	equality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
@@ -90,7 +89,7 @@ func CreateExpectedIngress(ab *atroxyzv1alpha1.AppBundle, name string, route *at
 	return ingress, nil
 }
 
-func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
+func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, ab *atroxyzv1alpha1.AppBundle) error {
 	l := log.FromContext(ctx)
 
 	// LOCK THE APP BUNDLE INGRESS MUTEX
@@ -156,7 +155,12 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, req ctrl.Req
 
 		// IF CURRENT != EXPECTED THEN UPSERT
 		if !equality.Semantic.DeepDerivative(expectedIngress.Spec, currentIngress.Spec) {
-			if err := UpsertResource(ctx, r, expectedIngress, er); err != nil {
+			reason, err := ForumlateDiffMessageForSpecs(currentIngress.Spec, expectedIngress.Spec)
+			if err != nil {
+				return err
+			}
+
+			if err := UpsertResource(ctx, r, expectedIngress, reason, er); err != nil {
 				return err
 			}
 		}

@@ -7,7 +7,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
@@ -15,71 +14,7 @@ import (
 	rxhash "github.com/rxwycdh/rxhash"
 )
 
-// The recurring jobs are not cleaned up after app bundle is deleted which needs to be fixed
-// GetAppBundleObjectMetaWithOwnerReference(ab).OwnerReferences[] gives a list of owner references (all things i depend on) this might be useful for that
-func (r *AppBundleReconciler) ReconcileBackup(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
-	if err := r.ReconcileRecurringBackupJob(ctx, req, ab); err != nil {
-		return err
-	}
-	reccuringJobName := fmt.Sprintf("%s-%s", ab.Name, ab.Namespace)
-
-	job_specific_key := fmt.Sprintf("recurring-job.longhorn.io/%s", reccuringJobName)
-	job_generic_key := "recurring-job.longhorn.io/source"
-	default_group_key := "recurring-job-group.longhorn.io/default"
-
-	volumeKeys := getSortedKeys(ab.Spec.Volumes)
-
-	for _, key := range volumeKeys {
-		abVol := ab.Spec.Volumes[key]
-
-		if abVol.HostPath != nil {
-			continue
-		}
-
-		if abVol.EmptyDir != nil && *abVol.EmptyDir {
-			continue
-		}
-
-		volName := ab.Name + "-" + key
-		if abVol.ExistingClaim != nil {
-			volName = *abVol.ExistingClaim
-		}
-
-		pvc := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{Name: volName, Namespace: ab.Namespace}}
-		if err := r.Get(ctx, client.ObjectKeyFromObject(pvc), pvc); err != nil {
-			return err
-		}
-
-		labels := make(map[string]string)
-		for key, value := range pvc.GetLabels() {
-			labels[key] = value
-		}
-
-		// If the key is not there we dont delete the generic key as it might be part of other backup place.
-		if abVol.Backup != nil && !*abVol.Backup {
-			delete(labels, job_specific_key)
-		} else {
-			labels[job_specific_key] = "enabled"
-			labels[job_generic_key] = "enabled"
-			labels[default_group_key] = "enabled"
-		}
-
-		pvc.ObjectMeta.Labels = labels
-
-		// REGAIN control if lost
-		if abVol.ExistingClaim == nil {
-			pvc.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
-		}
-
-		if err := UpsertResource(ctx, r, pvc, nil); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (r *AppBundleReconciler) ReconcileRecurringBackupJob(ctx context.Context, req ctrl.Request, ab *atroxyzv1alpha1.AppBundle) error {
+func (r *AppBundleReconciler) ReconcileRecurringBackupJob(ctx context.Context, ab *atroxyzv1alpha1.AppBundle) error {
 	if ab.Spec.Backup == nil {
 		return nil
 	}
@@ -161,7 +96,7 @@ func (r *AppBundleReconciler) ReconcileRecurringBackupJob(ctx context.Context, r
 	}
 
 	// UPSERT the resource
-	if err := UpsertResource(ctx, r, recurringJob, er); err != nil {
+	if err := UpsertResource(ctx, r, recurringJob, "", er); err != nil {
 		return err
 	}
 
