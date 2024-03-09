@@ -1,6 +1,4 @@
 /*
-Copyright 2023 atropos.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -25,6 +23,7 @@ import (
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	"github.com/getsentry/sentry-go"
+	"github.com/grafana/pyroscope-go"
 	longhornv1beta2 "github.com/longhorn/longhorn-manager/k8s/pkg/apis/longhorn/v1beta2"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
@@ -60,49 +59,53 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
-	// pyroscope.Start(pyroscope.Config{
-	// 	ApplicationName: "atrok",
+	if os.Getenv("ATROK_PYROSCOPE_ENABLED") == "true" {
+		pyroscope.Start(pyroscope.Config{
+			ApplicationName: "atrok",
 
-	// 	// replace this with the address of pyroscope server
-	// 	ServerAddress: "http://pyroscope.traces:4040",
+			// replace this with the address of pyroscope server
+			ServerAddress: "http://pyroscope.traces:4040",
 
-	// 	// you can disable logging by setting this to nil
-	// 	Logger: pyroscope.StandardLogger,
+			// you can disable logging by setting this to nil
+			Logger: pyroscope.StandardLogger,
 
-	// 	// you can provide static tags via a map:
-	// 	Tags: map[string]string{
-	// 		"pod": os.Getenv("HOSTNAME"),
-	// 		"app": "atrok",
-	// 	},
+			// you can provide static tags via a map:
+			Tags: map[string]string{
+				"pod": os.Getenv("HOSTNAME"),
+				"app": "atrok",
+			},
 
-	// 	ProfileTypes: []pyroscope.ProfileType{
-	// 		// these profile types are enabled by default:
-	// 		pyroscope.ProfileCPU,
-	// 		pyroscope.ProfileAllocObjects,
-	// 		pyroscope.ProfileAllocSpace,
-	// 		pyroscope.ProfileInuseObjects,
-	// 		pyroscope.ProfileInuseSpace,
+			ProfileTypes: []pyroscope.ProfileType{
+				// these profile types are enabled by default:
+				pyroscope.ProfileCPU,
+				pyroscope.ProfileAllocObjects,
+				pyroscope.ProfileAllocSpace,
+				pyroscope.ProfileInuseObjects,
+				pyroscope.ProfileInuseSpace,
 
-	// 		// these profile types are optional:
-	// 		pyroscope.ProfileGoroutines,
-	// 		pyroscope.ProfileMutexCount,
-	// 		pyroscope.ProfileMutexDuration,
-	// 		pyroscope.ProfileBlockCount,
-	// 		pyroscope.ProfileBlockDuration,
-	// 	},
-	// })
-	err := sentry.Init(sentry.ClientOptions{
-		Dsn: "https://18d3749094d5f09ceed1b5363756bd0c@o4506860165398528.ingest.us.sentry.io/4506860202295296",
-		// Set TracesSampleRate to 1.0 to capture 100%
-		// of transactions for performance monitoring.
-		// We recommend adjusting this value in production,
-		TracesSampleRate: 1.0,
-	})
-	if err != nil {
-		log.Fatalf("sentry.Init: %s", err)
+				// these profile types are optional:
+				pyroscope.ProfileGoroutines,
+				pyroscope.ProfileMutexCount,
+				pyroscope.ProfileMutexDuration,
+				pyroscope.ProfileBlockCount,
+				pyroscope.ProfileBlockDuration,
+			},
+		})
 	}
-	// Flush buffered events before the program terminates.
-	defer sentry.Flush(2 * time.Second)
+	if os.Getenv("ATROK_SENTRY_ENABLED") == "true" {
+		err := sentry.Init(sentry.ClientOptions{
+			Dsn: os.Getenv("ATROK_SENTRY_DSN"),
+			// Set TracesSampleRate to 1.0 to capture 100%
+			// of transactions for performance monitoring.
+			// We recommend adjusting this value in production,
+			TracesSampleRate: 1.0,
+		})
+		if err != nil {
+			log.Fatalf("sentry.Init: %s", err)
+		}
+		// Flush buffered events before the program terminates.
+		defer sentry.Flush(2 * time.Second)
+	}
 
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":9080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":9081", "The address the probe endpoint binds to.")

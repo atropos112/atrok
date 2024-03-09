@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	"github.com/r3labs/diff/v3"
 	"golang.org/x/sync/errgroup"
 	k8serror "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,21 +45,58 @@ func UpsertLabelIntoResource(ctx context.Context, r ReaderWriter, kv map[string]
 	return nil
 }
 
-func UpsertResource(ctx context.Context, r ReaderWriter, obj client.Object, er error) error {
+func GetDiffPaths(oldObj, newObj interface{}) (string, error) {
+	changes, err := diff.Diff(oldObj, newObj)
+	if err != nil {
+		return "", err
+	}
+
+	paths := []string{}
+	for _, change := range changes {
+		path := ""
+		for _, p := range change.Path {
+			path += p + "/"
+		}
+		paths = append(paths, path)
+	}
+
+	output := "\n"
+	for _, path := range paths {
+		output += path + "\n"
+	}
+
+	return output, nil
+}
+
+func ForumlateDiffMessageForSpecs(oldObjSpec, newObjSpec interface{}) (string, error) {
+	diff, err := GetDiffPaths(oldObjSpec, newObjSpec)
+	if err != nil {
+		return "", err
+	}
+	reason := "Spec changed, namely the paths: " + diff
+	return reason, nil
+}
+
+// UpsertResource creates or updates a resource with nice logging indicating what is happening.
+func UpsertResource(ctx context.Context, r ReaderWriter, newObj client.Object, reason string, er error) error {
 	l := log.FromContext(ctx)
 
 	if er != nil && !k8serror.IsNotFound(er) {
 		return er
 	}
 
+	if reason != "" {
+		l.Info("Upserting reason because: " + reason)
+	}
+
 	if k8serror.IsNotFound(er) {
-		l.Info("Creating resource.", "type", reflect.TypeOf(obj).String(), "object", obj)
-		if err := r.Create(ctx, obj); err != nil {
+		l.Info("Creating resource.", "type", reflect.TypeOf(newObj).String(), "object", newObj)
+		if err := r.Create(ctx, newObj); err != nil {
 			return err
 		}
 	} else {
-		l.Info("Updating resource.", "type", reflect.TypeOf(obj).String(), "object", obj)
-		if err := r.Update(ctx, obj); err != nil {
+		l.Info("Resource exists but changes were found.", "type", reflect.TypeOf(newObj).String(), "object", newObj)
+		if err := r.Update(ctx, newObj); err != nil {
 			return err
 		}
 	}

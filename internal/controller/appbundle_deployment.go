@@ -233,7 +233,12 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, ab *atrox
 
 	// IF CURRENT != EXPECTED THEN UPSERT
 	if !equality.Semantic.DeepDerivative(expectedDeployment.Spec, currentDeployment.Spec) {
-		if err := UpsertResource(ctx, r, expectedDeployment, er); err != nil {
+		reason, err := ForumlateDiffMessageForSpecs(currentDeployment.Spec, expectedDeployment.Spec)
+		if err != nil {
+			return err
+		}
+
+		if err := UpsertResource(ctx, r, expectedDeployment, reason, er); err != nil {
 			return err
 		}
 	}

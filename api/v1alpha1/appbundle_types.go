@@ -96,6 +96,11 @@ type AppBundle struct {
 	Status AppBundleStatus `json:"status,omitempty"`
 }
 
+// ID returns the unique ID of the appbundle
+func (ab *AppBundle) ID() string {
+	return ab.Name + "_" + ab.Namespace
+}
+
 func (ab *AppBundle) OwnerReference() metav1.OwnerReference {
 	return metav1.OwnerReference{
 		APIVersion: ab.APIVersion,

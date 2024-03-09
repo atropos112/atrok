@@ -155,7 +155,12 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, ab *atroxyzv
 
 		// IF CURRENT != EXPECTED THEN UPSERT
 		if !equality.Semantic.DeepDerivative(expectedIngress.Spec, currentIngress.Spec) {
-			if err := UpsertResource(ctx, r, expectedIngress, er); err != nil {
+			reason, err := ForumlateDiffMessageForSpecs(currentIngress.Spec, expectedIngress.Spec)
+			if err != nil {
+				return err
+			}
+
+			if err := UpsertResource(ctx, r, expectedIngress, reason, er); err != nil {
 				return err
 			}
 		}
