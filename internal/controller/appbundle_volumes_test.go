@@ -10,7 +10,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
@@ -21,15 +20,17 @@ var _ = Describe("Correctly populated AppBundle with PVC, Emptydir and HostPath"
 	var ab *atroxyzv1alpha1.AppBundle
 	var rec *AppBundleReconciler
 	var ctx context.Context
-	var fake_req ctrl.Request
-	pvcName := GetRandomName()
-	emptyDirName := GetRandomName()
-	hostPathName := GetRandomName()
+	// NOTE: I am picking names here so that they are in order (alphabetical, expect pvc to be first, then empty dir then host path), the order is ALSO important and tested here.
+	pvcNameInAppBundle := "apvc"
+	var pvcName string
+	emptyDirName := "bemptydir"
+	hostPathName := "chostpath"
 
 	BeforeEach(func() {
 		// SETUP
 		ctx = context.Background()
 		ab = GetBasicAppBundle()
+		pvcName = ab.Name + "-" + pvcNameInAppBundle
 		size := "1Gi"
 		hostPath := "/tmp"
 		path1 := "/tmp1"
@@ -38,13 +39,12 @@ var _ = Describe("Correctly populated AppBundle with PVC, Emptydir and HostPath"
 		emptyDir := true
 
 		ab.Spec.Volumes = map[string]atroxyzv1alpha1.AppBundleVolume{
-			pvcName:      {Size: &size, Path: &path1},
-			emptyDirName: {EmptyDir: &emptyDir, Path: &path2},
-			hostPathName: {HostPath: &hostPath, Path: &path3},
+			pvcNameInAppBundle: {Size: &size, Path: &path1},
+			emptyDirName:       {EmptyDir: &emptyDir, Path: &path2},
+			hostPathName:       {HostPath: &hostPath, Path: &path3},
 		}
 
 		rec = &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
-		fake_req = ctrl.Request{NamespacedName: client.ObjectKey{Name: ab.Name, Namespace: ab.Namespace}}
 
 		// CREATE APPBUNDLE
 		er := rec.Create(ctx, ab)
@@ -52,11 +52,11 @@ var _ = Describe("Correctly populated AppBundle with PVC, Emptydir and HostPath"
 		ApplyTypeMetaToAppBundleForTesting(ab)
 
 		// RECONCILE Volume
-		err := rec.ReconcileVolumes(ctx, fake_req, ab)
+		err := rec.ReconcileVolumes(ctx, ab)
 		Expect(err).NotTo(HaveOccurred())
 
 		// RECONCILE Deployment
-		err = rec.ReconcileDeployment(ctx, fake_req, ab)
+		err = rec.ReconcileDeployment(ctx, ab)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -110,7 +110,7 @@ var _ = Describe("Correctly populated AppBundle with PVC, Emptydir and HostPath"
 		// VOLUME MOUNTS
 		volumeMounts := deployment.Spec.Template.Spec.Containers[0].VolumeMounts
 		Expect(volumeMounts).To(HaveLen(3))
-		Expect(volumeMounts[0].Name).To(Equal(pvcName))
+		Expect(volumeMounts[0].Name).To(Equal(pvcNameInAppBundle))
 		Expect(volumeMounts[1].Name).To(Equal(emptyDirName))
 		Expect(volumeMounts[2].Name).To(Equal(hostPathName))
 
@@ -119,7 +119,7 @@ var _ = Describe("Correctly populated AppBundle with PVC, Emptydir and HostPath"
 		Expect(volumes).To(HaveLen(3))
 
 		// PVC
-		Expect(volumes[0].Name).To(Equal(pvcName))
+		Expect(volumes[0].Name).To(Equal(pvcNameInAppBundle))
 		Expect(volumes[0].VolumeSource.PersistentVolumeClaim.ClaimName).To(Equal(pvcName))
 
 		// EMPTYDIR

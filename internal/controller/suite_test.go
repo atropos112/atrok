@@ -87,6 +87,10 @@ func GetBasicAppBundle() *atroxyzv1alpha1.AppBundle {
 	name := GetRandomName()
 
 	basicAppBundle := &atroxyzv1alpha1.AppBundle{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "AppBundle",
+			APIVersion: "atroxyz.atrok.io/v1alpha1",
+		},
 		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "devel"},
 		Spec: atroxyzv1alpha1.AppBundleSpec{
 			Image: basicImage,

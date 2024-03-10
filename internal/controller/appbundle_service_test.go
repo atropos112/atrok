@@ -9,7 +9,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/kubernetes/scheme"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
@@ -20,14 +19,12 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling serv
 	var ab *atroxyzv1alpha1.AppBundle
 	var rec *AppBundleReconciler
 	var ctx context.Context
-	var fake_req ctrl.Request
 
 	BeforeEach(func() {
 		// SETUP
 		ctx = context.Background()
 		ab = GetBasicAppBundle()
 		rec = &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
-		fake_req = ctrl.Request{NamespacedName: client.ObjectKey{Name: ab.Name, Namespace: ab.Namespace}}
 
 		// CREATE APPBUNDLE
 		er := rec.Create(ctx, ab)
@@ -37,7 +34,7 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling serv
 
 	It("Should make no service as there are no routes", func() {
 		By("Reconciling service using app bundle")
-		err := rec.ReconcileService(ctx, fake_req, ab)
+		err := rec.ReconcileService(ctx, ab)
 		Expect(err).NotTo(HaveOccurred())
 
 		// GET the resource
@@ -68,7 +65,7 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling serv
 
 			It("Should make a simple service", func() {
 				By("Reconciling service using app bundle")
-				err := rec.ReconcileService(ctx, fake_req, ab)
+				err := rec.ReconcileService(ctx, ab)
 				Expect(err).NotTo(HaveOccurred())
 
 				// GET the resource
@@ -87,7 +84,7 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling serv
 			Describe("With a single route", func() {
 				Context("And created service", func() {
 					BeforeEach(func() {
-						err := rec.ReconcileService(ctx, fake_req, ab)
+						err := rec.ReconcileService(ctx, ab)
 						Expect(err).NotTo(HaveOccurred())
 					})
 
@@ -100,7 +97,7 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling serv
 						Expect(err).NotTo(HaveOccurred())
 
 						// RECONCILE service
-						err = rec.ReconcileService(ctx, fake_req, ab)
+						err = rec.ReconcileService(ctx, ab)
 						Expect(err).NotTo(HaveOccurred())
 
 						// GET service
@@ -128,7 +125,7 @@ var _ = Describe("Correctly populated AppBundle with no routes reconcilling serv
 						Expect(err).NotTo(HaveOccurred())
 
 						// RECONCILE service
-						err = rec.ReconcileService(ctx, fake_req, ab)
+						err = rec.ReconcileService(ctx, ab)
 						Expect(err).NotTo(HaveOccurred())
 
 						// GET service
@@ -146,14 +143,12 @@ var _ = Describe("AppBundle with incorrectly populated route", func() {
 	var ab *atroxyzv1alpha1.AppBundle
 	var rec *AppBundleReconciler
 	var ctx context.Context
-	var fake_req ctrl.Request
 
 	BeforeEach(func() {
 		// SETUP
 		ctx = context.Background()
 		ab = GetBasicAppBundle()
 		rec = &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
-		fake_req = ctrl.Request{NamespacedName: client.ObjectKey{Name: ab.Name, Namespace: ab.Namespace}}
 
 		// CREATE bad route (negative port)
 		route_name := "test"
@@ -174,7 +169,7 @@ var _ = Describe("AppBundle with incorrectly populated route", func() {
 
 	It("Should not make a service", func() {
 		By("Reconciling service using app bundle")
-		err := rec.ReconcileService(ctx, fake_req, ab)
+		err := rec.ReconcileService(ctx, ab)
 		Expect(err).To(HaveOccurred())
 
 		// GET the resource
