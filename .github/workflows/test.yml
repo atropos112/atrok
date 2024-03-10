@@ -20,4 +20,4 @@ jobs:
       - name: Setup Ginkgo
         run: go install github.com/onsi/ginkgo/v2/ginkgo
       - name: Test with the Ginkgo CLI
-        run: $HOME/go/bin/ginkgo run internal/controller
+        run: ginkgo run internal/controller
