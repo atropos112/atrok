@@ -38,7 +38,7 @@ jobs:
         with:
           images: |
             atropos112/atrok
-          tags: "type=schedule\ntype=ref,event=branch\ntype=ref,event=pr\ntype=semver,pattern={{version}}\ntype=semver,pattern={{major}}.{{minor}}\ntype=semver,pattern={{major}}\ntype=sha  \n"
+          tags: "type=semver,pattern={{version}}\ntype=semver,pattern={{major}}.{{minor}}\ntype=semver,pattern={{major}}\ntype=sha  \n"
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
