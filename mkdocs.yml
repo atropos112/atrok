@@ -1,0 +1,42 @@
+site_name: AtroArgs
+repo_name: atropos112/atrok
+repo_url: https://github.com/atropos112/atrok
+theme:
+  name: material
+  logo: logoatro.png
+  favicon: logoatro.png
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/lightbulb
+        name: Switch to light mode
+  features: [search.suggest]
+plugins:
+  - include-markdown
+  - search:
+      lang: en
+nav:
+  - Home: index.md
+  - Usage: usage.md
+  - Examples: examples.md
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.extra
