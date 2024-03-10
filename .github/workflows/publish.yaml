@@ -40,4 +40,4 @@ jobs:
           push: true
           images: |
             atropos112/atrok
-          tags: "type=ref,event=branch\ntype=ref,event=pr\ntype=semver,pattern={{version}}\ntype=semver,pattern={{major}}.{{minor}}\ntype=semver,pattern={{major}}\ntype=sha    \n"
+          tags: "type=semver,pattern={{version}}\ntype=semver,pattern={{major}}.{{minor}}\ntype=semver,pattern={{major}}\ntype=sha    \n"
