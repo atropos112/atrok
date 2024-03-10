@@ -17,11 +17,15 @@ jobs:
         run: go mod download
       - name: Build
         run: go build -v ./...
-      - name: Create k8s Kind Cluster
-        uses: helm/kind-action@v1
-        with:
-          kubectl_version: "v1.28.6"
       - name: Setup Ginkgo
         run: go install github.com/onsi/ginkgo/v2/ginkgo
-      - name: Test with the Ginkgo CLI
-        run: ginkgo run internal/controller
+      - name: Setup envtest
+        run: make envtest
+      - name: Test
+        run: make test
+    # Will be helm install testing at some point, not yet. 
+    # - name: Create k8s Kind Cluster
+    #   uses: helm/kind-action@v1
+    #   with:
+    #     cluster_name: "operator-testing"
+    #     kubectl_version: "v1.28.6"
