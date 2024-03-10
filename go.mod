@@ -4,19 +4,19 @@ go 1.22
 
 require (
 	github.com/getsentry/sentry-go v0.27.0
+	github.com/grafana/pyroscope-go v1.1.1
 	github.com/longhorn/longhorn-manager v1.5.3
 	github.com/onsi/ginkgo/v2 v2.14.0
 	github.com/onsi/gomega v1.30.0
 	github.com/r3labs/diff/v3 v3.0.1
 	golang.org/x/sync v0.6.0
 	k8s.io/api v0.29.1
-	k8s.io/apimachinery v0.29.1
+	k8s.io/apimachinery v0.29.2
 	k8s.io/client-go v0.29.1
 	sigs.k8s.io/controller-runtime v0.17.0
 )
 
 require (
-	github.com/grafana/pyroscope-go v1.1.1 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.6 // indirect
 	github.com/klauspost/compress v1.17.3 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
