@@ -17,5 +17,7 @@ jobs:
         run: go mod download
       - name: Build
         run: go build -v ./...
+      - name: Setup Ginkgo
+        run: go install github.com/onsi/ginkgo/v2/ginkgo
       - name: Test with the Ginkgo CLI
-        run: ginkgo run internal/controller
+        run: $HOME/go/bin/ginkgo run internal/controller
