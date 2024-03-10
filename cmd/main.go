@@ -67,7 +67,7 @@ func main() {
 			ServerAddress: "http://pyroscope.traces:4040",
 
 			// you can disable logging by setting this to nil
-			Logger: nil // pyroscope.StandardLogger,
+			Logger: nil, // pyroscope.StandardLogger,
 
 			// you can provide static tags via a map:
 			Tags: map[string]string{
