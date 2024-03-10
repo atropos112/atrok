@@ -1,8 +1,6 @@
 name: Test And Publish
 on:
   push:
-    branches:
-      - main
     tags:
       - "v*.*.*"
 jobs:
@@ -42,4 +40,4 @@ jobs:
           push: true
           images: |
             atropos112/atrok
-          tags: "type=schedule\ntype=ref,event=branch\ntype=ref,event=pr\ntype=semver,pattern={{version}}\ntype=semver,pattern={{major}}.{{minor}}\ntype=semver,pattern={{major}}\ntype=sha    \n"
+          tags: "type=ref,event=branch\ntype=ref,event=pr\ntype=semver,pattern={{version}}\ntype=semver,pattern={{major}}.{{minor}}\ntype=semver,pattern={{major}}\ntype=sha    \n"
