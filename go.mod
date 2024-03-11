@@ -6,7 +6,7 @@ require (
 	github.com/getsentry/sentry-go v0.27.0
 	github.com/grafana/pyroscope-go v1.1.1
 	github.com/longhorn/longhorn-manager v1.5.3
-	github.com/onsi/ginkgo/v2 v2.15.0
+	github.com/onsi/ginkgo/v2 v2.16.0
 	github.com/onsi/gomega v1.31.1
 	github.com/r3labs/diff/v3 v3.0.1
 	golang.org/x/sync v0.6.0
