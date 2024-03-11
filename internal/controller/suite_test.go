@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"os"
 	"path/filepath"
 	"runtime"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -34,16 +36,23 @@ var _ = BeforeSuite(func() {
 	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
 
 	By("bootstrapping test environment")
-	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
-		ErrorIfCRDPathMissing: true,
-		// The BinaryAssetsDirectory is only required if you want to run the tests directly
-		// without call the makefile target test. If not informed it will look for the
-		// default path defined in controller-runtime which is /usr/local/kubebuilder/.
-		// Note that you must have the required binaries setup under the bin directory to perform
-		// the tests directly. When we run make test it will be setup and used automatically.
-		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-			fmt.Sprintf("1.28.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
+	if os.Getenv("ATROK_TEST_ENV") == "end2end" {
+		useExistingCluster := true
+		testEnv = &envtest.Environment{
+			UseExistingCluster: &useExistingCluster,
+		}
+	} else {
+		testEnv = &envtest.Environment{
+			CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
+			ErrorIfCRDPathMissing: true,
+			// The BinaryAssetsDirectory is only required if you want to run the tests directly
+			// without call the makefile target test. If not informed it will look for the
+			// default path defined in controller-runtime which is /usr/local/kubebuilder/.
+			// Note that you must have the required binaries setup under the bin directory to perform
+			// the tests directly. When we run make test it will be setup and used automatically.
+			BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
+				fmt.Sprintf("1.28.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
+		}
 	}
 
 	var err error
@@ -68,7 +77,9 @@ var _ = BeforeSuite(func() {
 
 	ns := &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "devel"}}
 	err = k8sClient.Create(context.Background(), ns)
-	Expect(err).NotTo(HaveOccurred())
+	if err != nil && !apierrors.IsAlreadyExists(err) {
+		Expect(err).NotTo(HaveOccurred())
+	}
 })
 
 var _ = AfterSuite(func() {
