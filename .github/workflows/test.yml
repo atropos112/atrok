@@ -1,5 +1,9 @@
 name: Test
 on:
+  workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        required: true
   pull_request:
     branches: ["main"]
 jobs:
@@ -19,6 +23,11 @@ jobs:
         run: make envtest
       - name: Test
         run: make test
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: atropos112/atrok
     # Will be helm install testing at some point, not yet. 
     # - name: Create k8s Kind Cluster
     #   uses: helm/kind-action@v1
