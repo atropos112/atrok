@@ -5,7 +5,7 @@ on:
       - "v*.*.*"
 jobs:
   test:
-    uses: atropos112/atro-args/.github/workflows/test.yaml@main
+    uses: atropos112/atrok/.github/workflows/test.yaml@main
     secrets: inherit
   publish:
     needs: test
