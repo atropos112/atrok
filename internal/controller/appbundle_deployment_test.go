@@ -67,7 +67,7 @@ var _ = Describe("Correctly populated AppBundle for just deplyoment", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		// CHANGE AppBundle
-		newTag := "test"
+		newTag := "mainline-alpine"
 		ab.Spec.Image.Tag = &newTag
 		err = rec.Update(ctx, ab)
 		Expect(err).NotTo(HaveOccurred())
