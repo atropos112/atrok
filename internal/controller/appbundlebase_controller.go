@@ -245,6 +245,9 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 					if abbRoute.Port != nil && abRoute.Port == nil {
 						abRoute.Port = abbRoute.Port
 					}
+					if abbRoute.TargetPort != nil && abRoute.TargetPort == nil {
+						abRoute.TargetPort = abbRoute.TargetPort
+					}
 					if abbRoute.Protocol != nil && abRoute.Protocol == nil {
 						abRoute.Protocol = abbRoute.Protocol
 					}
