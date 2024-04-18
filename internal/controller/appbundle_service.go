@@ -49,7 +49,13 @@ func CreateExpectedService(ab *atroxyzv1alpha1.AppBundle, generatedSpecData *Gen
 	routeKeys := getSortedKeys(ab.Spec.Routes)
 	for _, key := range routeKeys {
 		route := ab.Spec.Routes[key]
-		port := corev1.ServicePort{Name: key, Port: int32(*route.Port), TargetPort: intstr.IntOrString{IntVal: int32(*route.Port)}, Protocol: "TCP"}
+
+		tPort := int32(*route.Port)
+		if route.TargetPort != nil {
+			tPort = int32(*route.TargetPort)
+		}
+
+		port := corev1.ServicePort{Name: key, Port: int32(*route.Port), TargetPort: intstr.IntOrString{IntVal: tPort}, Protocol: "TCP"}
 
 		if route.Protocol != nil {
 			port.Protocol = *route.Protocol

@@ -42,9 +42,10 @@ type AppBundleImage struct {
 }
 
 type AppBundleRoute struct {
-	Port     *int                   `json:"port,omitempty"`
-	Protocol *v1.Protocol           `json:"protocol,omitempty"`
-	Ingress  *AppBundleRouteIngress `json:"ingress,omitempty"`
+	Port       *int                   `json:"port,omitempty"`
+	TargetPort *int                   `json:"targetPort,omitempty"`
+	Protocol   *v1.Protocol           `json:"protocol,omitempty"`
+	Ingress    *AppBundleRouteIngress `json:"ingress,omitempty"`
 }
 
 type AppBundleRouteIngress struct {
