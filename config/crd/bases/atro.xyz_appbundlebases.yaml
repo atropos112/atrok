@@ -465,6 +465,8 @@ spec:
                     protocol:
                       default: TCP
                       type: string
+                    targetPort:
+                      type: integer
                   type: object
                 type: object
               selector:
