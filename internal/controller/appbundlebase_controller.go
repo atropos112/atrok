@@ -39,7 +39,6 @@ type AppBundleIdentifier string // Identifier for the app bundle
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.3/pkg/reconcile
 func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-
 	l := log.FromContext(ctx)
 
 	// LOCK the resource
@@ -65,7 +64,7 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, err
 	}
 
-	var lastRecon = time.Unix(0, 0)
+	lastRecon := time.Unix(0, 0)
 
 	if abb.Status.LastReconciliation != nil {
 		lastRecon, err = time.Parse(time.UnixDate, *abb.Status.LastReconciliation)
@@ -161,7 +160,6 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 	abbSpec.Args = ReturnFirstNonDefault(abSpec.Args, abbSpec.Args)
 
 	if abbSpec.Volumes != nil {
-
 		if abSpec.Volumes == nil {
 			abSpec.Volumes = abbSpec.Volumes
 		} else {
@@ -191,6 +189,12 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 		for name, inline := range abbSpec.Configs {
 			if _, ok := abSpec.Configs[name]; !ok {
 				abSpec.Configs[name] = inline
+			} else {
+				config := abSpec.Configs[name]
+				config.Data = ReturnFirstNonDefault(config.Data, inline.Data)
+				config.MountPath = ReturnFirstNonDefault(config.MountPath, inline.MountPath)
+
+				abSpec.Configs[name] = config
 			}
 		}
 	}
@@ -310,7 +314,6 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 
 	newAbb := &atroxyzv1alpha1.AppBundleBase{ObjectMeta: metav1.ObjectMeta{Name: *abb.Spec.Base}}
 	err := r.Get(ctx, client.ObjectKey{Name: *abb.Spec.Base}, newAbb)
-
 	if err != nil {
 		return err
 	}

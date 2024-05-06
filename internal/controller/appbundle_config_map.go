@@ -20,7 +20,10 @@ func CreateExpectedConfigMap(ab *atroxyzv1alpha1.AppBundle) (*corev1.ConfigMap, 
 	}
 
 	// Trivail mappings.
-	cm.Data = ab.Spec.Configs
+	cm.Data = make(map[string]string)
+	for k, v := range ab.Spec.Configs {
+		cm.Data[k] = v.Data
+	}
 
 	return cm, nil
 }

@@ -77,6 +77,25 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 		}
 	}
 
+	if ab.Spec.Configs != nil {
+		configMapKeys := getSortedKeys(ab.Spec.Configs)
+		configMapItems := make([]corev1.KeyToPath, 0)
+
+		for _, key := range configMapKeys {
+			configMapItems = append(configMapItems, corev1.KeyToPath{Key: key, Path: ab.Spec.Configs[key].MountPath})
+		}
+
+		volumes = append(volumes, corev1.Volume{
+			Name: "configMap",
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+					LocalObjectReference: corev1.LocalObjectReference{Name: ab.Name},
+					Items:                configMapItems,
+				},
+			},
+		})
+	}
+
 	// Small bits
 	revision_history_limit := int32(3)
 	labels := make(map[string]string)
@@ -184,7 +203,10 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 			Spec: corev1.PodSpec{
 				Volumes:          volumes,
 				ImagePullSecrets: image_pull_secrets,
-				Containers:       []corev1.Container{container}}}}
+				Containers:       []corev1.Container{container},
+			},
+		},
+	}
 
 	if ab.Spec.NodeSelector != nil {
 		deployment.Spec.Template.Spec.NodeSelector = *ab.Spec.NodeSelector

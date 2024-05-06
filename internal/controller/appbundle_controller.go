@@ -16,7 +16,6 @@ import (
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.0/pkg/reconcile
 func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-
 	// LOCK the resource
 	mu := getMutex("appBundle", req.Name, req.Namespace)
 	mu.Lock()

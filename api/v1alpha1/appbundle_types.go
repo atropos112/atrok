@@ -28,7 +28,12 @@ type AppBundleSpec struct {
 	TailscaleName  *string                        `json:"tailscaleName,omitempty"`
 	Command        []*string                      `json:"command,omitempty"`
 	Args           []*string                      `json:"args,omitempty"`
-	Configs        map[string]string              `json:"configs,omitempty"`
+	Configs        map[string]AppBundleConfig     `json:"configs,omitempty"`
+}
+
+type AppBundleConfig struct {
+	Data      string `json:"data,omitempty"`
+	MountPath string `json:"mountPath,omitempty"`
 }
 
 type AppBundleSourcedEnv struct {

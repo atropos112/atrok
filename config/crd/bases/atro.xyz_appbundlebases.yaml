@@ -60,7 +60,12 @@ spec:
                 type: array
               configs:
                 additionalProperties:
-                  type: string
+                  properties:
+                    data:
+                      type: string
+                    mountPath:
+                      type: string
+                  type: object
                 type: object
               envs:
                 additionalProperties:
