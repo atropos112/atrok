@@ -77,23 +77,24 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 		}
 	}
 
+	// Attach ConfigMaps
 	if ab.Spec.Configs != nil {
 		configMapKeys := getSortedKeys(ab.Spec.Configs)
-		configMapItems := make([]corev1.KeyToPath, 0)
 
 		for _, key := range configMapKeys {
-			configMapItems = append(configMapItems, corev1.KeyToPath{Key: key, Path: ab.Spec.Configs[key].MountPath})
-		}
-
-		volumes = append(volumes, corev1.Volume{
-			Name: "configMap",
-			VolumeSource: corev1.VolumeSource{
-				ConfigMap: &corev1.ConfigMapVolumeSource{
-					LocalObjectReference: corev1.LocalObjectReference{Name: ab.Name},
-					Items:                configMapItems,
+			volumeName := "configMap" + key
+			volumes = append(volumes, corev1.Volume{
+				Name: volumeName,
+				VolumeSource: corev1.VolumeSource{
+					ConfigMap: &corev1.ConfigMapVolumeSource{
+						LocalObjectReference: corev1.LocalObjectReference{Name: ab.Name},
+						Items:                []corev1.KeyToPath{{Key: key, Path: key}},
+					},
 				},
-			},
-		})
+			})
+
+			volumeMounts = append(volumeMounts, corev1.VolumeMount{Name: volumeName, MountPath: ab.Spec.Configs[key].MountPath})
+		}
 	}
 
 	// Small bits
