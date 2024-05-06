@@ -19,6 +19,7 @@ func CreateExpectedConfigMap(ab *atroxyzv1alpha1.AppBundle) (*corev1.ConfigMap, 
 		return nil, nil
 	}
 
+	// Trivail mappings.
 	cm.Data = ab.Spec.Configs
 
 	return cm, nil
