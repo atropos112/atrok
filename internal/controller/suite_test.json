@@ -1,0 +1,912 @@
+[
+  {
+    "SuitePath": "/home/atropos/projects/Infra/atrok/internal/controller",
+    "SuiteDescription": "Controller Suite",
+    "SuiteLabels": [],
+    "SuiteSucceeded": true,
+    "SuiteHasProgrammaticFocus": false,
+    "SpecialSuiteFailureReasons": null,
+    "PreRunStats": {
+      "TotalSpecs": 20,
+      "SpecsThatWillRun": 1
+    },
+    "StartTime": "2024-05-06T19:21:27.441403787+01:00",
+    "EndTime": "2024-05-06T19:21:31.286566521+01:00",
+    "RunTime": 3845162736,
+    "SuiteConfig": {
+      "RandomSeed": 1715019686,
+      "RandomizeAllSpecs": false,
+      "FocusStrings": [
+        "\\bCorrectly populated AppBundle for just deplyoment Should select first non-default element\\b"
+      ],
+      "SkipStrings": null,
+      "FocusFiles": [
+        "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_controller_test.go"
+      ],
+      "SkipFiles": null,
+      "LabelFilter": "",
+      "FailOnPending": false,
+      "FailFast": false,
+      "FlakeAttempts": 0,
+      "MustPassRepeatedly": 0,
+      "DryRun": false,
+      "PollProgressAfter": 0,
+      "PollProgressInterval": 0,
+      "Timeout": 3598739635777,
+      "EmitSpecProgress": false,
+      "OutputInterceptorMode": "",
+      "SourceRoots": null,
+      "GracePeriod": 30000000000,
+      "ParallelProcess": 1,
+      "ParallelTotal": 1,
+      "ParallelHost": ""
+    },
+    "SpecReports": [
+      {
+        "ContainerHierarchyTexts": null,
+        "ContainerHierarchyLocations": null,
+        "ContainerHierarchyLabels": null,
+        "LeafNodeType": "BeforeSuite",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
+          "LineNumber": 35
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "",
+        "State": "passed",
+        "StartTime": "2024-05-06T19:21:27.441483032+01:00",
+        "EndTime": "2024-05-06T19:21:30.21246676+01:00",
+        "RunTime": 2770983731,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "2024-05-06T19:21:27+01:00\tDEBUG\tcontroller-runtime.test-env\tstarting control plane\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling CRDs\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\treading CRDs from path\t{\"path\": \"../../config/crd/bases\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tread CRDs from file\t{\"file\": \"atro.xyz_appbundlebases.yaml\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tread CRDs from file\t{\"file\": \"atro.xyz_appbundles.yaml\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling CRD\t{\"crd\": \"appbundlebases.atro.xyz\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling CRD\t{\"crd\": \"appbundles.atro.xyz\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tadding API in waitlist\t{\"GV\": \"atro.xyz/v1alpha1\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tadding API in waitlist\t{\"GV\": \"atro.xyz/v1alpha1\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling webhooks\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
+              "LineNumber": 35
+            },
+            "TimelineLocation": {
+              "Order": 1,
+              "Time": "2024-05-06T19:21:27.441496229+01:00"
+            },
+            "Message": "TOP-LEVEL",
+            "NodeType": "BeforeSuite"
+          },
+          {
+            "SpecEventType": "By",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
+              "LineNumber": 38
+            },
+            "TimelineLocation": {
+              "Order": 2,
+              "Time": "2024-05-06T19:21:27.441597185+01:00"
+            },
+            "Message": "bootstrapping test environment"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
+              "LineNumber": 35
+            },
+            "TimelineLocation": {
+              "Offset": 1033,
+              "Order": 4,
+              "Time": "2024-05-06T19:21:30.212464369+01:00"
+            },
+            "Message": "TOP-LEVEL",
+            "Duration": 2770968146,
+            "NodeType": "BeforeSuite"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle for just deplyoment"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
+            "LineNumber": 19
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
+          "LineNumber": 40
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should make a deployment with the correct name",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212651381+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle for just deplyoment"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
+            "LineNumber": 19
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
+          "LineNumber": 62
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should update the deployment when the app bundle is updated with new image tag",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212659269+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle for just deplyoment"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_controller_test.go",
+            "LineNumber": 10
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_controller_test.go",
+          "LineNumber": 12
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should select first non-default element",
+        "State": "passed",
+        "StartTime": "2024-05-06T19:21:30.212682296+01:00",
+        "EndTime": "2024-05-06T19:21:30.212814685+01:00",
+        "RunTime": 132395,
+        "ParallelProcess": 1,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_controller_test.go",
+              "LineNumber": 12
+            },
+            "TimelineLocation": {
+              "Order": 5,
+              "Time": "2024-05-06T19:21:30.212692902+01:00"
+            },
+            "Message": "Should select first non-default element",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "By",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_controller_test.go",
+              "LineNumber": 13
+            },
+            "TimelineLocation": {
+              "Order": 6,
+              "Time": "2024-05-06T19:21:30.212711699+01:00"
+            },
+            "Message": "Using the ReturnFirstNonDefault function on two elements"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_controller_test.go",
+              "LineNumber": 12
+            },
+            "TimelineLocation": {
+              "Order": 8,
+              "Time": "2024-05-06T19:21:30.212812878+01:00"
+            },
+            "Message": "Should select first non-default element",
+            "Duration": 119976,
+            "NodeType": "It"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with no routes reconcilling ingress route"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 18
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+          "LineNumber": 35
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should make no ingress route as there are no routes",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.21282831+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with no routes reconcilling ingress route",
+          "Adding a single route to AppBundle with ingress route",
+          "And updating"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 46
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 47
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+          "LineNumber": 69
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should make a simple ingress",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212834523+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with no routes reconcilling ingress route",
+          "Adding a single route to AppBundle with ingress route",
+          "And updating",
+          "With an ingress route",
+          "And created ingress route"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 46
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 47
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 85
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 86
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+          "LineNumber": 92
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should not change the ingress route",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212842099+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with no routes reconcilling ingress route",
+          "Adding a single route to AppBundle with ingress route",
+          "And updating",
+          "With an ingress route",
+          "And created ingress route"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 46
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 47
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 85
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 86
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+          "LineNumber": 113
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should delete the ingress route",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212849777+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with PVC, Emptydir and HostPath"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_volumes_test.go",
+            "LineNumber": 19
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_volumes_test.go",
+          "LineNumber": 63
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should make a PVC",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212854791+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with PVC, Emptydir and HostPath"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_volumes_test.go",
+            "LineNumber": 19
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_volumes_test.go",
+          "LineNumber": 75
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Shouldn't make a PVC for an emptydir volume",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212861283+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with PVC, Emptydir and HostPath"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_volumes_test.go",
+            "LineNumber": 19
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_volumes_test.go",
+          "LineNumber": 87
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Shouldn't make a PVC for a hostpath volume",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212865831+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with PVC, Emptydir and HostPath"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_volumes_test.go",
+            "LineNumber": 19
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_volumes_test.go",
+          "LineNumber": 99
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should have a deployment with 3 volumes",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212869505+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with no routes reconcilling service"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 18
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+          "LineNumber": 35
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should make no service as there are no routes",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212873189+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with no routes reconcilling service",
+          "Adding a single route to AppBundle",
+          "And updating"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 46
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 47
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+          "LineNumber": 66
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should make a simple service",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212877943+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with no routes reconcilling service",
+          "Adding a single route to AppBundle",
+          "And updating",
+          "With a single route",
+          "And created service"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 46
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 47
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 84
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 85
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+          "LineNumber": 91
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should not change the service",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212883959+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with no routes reconcilling service",
+          "Adding a single route to AppBundle",
+          "And updating",
+          "With a single route",
+          "And created service"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 46
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 47
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 84
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 85
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+          "LineNumber": 112
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should delete the service",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212892145+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated very basic AppBundle"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+            "LineNumber": 16
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+          "LineNumber": 35
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should make no difference when resolving without a base against base",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212896357+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated very basic AppBundle"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+            "LineNumber": 16
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+          "LineNumber": 46
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should append all routes from base to app bundle",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212912736+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated heavily populated AppBundle"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+            "LineNumber": 85
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+          "LineNumber": 131
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should make no difference when resolving without a base against base",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212916781+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated heavily populated AppBundle"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+            "LineNumber": 85
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+          "LineNumber": 142
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should append all routes from base to app bundle",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.212920657+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "AppBundle with incorrectly populated route"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 142
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+          "LineNumber": 170
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should not make a service",
+        "State": "skipped",
+        "StartTime": "2024-05-06T19:21:30.21292425+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": null,
+        "ContainerHierarchyLocations": null,
+        "ContainerHierarchyLabels": null,
+        "LeafNodeType": "AfterSuite",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
+          "LineNumber": 85
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "",
+        "State": "passed",
+        "StartTime": "2024-05-06T19:21:30.212939544+01:00",
+        "EndTime": "2024-05-06T19:21:31.286526888+01:00",
+        "RunTime": 1073587345,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
+              "LineNumber": 85
+            },
+            "TimelineLocation": {
+              "Order": 9,
+              "Time": "2024-05-06T19:21:30.212940285+01:00"
+            },
+            "Message": "TOP-LEVEL",
+            "NodeType": "AfterSuite"
+          },
+          {
+            "SpecEventType": "By",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
+              "LineNumber": 86
+            },
+            "TimelineLocation": {
+              "Order": 10,
+              "Time": "2024-05-06T19:21:30.212950941+01:00"
+            },
+            "Message": "tearing down the test environment"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
+              "LineNumber": 85
+            },
+            "TimelineLocation": {
+              "Order": 12,
+              "Time": "2024-05-06T19:21:31.286524546+01:00"
+            },
+            "Message": "TOP-LEVEL",
+            "Duration": 1073584262,
+            "NodeType": "AfterSuite"
+          }
+        ]
+      }
+    ]
+  }
+]

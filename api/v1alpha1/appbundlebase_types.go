@@ -1,7 +1,7 @@
 package v1alpha1
 
 import (
-	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -15,20 +15,21 @@ type AppBundleBaseSpec struct {
 	NodeSelector   *map[string]string             `json:"nodeSelector,omitempty"`
 	UseNvidia      *bool                          `json:"useNvidia,omitempty"`
 	Replicas       *int32                         `json:"replicas,omitempty"`
-	Resources      *corev1.ResourceRequirements   `json:"resources,omitempty"`
+	Resources      *v1.ResourceRequirements       `json:"resources,omitempty"`
 	Envs           map[string]string              `json:"envs,omitempty"`
 	SourcedEnvs    map[string]AppBundleSourcedEnv `json:"sourcedEnvs,omitempty"`
-	ServiceType    *corev1.ServiceType            `json:"serviceType,omitempty"`
+	ServiceType    *v1.ServiceType                `json:"serviceType,omitempty"`
 	Routes         map[string]AppBundleRoute      `json:"routes,omitempty"`
 	Homepage       *AppBundleHomePage             `json:"homepage,omitempty"`
 	Volumes        map[string]AppBundleVolume     `json:"volumes,omitempty"`
 	Backup         *AppBundleVolumeLonghornBackup `json:"backup,omitempty"`
 	Selector       *metav1.LabelSelector          `json:"selector,omitempty"`
-	LivenessProbe  *corev1.Probe                  `json:"livenessProbe,omitempty"`
-	ReadinessProbe *corev1.Probe                  `json:"readinessProbe,omitempty"`
-	StartupProbe   *corev1.Probe                  `json:"startupProbe,omitempty"`
+	LivenessProbe  *v1.Probe                      `json:"livenessProbe,omitempty"`
+	ReadinessProbe *v1.Probe                      `json:"readinessProbe,omitempty"`
+	StartupProbe   *v1.Probe                      `json:"startupProbe,omitempty"`
 	Command        []*string                      `json:"command,omitempty"`
 	Args           []*string                      `json:"args,omitempty"`
+	Configs        map[string]string              `json:"configs,omitempty"`
 }
 
 // AppBundleBaseStatus defines the observed state of AppBundleBase

@@ -39,6 +39,8 @@ spec:
           metadata:
             type: object
           spec:
+            description: AppBundleSpec defines the desired state of AppBundle, its
+              the core of the AppBundle (minus metadata etc.)
             properties:
               args:
                 items:
@@ -57,6 +59,10 @@ spec:
                 items:
                   type: string
                 type: array
+              configs:
+                additionalProperties:
+                  type: string
+                type: object
               envs:
                 additionalProperties:
                   type: string
@@ -103,6 +109,7 @@ spec:
                         items:
                           type: string
                         type: array
+                        x-kubernetes-list-type: atomic
                     type: object
                   failureThreshold:
                     description: |-
@@ -157,6 +164,7 @@ spec:
                           - value
                           type: object
                         type: array
+                        x-kubernetes-list-type: atomic
                       path:
                         description: Path to access on the HTTP server.
                         type: string
@@ -258,6 +266,7 @@ spec:
                         items:
                           type: string
                         type: array
+                        x-kubernetes-list-type: atomic
                     type: object
                   failureThreshold:
                     description: |-
@@ -312,6 +321,7 @@ spec:
                           - value
                           type: object
                         type: array
+                        x-kubernetes-list-type: atomic
                       path:
                         description: Path to access on the HTTP server.
                         type: string
@@ -500,11 +510,13 @@ spec:
                           items:
                             type: string
                           type: array
+                          x-kubernetes-list-type: atomic
                       required:
                       - key
                       - operator
                       type: object
                     type: array
+                    x-kubernetes-list-type: atomic
                   matchLabels:
                     additionalProperties:
                       type: string
@@ -547,6 +559,7 @@ spec:
                         items:
                           type: string
                         type: array
+                        x-kubernetes-list-type: atomic
                     type: object
                   failureThreshold:
                     description: |-
@@ -601,6 +614,7 @@ spec:
                           - value
                           type: object
                         type: array
+                        x-kubernetes-list-type: atomic
                       path:
                         description: Path to access on the HTTP server.
                         type: string

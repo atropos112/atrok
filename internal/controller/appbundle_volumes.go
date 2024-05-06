@@ -107,7 +107,7 @@ func (r *AppBundleReconciler) ReconcilePVC(ctx context.Context, ab *atroxyzv1alp
 
 	// IF CURRENT != EXPECTED THEN UPSERT
 	if !equality.Semantic.DeepDerivative(expectedPVC.Spec, currentPVC.Spec) {
-		reason, err := ForumlateDiffMessageForSpecs(currentPVC.Spec, expectedPVC.Spec)
+		reason, err := FormulateDiffMessageForSpecs(currentPVC.Spec, expectedPVC.Spec)
 		if err != nil {
 			return err
 		}

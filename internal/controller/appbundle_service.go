@@ -121,7 +121,7 @@ func (r *AppBundleReconciler) ReconcileService(ctx context.Context, ab *atroxyzv
 	}
 
 	if expectedService != nil && !equality.Semantic.DeepDerivative(expectedService.Spec, currentService.Spec) {
-		reason, err := ForumlateDiffMessageForSpecs(currentService.Spec, expectedService.Spec)
+		reason, err := FormulateDiffMessageForSpecs(currentService.Spec, expectedService.Spec)
 		if err != nil {
 			return err
 		}

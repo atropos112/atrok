@@ -64,6 +64,7 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		r.ReconcileService,
 		r.ReconcileDeployment,
 		r.ReconcileIngress,
+		r.ReconcileConfigMap,
 	); err != nil {
 		// TODO: Given an error, we should consider running exponential backoff here.
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, err

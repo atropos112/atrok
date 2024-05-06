@@ -68,7 +68,7 @@ func GetDiffPaths(oldObj, newObj interface{}) (string, error) {
 	return output, nil
 }
 
-func ForumlateDiffMessageForSpecs(oldObjSpec, newObjSpec interface{}) (string, error) {
+func FormulateDiffMessageForSpecs(oldObjSpec, newObjSpec interface{}) (string, error) {
 	diff, err := GetDiffPaths(oldObjSpec, newObjSpec)
 	if err != nil {
 		return "", err

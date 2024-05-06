@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"reflect"
 	"sync"
 	"time"
 
@@ -21,6 +22,8 @@ type AppBundleBaseReconciler struct {
 }
 
 var hashedSpecAbb map[string]string = make(map[string]string)
+
+type AppBundleIdentifier string // Identifier for the app bundle
 
 //+kubebuilder:rbac:groups=atro.xyz,resources=appbundlebases,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=atro.xyz,resources=appbundlebases/status,verbs=get;update;patch
@@ -110,8 +113,9 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 			if err != nil {
 				return ctrl.Result{}, err
 			}
-			stateAb.SpecHash = "" // Force update by reseting the hashed spec
-			ctx = context.WithValue(ctx, ab.ID(), stateAb)
+			stateAb.SpecHash = "" // Force update by resetting the hashed spec
+			abID := AppBundleIdentifier(ab.ID())
+			ctx = context.WithValue(ctx, abID, stateAb)
 
 			if err := r.Status().Update(ctx, &ab); err != nil {
 				return ctrl.Result{}, err
@@ -131,20 +135,30 @@ func (r *AppBundleBaseReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
+func isDefault[T any](value T) bool {
+	defaultValue := reflect.Zero(reflect.TypeOf(value)).Interface()
+	return reflect.DeepEqual(value, defaultValue)
+}
+
+// ReturnFirstNonNil returns the first non-nil element in a list of pointers
+func ReturnFirstNonDefault[T any](elem ...T) T {
+	var result T
+	for _, e := range elem {
+		if !isDefault[T](e) {
+			return e
+		}
+	}
+	return result
+}
+
 // ResolveAppBundleBase
 func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atroxyzv1alpha1.AppBundle, abb *atroxyzv1alpha1.AppBundleBase) error {
 	abSpec := &ab.Spec
 	abbSpec := &abb.Spec
 
 	// By hand merge, can do with reflection but then its not clear when to override, when to append etc.
-
-	if abb.Spec.Command != nil && abSpec.Command == nil {
-		abSpec.Command = abbSpec.Command
-	}
-
-	if abbSpec.Args != nil && abSpec.Args == nil {
-		abSpec.Args = abbSpec.Args
-	}
+	abSpec.Command = ReturnFirstNonDefault(abSpec.Command, abbSpec.Command)
+	abbSpec.Args = ReturnFirstNonDefault(abSpec.Args, abbSpec.Args)
 
 	if abbSpec.Volumes != nil {
 
@@ -157,27 +171,14 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 				abbVol := abbSpec.Volumes[abbVolKey]
 
 				if abVol, ok := abSpec.Volumes[abbVolKey]; ok {
-					if abbVol.Path != nil && abVol.Path == nil {
-						abVol.Path = abbVol.Path
-					}
-					if abbVol.Size != nil && abVol.Size == nil {
-						abVol.Size = abbVol.Size
-					}
-					if abbVol.StorageClass != nil && abVol.StorageClass == nil {
-						abVol.StorageClass = abbVol.StorageClass
-					}
-					if abbVol.ExistingClaim != nil && abVol.ExistingClaim == nil {
-						abVol.ExistingClaim = abbVol.ExistingClaim
-					}
-					if abbVol.Backup != nil && abVol.Backup == nil {
-						abVol.Backup = abbVol.Backup
-					}
-					if abbVol.HostPath != nil && abVol.HostPath == nil {
-						abVol.HostPath = abbVol.HostPath
-					}
-					if abbVol.EmptyDir != nil && abVol.EmptyDir == nil {
-						abVol.EmptyDir = abbVol.EmptyDir
-					}
+					abVol.Path = ReturnFirstNonDefault(abVol.Path, abbVol.Path)
+					abVol.Size = ReturnFirstNonDefault(abVol.Size, abbVol.Size)
+					abVol.StorageClass = ReturnFirstNonDefault(abVol.StorageClass, abbVol.StorageClass)
+					abVol.ExistingClaim = ReturnFirstNonDefault(abVol.ExistingClaim, abbVol.ExistingClaim)
+					abVol.Backup = ReturnFirstNonDefault(abVol.Backup, abbVol.Backup)
+					abVol.HostPath = ReturnFirstNonDefault(abVol.HostPath, abbVol.HostPath)
+					abVol.EmptyDir = ReturnFirstNonDefault(abVol.EmptyDir, abbVol.EmptyDir)
+
 					abSpec.Volumes[abbVolKey] = abVol
 				} else {
 					abSpec.Volumes[abbVolKey] = abbVol
@@ -186,16 +187,20 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 		}
 	}
 
+	if abbSpec.Configs != nil {
+		for name, inline := range abbSpec.Configs {
+			if _, ok := abSpec.Configs[name]; !ok {
+				abSpec.Configs[name] = inline
+			}
+		}
+	}
+
 	if abbSpec.Backup != nil {
 		if abSpec.Backup == nil {
 			abSpec.Backup = abbSpec.Backup
 		} else {
-			if abbSpec.Backup.Frequency != nil && abSpec.Backup.Frequency == nil {
-				abSpec.Backup.Frequency = abbSpec.Backup.Frequency
-			}
-			if abbSpec.Backup.Retain != nil && abSpec.Backup.Retain == nil {
-				abSpec.Backup.Retain = abbSpec.Backup.Retain
-			}
+			abSpec.Backup.Frequency = ReturnFirstNonDefault(abSpec.Backup.Frequency, abbSpec.Backup.Frequency)
+			abSpec.Backup.Retain = ReturnFirstNonDefault(abSpec.Backup.Retain, abbSpec.Backup.Retain)
 		}
 	}
 
@@ -223,13 +228,8 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 		}
 	}
 
-	if abbSpec.NodeSelector != nil && abSpec.NodeSelector == nil {
-		abSpec.NodeSelector = abbSpec.NodeSelector
-	}
-
-	if abbSpec.UseNvidia != nil && abSpec.UseNvidia == nil {
-		abSpec.UseNvidia = abbSpec.UseNvidia
-	}
+	abbSpec.NodeSelector = ReturnFirstNonDefault(abSpec.NodeSelector, abbSpec.NodeSelector)
+	abbSpec.UseNvidia = ReturnFirstNonDefault(abSpec.UseNvidia, abbSpec.UseNvidia)
 
 	if abbSpec.Routes != nil {
 		if abSpec.Routes == nil {
@@ -242,25 +242,15 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 				abbRoute := abbSpec.Routes[key]
 
 				if abRoute, ok := abSpec.Routes[key]; ok {
-					if abbRoute.Port != nil && abRoute.Port == nil {
-						abRoute.Port = abbRoute.Port
-					}
-					if abbRoute.TargetPort != nil && abRoute.TargetPort == nil {
-						abRoute.TargetPort = abbRoute.TargetPort
-					}
-					if abbRoute.Protocol != nil && abRoute.Protocol == nil {
-						abRoute.Protocol = abbRoute.Protocol
-					}
+					abRoute.Port = ReturnFirstNonDefault(abRoute.Port, abbRoute.Port)
+					abRoute.TargetPort = ReturnFirstNonDefault(abRoute.TargetPort, abbRoute.TargetPort)
+					abRoute.Protocol = ReturnFirstNonDefault(abRoute.Protocol, abbRoute.Protocol)
+
 					if abbRoute.Ingress != nil && abRoute.Ingress == nil {
 						abRoute.Ingress = abbRoute.Ingress
 					} else if abbRoute.Ingress != nil && abRoute.Ingress != nil {
-						// Merge ingress
-						if abbRoute.Ingress.Auth != nil && abRoute.Ingress.Auth == nil {
-							abRoute.Ingress.Auth = abbRoute.Ingress.Auth
-						}
-						if abbRoute.Ingress.Domain != nil && abRoute.Ingress.Domain == nil {
-							abRoute.Ingress.Domain = abbRoute.Ingress.Domain
-						}
+						abRoute.Ingress.Auth = ReturnFirstNonDefault(abRoute.Ingress.Auth, abbRoute.Ingress.Auth)
+						abRoute.Ingress.Domain = ReturnFirstNonDefault(abRoute.Ingress.Domain, abbRoute.Ingress.Domain)
 					}
 					abSpec.Routes[key] = abRoute
 				} else {
@@ -270,40 +260,18 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 		}
 	}
 
-	if abbSpec.Resources != nil && abSpec.Resources == nil {
-		abSpec.Resources = abbSpec.Resources
-	}
-
-	if abbSpec.Replicas != nil && abSpec.Replicas == nil {
-		abSpec.Replicas = abbSpec.Replicas
-	}
+	abSpec.Resources = ReturnFirstNonDefault(abSpec.Resources, abbSpec.Resources)
+	abSpec.Replicas = ReturnFirstNonDefault(abSpec.Replicas, abbSpec.Replicas)
 
 	// Special case, happy to fill in the blanks but not the whole things,
 	// it makes no sense to inherit the whole thing, so it needs to exist in some capacity beforehand
 	if abbSpec.Homepage != nil && abSpec.Homepage != nil {
-		if abbSpec.Homepage.Name != nil && abSpec.Homepage.Name == nil {
-			abSpec.Homepage.Name = abbSpec.Homepage.Name
-		}
-
-		if abbSpec.Homepage.Description != nil && abSpec.Homepage.Description == nil {
-			abSpec.Homepage.Description = abbSpec.Homepage.Description
-		}
-
-		if abbSpec.Homepage.Group != nil && abSpec.Homepage.Group == nil {
-			abSpec.Homepage.Group = abbSpec.Homepage.Group
-		}
-
-		if abbSpec.Homepage.Href != nil && abSpec.Homepage.Href == nil {
-			abSpec.Homepage.Href = abbSpec.Homepage.Href
-		}
-
-		if abbSpec.Homepage.Icon != nil && abSpec.Homepage.Icon == nil {
-			abSpec.Homepage.Icon = abbSpec.Homepage.Icon
-		}
-
-		if abbSpec.Homepage.Instance != nil && abSpec.Homepage.Instance == nil {
-			abSpec.Homepage.Instance = abbSpec.Homepage.Instance
-		}
+		abSpec.Homepage.Name = ReturnFirstNonDefault(abSpec.Homepage.Name, abbSpec.Homepage.Name)
+		abSpec.Homepage.Description = ReturnFirstNonDefault(abSpec.Homepage.Description, abbSpec.Homepage.Description)
+		abSpec.Homepage.Group = ReturnFirstNonDefault(abSpec.Homepage.Group, abbSpec.Homepage.Group)
+		abSpec.Homepage.Href = ReturnFirstNonDefault(abSpec.Homepage.Href, abbSpec.Homepage.Href)
+		abSpec.Homepage.Icon = ReturnFirstNonDefault(abSpec.Homepage.Icon, abbSpec.Homepage.Icon)
+		abSpec.Homepage.Instance = ReturnFirstNonDefault(abSpec.Homepage.Instance, abbSpec.Homepage.Instance)
 	}
 
 	if abbSpec.Image != nil {
@@ -314,46 +282,26 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 				PullPolicy: abbSpec.Image.PullPolicy,
 			}
 		} else {
-			if abbSpec.Image.Repository != nil && abSpec.Image.Repository == nil {
-				abSpec.Image.Repository = abbSpec.Image.Repository
-			}
-			if abbSpec.Image.Tag != nil && abSpec.Image.Tag == nil {
-				abSpec.Image.Tag = abbSpec.Image.Tag
-			}
-			if abbSpec.Image.PullPolicy != nil && abSpec.Image.PullPolicy == nil {
-				abSpec.Image.PullPolicy = abbSpec.Image.PullPolicy
-			}
+			abSpec.Image.Repository = ReturnFirstNonDefault(abSpec.Image.Repository, abbSpec.Image.Repository)
+			abSpec.Image.Tag = ReturnFirstNonDefault(abSpec.Image.Tag, abbSpec.Image.Tag)
+			abSpec.Image.PullPolicy = ReturnFirstNonDefault(abSpec.Image.PullPolicy, abbSpec.Image.PullPolicy)
 		}
 	}
 
-	if abbSpec.ServiceType != nil && abSpec.ServiceType == nil {
-		abSpec.ServiceType = abbSpec.ServiceType
-	}
+	abSpec.ServiceType = ReturnFirstNonDefault(abSpec.ServiceType, abbSpec.ServiceType)
 
 	if abbSpec.Selector != nil {
 		if abSpec.Selector == nil {
 			abSpec.Selector = abbSpec.Selector
 		} else {
-			if abbSpec.Selector.MatchLabels != nil && abSpec.Selector.MatchLabels == nil {
-				abSpec.Selector.MatchLabels = abbSpec.Selector.MatchLabels
-			}
-			if abbSpec.Selector.MatchExpressions != nil && abSpec.Selector.MatchExpressions == nil {
-				abSpec.Selector.MatchExpressions = abbSpec.Selector.MatchExpressions
-			}
+			abSpec.Selector.MatchLabels = ReturnFirstNonDefault(abSpec.Selector.MatchLabels, abbSpec.Selector.MatchLabels)
+			abSpec.Selector.MatchExpressions = ReturnFirstNonDefault(abSpec.Selector.MatchExpressions, abbSpec.Selector.MatchExpressions)
 		}
 	}
 
-	if abbSpec.LivenessProbe != nil && abSpec.LivenessProbe == nil {
-		abSpec.LivenessProbe = abbSpec.LivenessProbe
-	}
-
-	if abbSpec.ReadinessProbe != nil && abSpec.ReadinessProbe == nil {
-		abSpec.ReadinessProbe = abbSpec.ReadinessProbe
-	}
-
-	if abbSpec.StartupProbe != nil && abSpec.StartupProbe == nil {
-		abSpec.StartupProbe = abbSpec.StartupProbe
-	}
+	abSpec.LivenessProbe = ReturnFirstNonDefault(abSpec.LivenessProbe, abbSpec.LivenessProbe)
+	abSpec.ReadinessProbe = ReturnFirstNonDefault(abSpec.ReadinessProbe, abbSpec.ReadinessProbe)
+	abSpec.StartupProbe = ReturnFirstNonDefault(abSpec.StartupProbe, abbSpec.StartupProbe)
 
 	// Recurse
 	if abb.Spec.Base == nil {
