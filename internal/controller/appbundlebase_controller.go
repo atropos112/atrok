@@ -186,15 +186,22 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 	}
 
 	if abbSpec.Configs != nil {
-		for name, inline := range abbSpec.Configs {
-			if _, ok := abSpec.Configs[name]; !ok {
-				abSpec.Configs[name] = inline
-			} else {
-				config := abSpec.Configs[name]
-				config.Data = ReturnFirstNonDefault(config.Data, inline.Data)
-				config.MountPath = ReturnFirstNonDefault(config.MountPath, inline.MountPath)
+		for _, abbConfig := range abbSpec.Configs {
+			found := false
+			var foundConfig *atroxyzv1alpha1.AppBundleConfig
+			for _, abConfig := range abSpec.Configs {
+				if abConfig.FileName == abbConfig.FileName {
+					found = true
+					foundConfig = abConfig
+					break
+				}
+			}
 
-				abSpec.Configs[name] = config
+			if !found {
+				abSpec.Configs = append(abSpec.Configs, abbConfig)
+			} else {
+				foundConfig.Content = ReturnFirstNonDefault(foundConfig.Content, abbConfig.Content)
+				foundConfig.DirPath = ReturnFirstNonDefault(foundConfig.DirPath, abbConfig.DirPath)
 			}
 		}
 	}

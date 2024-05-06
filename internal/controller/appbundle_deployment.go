@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 	"fmt"
+	"sort"
+	"strings"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -16,6 +18,14 @@ import (
 // CreateExpectedDeployment creates expected deployment from appbundle
 func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment, error) {
 	deployment := &appsv1.Deployment{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+	deployment.ObjectMeta.Annotations = ab.GetAnnotations()
+	if deployment.ObjectMeta.Annotations == nil {
+		deployment.ObjectMeta.Annotations = make(map[string]string)
+	}
+	// Future proofing, to allow reloader usage.
+	if _, ok := deployment.ObjectMeta.Annotations["reloader.stakater.com/auto"]; !ok {
+		deployment.ObjectMeta.Annotations["reloader.stakater.com/auto"] = "true"
+	}
 
 	// Ports
 	var ports []corev1.ContainerPort
@@ -79,21 +89,23 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 
 	// Attach ConfigMaps
 	if ab.Spec.Configs != nil {
-		configMapKeys := getSortedKeys(ab.Spec.Configs)
+		configs := ab.Spec.Configs
+		sort.Sort(configs)
 
-		for _, key := range configMapKeys {
-			volumeName := "configMap" + key
+		for _, config := range configs {
+			volumeName := "cm-" + strings.Replace(config.FileName, ".", "", -1)
+
 			volumes = append(volumes, corev1.Volume{
 				Name: volumeName,
 				VolumeSource: corev1.VolumeSource{
 					ConfigMap: &corev1.ConfigMapVolumeSource{
 						LocalObjectReference: corev1.LocalObjectReference{Name: ab.Name},
-						Items:                []corev1.KeyToPath{{Key: key, Path: key}},
+						Items:                []corev1.KeyToPath{{Key: config.FileName, Path: config.FileName}},
 					},
 				},
 			})
 
-			volumeMounts = append(volumeMounts, corev1.VolumeMount{Name: volumeName, MountPath: ab.Spec.Configs[key].MountPath})
+			volumeMounts = append(volumeMounts, corev1.VolumeMount{Name: volumeName, MountPath: config.DirPath})
 		}
 	}
 

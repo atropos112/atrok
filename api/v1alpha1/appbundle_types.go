@@ -2,6 +2,8 @@
 package v1alpha1
 
 import (
+	"strings"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -28,12 +30,27 @@ type AppBundleSpec struct {
 	TailscaleName  *string                        `json:"tailscaleName,omitempty"`
 	Command        []*string                      `json:"command,omitempty"`
 	Args           []*string                      `json:"args,omitempty"`
-	Configs        map[string]AppBundleConfig     `json:"configs,omitempty"`
+	Configs        AppBundleConfigs               `json:"configs,omitempty"`
+}
+
+type AppBundleConfigs []*AppBundleConfig
+
+func (s AppBundleConfigs) Less(i, j int) bool {
+	return strings.Compare(s[i].FileName, s[j].FileName) < 0
+}
+
+func (s AppBundleConfigs) Len() int {
+	return len(s)
+}
+
+func (s AppBundleConfigs) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
 }
 
 type AppBundleConfig struct {
-	Data      string `json:"data,omitempty"`
-	MountPath string `json:"mountPath,omitempty"`
+	FileName string `json:"fileName,omitempty"`
+	Content  string `json:"content,omitempty"`
+	DirPath  string `json:"dirPath,omitempty"`
 }
 
 type AppBundleSourcedEnv struct {

@@ -29,7 +29,7 @@ type AppBundleBaseSpec struct {
 	StartupProbe   *v1.Probe                      `json:"startupProbe,omitempty"`
 	Command        []*string                      `json:"command,omitempty"`
 	Args           []*string                      `json:"args,omitempty"`
-	Configs        map[string]AppBundleConfig     `json:"configs,omitempty"`
+	Configs        AppBundleConfigs               `json:"configs,omitempty"`
 }
 
 // AppBundleBaseStatus defines the observed state of AppBundleBase

@@ -60,14 +60,16 @@ spec:
                   type: string
                 type: array
               configs:
-                additionalProperties:
+                items:
                   properties:
-                    data:
+                    content:
                       type: string
-                    mountPath:
+                    dirPath:
+                      type: string
+                    fileName:
                       type: string
                   type: object
-                type: object
+                type: array
               envs:
                 additionalProperties:
                   type: string
