@@ -206,6 +206,8 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 		}
 	}
 
+	abSpec.NodeSelector = ReturnFirstNonDefault(abSpec.NodeSelector, abbSpec.NodeSelector)
+
 	if abbSpec.Backup != nil {
 		if abSpec.Backup == nil {
 			abSpec.Backup = abbSpec.Backup
