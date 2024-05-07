@@ -105,7 +105,12 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 				},
 			})
 
-			volumeMounts = append(volumeMounts, corev1.VolumeMount{Name: volumeName, MountPath: config.DirPath})
+			volumeMounts = append(volumeMounts, corev1.VolumeMount{
+				Name:      volumeName,
+				MountPath: config.DirPath + "/" + config.FileName,
+				SubPath:   config.FileName,
+				ReadOnly:  true,
+			})
 		}
 	}
 
