@@ -24,7 +24,7 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	// Get app bundle
 	ab := &atroxyzv1alpha1.AppBundle{}
 	if err := r.Get(ctx, req.NamespacedName, ab); err != nil {
-		return ctrl.Result{RequeueAfter: 10 * time.Second}, err
+		return ctrl.Result{RequeueAfter: 120 * time.Second}, err
 	}
 
 	// Get (cached) state of the appbundle
@@ -33,13 +33,13 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	if err != nil {
 		_, stateAlreadyRegistered = err.(StateAlreadyRegisteredError)
 		if !stateAlreadyRegistered {
-			return ctrl.Result{RequeueAfter: 10 * time.Second}, err
+			return ctrl.Result{RequeueAfter: 120 * time.Second}, err
 		}
 	}
 
 	stateNeedsUpdating, err := StateNeedsUpdating(ctx, ab, stateAlreadyRegistered)
 	if err != nil {
-		return ctrl.Result{RequeueAfter: 10 * time.Second}, err
+		return ctrl.Result{RequeueAfter: 120 * time.Second}, err
 	}
 
 	if !stateNeedsUpdating {
@@ -50,11 +50,11 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	if ab.Spec.Base != nil {
 		abb := &atroxyzv1alpha1.AppBundleBase{}
 		if err := r.Get(ctx, client.ObjectKey{Name: *ab.Spec.Base}, abb); err != nil {
-			return ctrl.Result{RequeueAfter: 10 * time.Second}, err
+			return ctrl.Result{RequeueAfter: 120 * time.Second}, err
 		}
 		err := ResolveAppBundleBase(ctx, r, ab, abb)
 		if err != nil {
-			return ctrl.Result{RequeueAfter: 10 * time.Second}, err
+			return ctrl.Result{RequeueAfter: 120 * time.Second}, err
 		}
 	}
 
@@ -66,7 +66,7 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		r.ReconcileConfigMap,
 	); err != nil {
 		// TODO: Given an error, we should consider running exponential backoff here.
-		return ctrl.Result{RequeueAfter: 10 * time.Second}, err
+		return ctrl.Result{RequeueAfter: 120 * time.Second}, err
 	}
 
 	return ctrl.Result{RequeueAfter: 10 * time.Second}, nil

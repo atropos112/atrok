@@ -77,6 +77,15 @@ func FormulateDiffMessageForSpecs(oldObjSpec, newObjSpec interface{}) (string, e
 	return reason, nil
 }
 
+func FormulateDiffMessageForLabels(oldObjLabels, newObjLabels interface{}) (string, error) {
+	diff, err := GetDiffPaths(oldObjLabels, newObjLabels)
+	if err != nil {
+		return "", err
+	}
+	reason := "Labels changed, namely the paths: " + diff
+	return reason, nil
+}
+
 // UpsertResource creates or updates a resource with nice logging indicating what is happening.
 func UpsertResource(ctx context.Context, r ReaderWriter, newObj client.Object, reason string, er error) error {
 	l := log.FromContext(ctx)
@@ -151,4 +160,35 @@ func getSortedKeys[V any](m map[string]V) []string {
 	}
 	sort.Strings(keys)
 	return keys
+}
+
+// SetDefaultAppBundleLabels attaches default labels to a derivative object of an app bundle
+func SetDefaultAppBundleLabels(ab *atroxyzv1alpha1.AppBundle, labels map[string]string) map[string]string {
+	if labels == nil {
+		labels = make(map[string]string)
+	}
+
+	// Force overwrite if set by user.
+	labels["app.kubernetes.io/instance"] = ab.Name
+	labels["app.kubernetes.io/name"] = ab.Name
+	labels["atro.xyz/app-bundle"] = ab.Name
+
+	return labels
+}
+
+func StringMapsMatch(map1, map2 map[string]string) bool {
+	// Check if the lengths are equal
+	if len(map1) != len(map2) {
+		return false
+	}
+
+	// Iterate through the first map
+	for key, value := range map1 {
+		// Check if the key exists in the second map
+		if val, ok := map2[key]; !ok || val != value {
+			return false
+		}
+	}
+
+	return true
 }

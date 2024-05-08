@@ -24,15 +24,12 @@ func CreateExpectedIngress(ab *atroxyzv1alpha1.AppBundle, name string, route *at
 	if ingress.Annotations == nil {
 		ingress.Annotations = make(map[string]string)
 	}
-	if ingress.Labels == nil {
-		ingress.Labels = make(map[string]string)
-	}
 
 	// REGAIN control if lost
 	ingress.ObjectMeta.OwnerReferences = []metav1.OwnerReference{ab.OwnerReference()}
 
 	// CHECK and BUILD the resource
-	ingress.Labels["appbundle"] = ab.Name
+	ingress.Labels = SetDefaultAppBundleLabels(ab, nil)
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.entryPoints"] = entry_point
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls"] = "true"
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls.certresolver"] = cluster_issuer
@@ -156,6 +153,17 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, ab *atroxyzv
 		// IF CURRENT != EXPECTED THEN UPSERT
 		if !equality.Semantic.DeepDerivative(expectedIngress.Spec, currentIngress.Spec) {
 			reason, err := FormulateDiffMessageForSpecs(currentIngress.Spec, expectedIngress.Spec)
+			if err != nil {
+				return err
+			}
+
+			if err := UpsertResource(ctx, r, expectedIngress, reason, er); err != nil {
+				return err
+			}
+		}
+
+		if !StringMapsMatch(expectedIngress.ObjectMeta.Labels, currentIngress.ObjectMeta.Labels) {
+			reason, err := FormulateDiffMessageForLabels(currentIngress.ObjectMeta.Labels, expectedIngress.ObjectMeta.Labels)
 			if err != nil {
 				return err
 			}

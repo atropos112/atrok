@@ -71,10 +71,12 @@ func CreateExpectedService(ab *atroxyzv1alpha1.AppBundle, generatedSpecData *Gen
 	}
 
 	// Labeling to match the deployment
-	labels := make(map[string]string)
-	labels["app"] = ab.Name
+	service.ObjectMeta.Labels = SetDefaultAppBundleLabels(ab, nil)
 
-	annotations := make(map[string]string)
+	annotations := ab.GetAnnotations()
+	if annotations == nil {
+		annotations = make(map[string]string)
+	}
 
 	if ab.Spec.TailscaleName != nil {
 		annotations["tailscale.com/hostname"] = *ab.Spec.TailscaleName
@@ -86,7 +88,7 @@ func CreateExpectedService(ab *atroxyzv1alpha1.AppBundle, generatedSpecData *Gen
 	service.Spec = corev1.ServiceSpec{
 		Ports:    ports,
 		Type:     *ab.Spec.ServiceType,
-		Selector: map[string]string{"app": ab.Name},
+		Selector: map[string]string{"atro.xyz/app-bundle": ab.Name},
 	}
 
 	MergeIntoServiceSpec(service, generatedSpecData)
@@ -122,6 +124,15 @@ func (r *AppBundleReconciler) ReconcileService(ctx context.Context, ab *atroxyzv
 
 	if expectedService != nil && !equality.Semantic.DeepDerivative(expectedService.Spec, currentService.Spec) {
 		reason, err := FormulateDiffMessageForSpecs(currentService.Spec, expectedService.Spec)
+		if err != nil {
+			return err
+		}
+
+		return UpsertResource(ctx, r, expectedService, reason, er)
+	}
+
+	if expectedService != nil && !StringMapsMatch(expectedService.ObjectMeta.Labels, currentService.ObjectMeta.Labels) {
+		reason, err := FormulateDiffMessageForLabels(currentService.ObjectMeta.Labels, expectedService.ObjectMeta.Labels)
 		if err != nil {
 			return err
 		}

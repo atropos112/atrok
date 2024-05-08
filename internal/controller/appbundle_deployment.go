@@ -18,14 +18,14 @@ import (
 // CreateExpectedDeployment creates expected deployment from appbundle
 func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment, error) {
 	deployment := &appsv1.Deployment{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
+
+	// Metadata
 	deployment.ObjectMeta.Annotations = ab.GetAnnotations()
 	if deployment.ObjectMeta.Annotations == nil {
 		deployment.ObjectMeta.Annotations = make(map[string]string)
 	}
-	// Future proofing, to allow reloader usage.
-	if _, ok := deployment.ObjectMeta.Annotations["reloader.stakater.com/auto"]; !ok {
-		deployment.ObjectMeta.Annotations["reloader.stakater.com/auto"] = "true"
-	}
+
+	labels := SetDefaultAppBundleLabels(ab, nil)
 
 	// Ports
 	var ports []corev1.ContainerPort
@@ -116,11 +116,6 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 
 	// Small bits
 	revision_history_limit := int32(3)
-	labels := make(map[string]string)
-	for key, value := range ab.GetLabels() {
-		labels[key] = value
-	}
-	labels["app"] = ab.Name
 
 	resources := corev1.ResourceRequirements{}
 	if ab.Spec.Resources != nil {
@@ -213,7 +208,7 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 		Replicas:             ab.Spec.Replicas,
 		RevisionHistoryLimit: &revision_history_limit,
 		Strategy:             appsv1.DeploymentStrategy{Type: appsv1.RecreateDeploymentStrategyType},
-		Selector:             &metav1.LabelSelector{MatchLabels: map[string]string{"app": ab.Name}},
+		Selector:             &metav1.LabelSelector{MatchLabels: map[string]string{"atro.xyz/app-bundle": ab.Name}},
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
 				Labels: labels,
@@ -225,6 +220,7 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 			},
 		},
 	}
+	deployment.ObjectMeta.Labels = labels
 
 	if ab.Spec.NodeSelector != nil {
 		deployment.Spec.Template.Spec.NodeSelector = *ab.Spec.NodeSelector
@@ -277,10 +273,15 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, ab *atrox
 		if err != nil {
 			return err
 		}
+		return UpsertResource(ctx, r, expectedDeployment, reason, er)
+	}
 
-		if err := UpsertResource(ctx, r, expectedDeployment, reason, er); err != nil {
+	if !StringMapsMatch(expectedDeployment.ObjectMeta.Labels, currentDeployment.ObjectMeta.Labels) {
+		reason, err := FormulateDiffMessageForSpecs(currentDeployment.ObjectMeta.Labels, expectedDeployment.ObjectMeta.Labels)
+		if err != nil {
 			return err
 		}
+		return UpsertResource(ctx, r, expectedDeployment, reason, er)
 	}
 
 	return nil

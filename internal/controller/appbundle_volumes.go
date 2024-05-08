@@ -24,7 +24,8 @@ func CreateExpectedPVC(ab *atroxyzv1alpha1.AppBundle, volume *atroxyzv1alpha1.Ap
 	pvc.Spec = corev1.PersistentVolumeClaimSpec{
 		AccessModes:      []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
 		StorageClassName: volume.StorageClass,
-		Resources:        corev1.VolumeResourceRequirements{Requests: corev1.ResourceList{corev1.ResourceStorage: resource.MustParse(*volume.Size)}}}
+		Resources:        corev1.VolumeResourceRequirements{Requests: corev1.ResourceList{corev1.ResourceStorage: resource.MustParse(*volume.Size)}},
+	}
 
 	if volume.Backup != nil && *volume.Backup {
 		reccuringJobName := fmt.Sprintf("%s-%s", ab.Name, ab.Namespace)
@@ -32,7 +33,7 @@ func CreateExpectedPVC(ab *atroxyzv1alpha1.AppBundle, volume *atroxyzv1alpha1.Ap
 		jobGenericKey := "recurring-job.longhorn.io/source"
 		defaultGroupKey := "recurring-job-group.longhorn.io/default"
 
-		labels := make(map[string]string)
+		labels := SetDefaultAppBundleLabels(ab, nil)
 		labels[jobSpecificKey] = "enabled"
 		labels[jobGenericKey] = "enabled"
 		labels[defaultGroupKey] = "enabled"

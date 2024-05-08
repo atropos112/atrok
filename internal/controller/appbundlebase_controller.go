@@ -327,5 +327,15 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 		return err
 	}
 
+	labels := ab.ObjectMeta.Labels
+	if labels == nil {
+		labels = make(map[string]string)
+	}
+	if _, ok := labels["atro.xyz/app-bundle-bases"]; !ok {
+		labels["atro.xyz/app-bundle-bases"] = abb.Name
+	} else {
+		labels["atro.xyz/app-bundle-bases"] += "." + abb.Name
+	}
+
 	return ResolveAppBundleBase(ctx, r, ab, newAbb)
 }

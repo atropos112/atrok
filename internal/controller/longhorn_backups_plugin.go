@@ -54,6 +54,7 @@ func (r *AppBundleReconciler) ReconcileRecurringBackupJob(ctx context.Context, a
 		Retain:      *ab.Spec.Backup.Retain,
 		Concurrency: 1,
 	}
+	recurringJob.Spec.Labels = SetDefaultAppBundleLabels(ab, nil)
 
 	pvc := &corev1.PersistentVolumeClaim{}
 	volumeKeys := getSortedKeys(ab.Spec.Volumes)
