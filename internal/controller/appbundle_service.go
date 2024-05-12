@@ -88,7 +88,7 @@ func CreateExpectedService(ab *atroxyzv1alpha1.AppBundle, generatedSpecData *Gen
 	service.Spec = corev1.ServiceSpec{
 		Ports:    ports,
 		Type:     *ab.Spec.ServiceType,
-		Selector: map[string]string{"atro.xyz/app-bundle": ab.Name},
+		Selector: map[string]string{AppBundleSelector: ab.Name},
 	}
 
 	MergeIntoServiceSpec(service, generatedSpecData)

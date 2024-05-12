@@ -7,21 +7,19 @@
     "SuiteHasProgrammaticFocus": false,
     "SpecialSuiteFailureReasons": null,
     "PreRunStats": {
-      "TotalSpecs": 20,
-      "SpecsThatWillRun": 1
+      "TotalSpecs": 19,
+      "SpecsThatWillRun": 3
     },
-    "StartTime": "2024-05-06T19:21:27.441403787+01:00",
-    "EndTime": "2024-05-06T19:21:31.286566521+01:00",
-    "RunTime": 3845162736,
+    "StartTime": "2024-05-12T11:35:58.515309945+01:00",
+    "EndTime": "2024-05-12T11:36:04.649530049+01:00",
+    "RunTime": 6134220097,
     "SuiteConfig": {
-      "RandomSeed": 1715019686,
+      "RandomSeed": 1715510157,
       "RandomizeAllSpecs": false,
-      "FocusStrings": [
-        "\\bCorrectly populated AppBundle for just deplyoment Should select first non-default element\\b"
-      ],
+      "FocusStrings": null,
       "SkipStrings": null,
       "FocusFiles": [
-        "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_controller_test.go"
+        "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go"
       ],
       "SkipFiles": null,
       "LabelFilter": "",
@@ -32,7 +30,7 @@
       "DryRun": false,
       "PollProgressAfter": 0,
       "PollProgressInterval": 0,
-      "Timeout": 3598739635777,
+      "Timeout": 3598659670040,
       "EmitSpecProgress": false,
       "OutputInterceptorMode": "",
       "SourceRoots": null,
@@ -49,29 +47,29 @@
         "LeafNodeType": "BeforeSuite",
         "LeafNodeLocation": {
           "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
-          "LineNumber": 35
+          "LineNumber": 37
         },
         "LeafNodeLabels": null,
         "LeafNodeText": "",
         "State": "passed",
-        "StartTime": "2024-05-06T19:21:27.441483032+01:00",
-        "EndTime": "2024-05-06T19:21:30.21246676+01:00",
-        "RunTime": 2770983731,
+        "StartTime": "2024-05-12T11:35:58.515435875+01:00",
+        "EndTime": "2024-05-12T11:36:01.554770488+01:00",
+        "RunTime": 3039334613,
         "ParallelProcess": 1,
         "NumAttempts": 0,
         "MaxFlakeAttempts": 0,
         "MaxMustPassRepeatedly": 0,
-        "CapturedGinkgoWriterOutput": "2024-05-06T19:21:27+01:00\tDEBUG\tcontroller-runtime.test-env\tstarting control plane\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling CRDs\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\treading CRDs from path\t{\"path\": \"../../config/crd/bases\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tread CRDs from file\t{\"file\": \"atro.xyz_appbundlebases.yaml\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tread CRDs from file\t{\"file\": \"atro.xyz_appbundles.yaml\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling CRD\t{\"crd\": \"appbundlebases.atro.xyz\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling CRD\t{\"crd\": \"appbundles.atro.xyz\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tadding API in waitlist\t{\"GV\": \"atro.xyz/v1alpha1\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tadding API in waitlist\t{\"GV\": \"atro.xyz/v1alpha1\"}\n2024-05-06T19:21:30+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling webhooks\n",
+        "CapturedGinkgoWriterOutput": "2024-05-12T11:35:58+01:00\tDEBUG\tcontroller-runtime.test-env\tstarting control plane\n2024-05-12T11:36:01+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling CRDs\n2024-05-12T11:36:01+01:00\tDEBUG\tcontroller-runtime.test-env\treading CRDs from path\t{\"path\": \"../../config/crd/bases\"}\n2024-05-12T11:36:01+01:00\tDEBUG\tcontroller-runtime.test-env\tread CRDs from file\t{\"file\": \"atro.xyz_appbundlebases.yaml\"}\n2024-05-12T11:36:01+01:00\tDEBUG\tcontroller-runtime.test-env\tread CRDs from file\t{\"file\": \"atro.xyz_appbundles.yaml\"}\n2024-05-12T11:36:01+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling CRD\t{\"crd\": \"appbundlebases.atro.xyz\"}\n2024-05-12T11:36:01+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling CRD\t{\"crd\": \"appbundles.atro.xyz\"}\n2024-05-12T11:36:01+01:00\tDEBUG\tcontroller-runtime.test-env\tadding API in waitlist\t{\"GV\": \"atro.xyz/v1alpha1\"}\n2024-05-12T11:36:01+01:00\tDEBUG\tcontroller-runtime.test-env\tadding API in waitlist\t{\"GV\": \"atro.xyz/v1alpha1\"}\n2024-05-12T11:36:01+01:00\tDEBUG\tcontroller-runtime.test-env\tinstalling webhooks\n",
         "SpecEvents": [
           {
             "SpecEventType": "Node",
             "CodeLocation": {
               "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
-              "LineNumber": 35
+              "LineNumber": 37
             },
             "TimelineLocation": {
               "Order": 1,
-              "Time": "2024-05-06T19:21:27.441496229+01:00"
+              "Time": "2024-05-12T11:35:58.515443984+01:00"
             },
             "Message": "TOP-LEVEL",
             "NodeType": "BeforeSuite"
@@ -80,11 +78,11 @@
             "SpecEventType": "By",
             "CodeLocation": {
               "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
-              "LineNumber": 38
+              "LineNumber": 40
             },
             "TimelineLocation": {
               "Order": 2,
-              "Time": "2024-05-06T19:21:27.441597185+01:00"
+              "Time": "2024-05-12T11:35:58.515546082+01:00"
             },
             "Message": "bootstrapping test environment"
           },
@@ -92,27 +90,27 @@
             "SpecEventType": "Node (End)",
             "CodeLocation": {
               "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
-              "LineNumber": 35
+              "LineNumber": 37
             },
             "TimelineLocation": {
               "Offset": 1033,
               "Order": 4,
-              "Time": "2024-05-06T19:21:30.212464369+01:00"
+              "Time": "2024-05-12T11:36:01.554768399+01:00"
             },
             "Message": "TOP-LEVEL",
-            "Duration": 2770968146,
+            "Duration": 3039324416,
             "NodeType": "BeforeSuite"
           }
         ]
       },
       {
         "ContainerHierarchyTexts": [
-          "Correctly populated AppBundle for just deplyoment"
+          "AppBundle with incorrectly populated route"
         ],
         "ContainerHierarchyLocations": [
           {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
-            "LineNumber": 19
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+            "LineNumber": 142
           }
         ],
         "ContainerHierarchyLabels": [
@@ -120,42 +118,13 @@
         ],
         "LeafNodeType": "It",
         "LeafNodeLocation": {
-          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
-          "LineNumber": 40
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
+          "LineNumber": 170
         },
         "LeafNodeLabels": [],
-        "LeafNodeText": "Should make a deployment with the correct name",
+        "LeafNodeText": "Should not make a service",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212651381+01:00",
-        "EndTime": "0001-01-01T00:00:00Z",
-        "RunTime": 0,
-        "ParallelProcess": 1,
-        "NumAttempts": 0,
-        "MaxFlakeAttempts": 0,
-        "MaxMustPassRepeatedly": 0
-      },
-      {
-        "ContainerHierarchyTexts": [
-          "Correctly populated AppBundle for just deplyoment"
-        ],
-        "ContainerHierarchyLocations": [
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
-            "LineNumber": 19
-          }
-        ],
-        "ContainerHierarchyLabels": [
-          []
-        ],
-        "LeafNodeType": "It",
-        "LeafNodeLocation": {
-          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
-          "LineNumber": 62
-        },
-        "LeafNodeLabels": [],
-        "LeafNodeText": "Should update the deployment when the app bundle is updated with new image tag",
-        "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212659269+01:00",
+        "StartTime": "2024-05-12T11:36:01.555490858+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
@@ -183,225 +152,8 @@
         },
         "LeafNodeLabels": [],
         "LeafNodeText": "Should select first non-default element",
-        "State": "passed",
-        "StartTime": "2024-05-06T19:21:30.212682296+01:00",
-        "EndTime": "2024-05-06T19:21:30.212814685+01:00",
-        "RunTime": 132395,
-        "ParallelProcess": 1,
-        "NumAttempts": 1,
-        "MaxFlakeAttempts": 0,
-        "MaxMustPassRepeatedly": 0,
-        "SpecEvents": [
-          {
-            "SpecEventType": "Node",
-            "CodeLocation": {
-              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_controller_test.go",
-              "LineNumber": 12
-            },
-            "TimelineLocation": {
-              "Order": 5,
-              "Time": "2024-05-06T19:21:30.212692902+01:00"
-            },
-            "Message": "Should select first non-default element",
-            "NodeType": "It"
-          },
-          {
-            "SpecEventType": "By",
-            "CodeLocation": {
-              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_controller_test.go",
-              "LineNumber": 13
-            },
-            "TimelineLocation": {
-              "Order": 6,
-              "Time": "2024-05-06T19:21:30.212711699+01:00"
-            },
-            "Message": "Using the ReturnFirstNonDefault function on two elements"
-          },
-          {
-            "SpecEventType": "Node (End)",
-            "CodeLocation": {
-              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_controller_test.go",
-              "LineNumber": 12
-            },
-            "TimelineLocation": {
-              "Order": 8,
-              "Time": "2024-05-06T19:21:30.212812878+01:00"
-            },
-            "Message": "Should select first non-default element",
-            "Duration": 119976,
-            "NodeType": "It"
-          }
-        ]
-      },
-      {
-        "ContainerHierarchyTexts": [
-          "Correctly populated AppBundle with no routes reconcilling ingress route"
-        ],
-        "ContainerHierarchyLocations": [
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 18
-          }
-        ],
-        "ContainerHierarchyLabels": [
-          []
-        ],
-        "LeafNodeType": "It",
-        "LeafNodeLocation": {
-          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-          "LineNumber": 35
-        },
-        "LeafNodeLabels": [],
-        "LeafNodeText": "Should make no ingress route as there are no routes",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.21282831+01:00",
-        "EndTime": "0001-01-01T00:00:00Z",
-        "RunTime": 0,
-        "ParallelProcess": 1,
-        "NumAttempts": 0,
-        "MaxFlakeAttempts": 0,
-        "MaxMustPassRepeatedly": 0
-      },
-      {
-        "ContainerHierarchyTexts": [
-          "Correctly populated AppBundle with no routes reconcilling ingress route",
-          "Adding a single route to AppBundle with ingress route",
-          "And updating"
-        ],
-        "ContainerHierarchyLocations": [
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 18
-          },
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 46
-          },
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 47
-          }
-        ],
-        "ContainerHierarchyLabels": [
-          [],
-          [],
-          []
-        ],
-        "LeafNodeType": "It",
-        "LeafNodeLocation": {
-          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-          "LineNumber": 69
-        },
-        "LeafNodeLabels": [],
-        "LeafNodeText": "Should make a simple ingress",
-        "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212834523+01:00",
-        "EndTime": "0001-01-01T00:00:00Z",
-        "RunTime": 0,
-        "ParallelProcess": 1,
-        "NumAttempts": 0,
-        "MaxFlakeAttempts": 0,
-        "MaxMustPassRepeatedly": 0
-      },
-      {
-        "ContainerHierarchyTexts": [
-          "Correctly populated AppBundle with no routes reconcilling ingress route",
-          "Adding a single route to AppBundle with ingress route",
-          "And updating",
-          "With an ingress route",
-          "And created ingress route"
-        ],
-        "ContainerHierarchyLocations": [
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 18
-          },
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 46
-          },
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 47
-          },
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 85
-          },
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 86
-          }
-        ],
-        "ContainerHierarchyLabels": [
-          [],
-          [],
-          [],
-          [],
-          []
-        ],
-        "LeafNodeType": "It",
-        "LeafNodeLocation": {
-          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-          "LineNumber": 92
-        },
-        "LeafNodeLabels": [],
-        "LeafNodeText": "Should not change the ingress route",
-        "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212842099+01:00",
-        "EndTime": "0001-01-01T00:00:00Z",
-        "RunTime": 0,
-        "ParallelProcess": 1,
-        "NumAttempts": 0,
-        "MaxFlakeAttempts": 0,
-        "MaxMustPassRepeatedly": 0
-      },
-      {
-        "ContainerHierarchyTexts": [
-          "Correctly populated AppBundle with no routes reconcilling ingress route",
-          "Adding a single route to AppBundle with ingress route",
-          "And updating",
-          "With an ingress route",
-          "And created ingress route"
-        ],
-        "ContainerHierarchyLocations": [
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 18
-          },
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 46
-          },
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 47
-          },
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 85
-          },
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-            "LineNumber": 86
-          }
-        ],
-        "ContainerHierarchyLabels": [
-          [],
-          [],
-          [],
-          [],
-          []
-        ],
-        "LeafNodeType": "It",
-        "LeafNodeLocation": {
-          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
-          "LineNumber": 113
-        },
-        "LeafNodeLabels": [],
-        "LeafNodeText": "Should delete the ingress route",
-        "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212849777+01:00",
+        "StartTime": "2024-05-12T11:36:01.555496944+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
@@ -430,7 +182,7 @@
         "LeafNodeLabels": [],
         "LeafNodeText": "Should make a PVC",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212854791+01:00",
+        "StartTime": "2024-05-12T11:36:01.555501336+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
@@ -459,7 +211,7 @@
         "LeafNodeLabels": [],
         "LeafNodeText": "Shouldn't make a PVC for an emptydir volume",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212861283+01:00",
+        "StartTime": "2024-05-12T11:36:01.555503358+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
@@ -488,7 +240,7 @@
         "LeafNodeLabels": [],
         "LeafNodeText": "Shouldn't make a PVC for a hostpath volume",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212865831+01:00",
+        "StartTime": "2024-05-12T11:36:01.555507307+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
@@ -517,7 +269,65 @@
         "LeafNodeLabels": [],
         "LeafNodeText": "Should have a deployment with 3 volumes",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212869505+01:00",
+        "StartTime": "2024-05-12T11:36:01.555510612+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated heavily populated AppBundle"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+            "LineNumber": 85
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+          "LineNumber": 131
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should make no difference when resolving without a base against base",
+        "State": "skipped",
+        "StartTime": "2024-05-12T11:36:01.555512777+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated heavily populated AppBundle"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+            "LineNumber": 85
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
+          "LineNumber": 142
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should append all routes from base to app bundle",
+        "State": "skipped",
+        "StartTime": "2024-05-12T11:36:01.555514663+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
@@ -546,7 +356,7 @@
         "LeafNodeLabels": [],
         "LeafNodeText": "Should make no service as there are no routes",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212873189+01:00",
+        "StartTime": "2024-05-12T11:36:01.555518106+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
@@ -587,7 +397,7 @@
         "LeafNodeLabels": [],
         "LeafNodeText": "Should make a simple service",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212877943+01:00",
+        "StartTime": "2024-05-12T11:36:01.555521192+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
@@ -640,7 +450,7 @@
         "LeafNodeLabels": [],
         "LeafNodeText": "Should not change the service",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212883959+01:00",
+        "StartTime": "2024-05-12T11:36:01.555526189+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
@@ -693,13 +503,569 @@
         "LeafNodeLabels": [],
         "LeafNodeText": "Should delete the service",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212892145+01:00",
+        "StartTime": "2024-05-12T11:36:01.555529315+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
         "NumAttempts": 0,
         "MaxFlakeAttempts": 0,
         "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle for just deplyoment"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
+            "LineNumber": 19
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
+          "LineNumber": 40
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should make a deployment with the correct name",
+        "State": "skipped",
+        "StartTime": "2024-05-12T11:36:01.555531881+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle for just deplyoment"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
+            "LineNumber": 19
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_deployment_test.go",
+          "LineNumber": 62
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should update the deployment when the app bundle is updated with new image tag",
+        "State": "skipped",
+        "StartTime": "2024-05-12T11:36:01.555534061+01:00",
+        "EndTime": "0001-01-01T00:00:00Z",
+        "RunTime": 0,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with no routes reconcilling ingress route",
+          "Adding a single route to AppBundle with ingress route",
+          "And updating"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 35
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 36
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+          "LineNumber": 58
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should make a simple ingress",
+        "State": "passed",
+        "StartTime": "2024-05-12T11:36:01.555552693+01:00",
+        "EndTime": "2024-05-12T11:36:03.566387291+01:00",
+        "RunTime": 2010834598,
+        "ParallelProcess": 1,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "2024-05-12T11:36:03+01:00\tINFO\tUpserting reason because: Spec changed, namely the paths: \nTLS/0/Hosts/0/\nTLS/0/SecretName/\nRules/0/Host/\nRules/0/IngressRuleValue/HTTP/\n\n2024-05-12T11:36:03+01:00\tINFO\tCreating resource.\t{\"type\": \"*v1.Ingress\", \"object\": \"\u0026Ingress{ObjectMeta:{tstsafwb-test  devel    0 0001-01-01 00:00:00 +0000 UTC \u003cnil\u003e \u003cnil\u003e map[app.kubernetes.io/instance:tstsafwb app.kubernetes.io/name:tstsafwb appbundle:tstsafwb atro.xyz/app-bundle:tstsafwb] map[cert-manager.io/cluster-issuer:letsencrypt traefik.ingress.kubernetes.io/router.entryPoints:websecure traefik.ingress.kubernetes.io/router.middlewares:auth-authelia@kubernetescrd traefik.ingress.kubernetes.io/router.tls:true traefik.ingress.kubernetes.io/router.tls.certresolver:letsencrypt] [{atroxyz.atrok.io/v1alpha1 AppBundle tstsafwb c78a8980-c225-4d95-acd0-95756d935ca8 \u003cnil\u003e \u003cnil\u003e}] [] []},Spec:IngressSpec{DefaultBackend:nil,TLS:[]IngressTLS{IngressTLS{Hosts:[test.com],SecretName:tstsafwb-test-devel-ingress-tls,},},Rules:[]IngressRule{IngressRule{Host:test.com,IngressRuleValue:IngressRuleValue{HTTP:\u0026HTTPIngressRuleValue{Paths:[]HTTPIngressPath{HTTPIngressPath{Path:/,Backend:IngressBackend{Resource:nil,Service:\u0026IngressServiceBackend{Name:tstsafwb,Port:ServiceBackendPort{Name:,Number:80,},},},PathType:*Prefix,},},},},},},IngressClassName:nil,},Status:IngressStatus{LoadBalancer:IngressLoadBalancerStatus{Ingress:[]IngressLoadBalancerIngress{},},},}\"}\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 23
+            },
+            "TimelineLocation": {
+              "Order": 5,
+              "Time": "2024-05-12T11:36:01.555563952+01:00"
+            },
+            "Message": "Correctly populated AppBundle with no routes reconcilling ingress route",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 23
+            },
+            "TimelineLocation": {
+              "Order": 7,
+              "Time": "2024-05-12T11:36:03.560881938+01:00"
+            },
+            "Message": "Correctly populated AppBundle with no routes reconcilling ingress route",
+            "Duration": 2005317996,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 37
+            },
+            "TimelineLocation": {
+              "Order": 8,
+              "Time": "2024-05-12T11:36:03.560886489+01:00"
+            },
+            "Message": "And updating",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 37
+            },
+            "TimelineLocation": {
+              "Order": 10,
+              "Time": "2024-05-12T11:36:03.562437722+01:00"
+            },
+            "Message": "And updating",
+            "Duration": 1551225,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 58
+            },
+            "TimelineLocation": {
+              "Order": 11,
+              "Time": "2024-05-12T11:36:03.562439033+01:00"
+            },
+            "Message": "Should make a simple ingress",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "By",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 59
+            },
+            "TimelineLocation": {
+              "Order": 12,
+              "Time": "2024-05-12T11:36:03.562451096+01:00"
+            },
+            "Message": "Reconciling ingress using app bundle"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 58
+            },
+            "TimelineLocation": {
+              "Offset": 1433,
+              "Order": 14,
+              "Time": "2024-05-12T11:36:03.566374236+01:00"
+            },
+            "Message": "Should make a simple ingress",
+            "Duration": 3935204,
+            "NodeType": "It"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with no routes reconcilling ingress route",
+          "Adding a single route to AppBundle with ingress route",
+          "And updating",
+          "With an ingress route",
+          "And created ingress route"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 35
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 36
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 74
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 75
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+          "LineNumber": 81
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should not change the ingress route",
+        "State": "passed",
+        "StartTime": "2024-05-12T11:36:03.566421136+01:00",
+        "EndTime": "2024-05-12T11:36:03.572572685+01:00",
+        "RunTime": 6151549,
+        "ParallelProcess": 1,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "2024-05-12T11:36:03+01:00\tINFO\tUpserting reason because: Spec changed, namely the paths: \nTLS/0/Hosts/0/\nTLS/0/SecretName/\nRules/0/Host/\nRules/0/IngressRuleValue/HTTP/\n\n2024-05-12T11:36:03+01:00\tINFO\tCreating resource.\t{\"type\": \"*v1.Ingress\", \"object\": \"\u0026Ingress{ObjectMeta:{tstwkuls-test  devel    0 0001-01-01 00:00:00 +0000 UTC \u003cnil\u003e \u003cnil\u003e map[app.kubernetes.io/instance:tstwkuls app.kubernetes.io/name:tstwkuls appbundle:tstwkuls atro.xyz/app-bundle:tstwkuls] map[cert-manager.io/cluster-issuer:letsencrypt traefik.ingress.kubernetes.io/router.entryPoints:websecure traefik.ingress.kubernetes.io/router.middlewares:auth-authelia@kubernetescrd traefik.ingress.kubernetes.io/router.tls:true traefik.ingress.kubernetes.io/router.tls.certresolver:letsencrypt] [{atroxyz.atrok.io/v1alpha1 AppBundle tstwkuls 5537b43f-c6eb-4327-9dcb-91685ea4ac32 \u003cnil\u003e \u003cnil\u003e}] [] []},Spec:IngressSpec{DefaultBackend:nil,TLS:[]IngressTLS{IngressTLS{Hosts:[test.com],SecretName:tstwkuls-test-devel-ingress-tls,},},Rules:[]IngressRule{IngressRule{Host:test.com,IngressRuleValue:IngressRuleValue{HTTP:\u0026HTTPIngressRuleValue{Paths:[]HTTPIngressPath{HTTPIngressPath{Path:/,Backend:IngressBackend{Resource:nil,Service:\u0026IngressServiceBackend{Name:tstwkuls,Port:ServiceBackendPort{Name:,Number:80,},},},PathType:*Prefix,},},},},},},IngressClassName:nil,},Status:IngressStatus{LoadBalancer:IngressLoadBalancerStatus{Ingress:[]IngressLoadBalancerIngress{},},},}\"}\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 23
+            },
+            "TimelineLocation": {
+              "Order": 15,
+              "Time": "2024-05-12T11:36:03.566423925+01:00"
+            },
+            "Message": "Correctly populated AppBundle with no routes reconcilling ingress route",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 23
+            },
+            "TimelineLocation": {
+              "Order": 17,
+              "Time": "2024-05-12T11:36:03.567359194+01:00"
+            },
+            "Message": "Correctly populated AppBundle with no routes reconcilling ingress route",
+            "Duration": 935276,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 37
+            },
+            "TimelineLocation": {
+              "Order": 18,
+              "Time": "2024-05-12T11:36:03.567360862+01:00"
+            },
+            "Message": "And updating",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 37
+            },
+            "TimelineLocation": {
+              "Order": 20,
+              "Time": "2024-05-12T11:36:03.56840266+01:00"
+            },
+            "Message": "And updating",
+            "Duration": 1041793,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 76
+            },
+            "TimelineLocation": {
+              "Order": 21,
+              "Time": "2024-05-12T11:36:03.568403872+01:00"
+            },
+            "Message": "And created ingress route",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 76
+            },
+            "TimelineLocation": {
+              "Offset": 1433,
+              "Order": 23,
+              "Time": "2024-05-12T11:36:03.570345331+01:00"
+            },
+            "Message": "And created ingress route",
+            "Duration": 1941466,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 81
+            },
+            "TimelineLocation": {
+              "Offset": 1433,
+              "Order": 24,
+              "Time": "2024-05-12T11:36:03.570346581+01:00"
+            },
+            "Message": "Should not change the ingress route",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "By",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 82
+            },
+            "TimelineLocation": {
+              "Offset": 1433,
+              "Order": 25,
+              "Time": "2024-05-12T11:36:03.570358152+01:00"
+            },
+            "Message": "Reconciling ingress route again using app bundle"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 81
+            },
+            "TimelineLocation": {
+              "Offset": 1433,
+              "Order": 27,
+              "Time": "2024-05-12T11:36:03.572570152+01:00"
+            },
+            "Message": "Should not change the ingress route",
+            "Duration": 2223565,
+            "NodeType": "It"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Correctly populated AppBundle with no routes reconcilling ingress route",
+          "Adding a single route to AppBundle with ingress route",
+          "And updating",
+          "With an ingress route",
+          "And created ingress route"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 35
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 36
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 74
+          },
+          {
+            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+            "LineNumber": 75
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+          "LineNumber": 102
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "Should delete the ingress route",
+        "State": "passed",
+        "StartTime": "2024-05-12T11:36:03.572615811+01:00",
+        "EndTime": "2024-05-12T11:36:03.579730145+01:00",
+        "RunTime": 7114339,
+        "ParallelProcess": 1,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "2024-05-12T11:36:03+01:00\tINFO\tUpserting reason because: Spec changed, namely the paths: \nTLS/0/Hosts/0/\nTLS/0/SecretName/\nRules/0/Host/\nRules/0/IngressRuleValue/HTTP/\n\n2024-05-12T11:36:03+01:00\tINFO\tCreating resource.\t{\"type\": \"*v1.Ingress\", \"object\": \"\u0026Ingress{ObjectMeta:{tsthqatt-test  devel    0 0001-01-01 00:00:00 +0000 UTC \u003cnil\u003e \u003cnil\u003e map[app.kubernetes.io/instance:tsthqatt app.kubernetes.io/name:tsthqatt appbundle:tsthqatt atro.xyz/app-bundle:tsthqatt] map[cert-manager.io/cluster-issuer:letsencrypt traefik.ingress.kubernetes.io/router.entryPoints:websecure traefik.ingress.kubernetes.io/router.middlewares:auth-authelia@kubernetescrd traefik.ingress.kubernetes.io/router.tls:true traefik.ingress.kubernetes.io/router.tls.certresolver:letsencrypt] [{atroxyz.atrok.io/v1alpha1 AppBundle tsthqatt 9c073a02-6d51-45be-8c5c-d72f2da0eeb3 \u003cnil\u003e \u003cnil\u003e}] [] []},Spec:IngressSpec{DefaultBackend:nil,TLS:[]IngressTLS{IngressTLS{Hosts:[test.com],SecretName:tsthqatt-test-devel-ingress-tls,},},Rules:[]IngressRule{IngressRule{Host:test.com,IngressRuleValue:IngressRuleValue{HTTP:\u0026HTTPIngressRuleValue{Paths:[]HTTPIngressPath{HTTPIngressPath{Path:/,Backend:IngressBackend{Resource:nil,Service:\u0026IngressServiceBackend{Name:tsthqatt,Port:ServiceBackendPort{Name:,Number:80,},},},PathType:*Prefix,},},},},},},IngressClassName:nil,},Status:IngressStatus{LoadBalancer:IngressLoadBalancerStatus{Ingress:[]IngressLoadBalancerIngress{},},},}\"}\n2024-05-12T11:36:03+01:00\tINFO\tDeleting ingress tsthqatt-test\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 23
+            },
+            "TimelineLocation": {
+              "Order": 28,
+              "Time": "2024-05-12T11:36:03.572620184+01:00"
+            },
+            "Message": "Correctly populated AppBundle with no routes reconcilling ingress route",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 23
+            },
+            "TimelineLocation": {
+              "Order": 30,
+              "Time": "2024-05-12T11:36:03.573523649+01:00"
+            },
+            "Message": "Correctly populated AppBundle with no routes reconcilling ingress route",
+            "Duration": 903472,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 37
+            },
+            "TimelineLocation": {
+              "Order": 31,
+              "Time": "2024-05-12T11:36:03.573525263+01:00"
+            },
+            "Message": "And updating",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 37
+            },
+            "TimelineLocation": {
+              "Order": 33,
+              "Time": "2024-05-12T11:36:03.574587116+01:00"
+            },
+            "Message": "And updating",
+            "Duration": 1061846,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 76
+            },
+            "TimelineLocation": {
+              "Order": 34,
+              "Time": "2024-05-12T11:36:03.574588222+01:00"
+            },
+            "Message": "And created ingress route",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 76
+            },
+            "TimelineLocation": {
+              "Offset": 1433,
+              "Order": 36,
+              "Time": "2024-05-12T11:36:03.576480706+01:00"
+            },
+            "Message": "And created ingress route",
+            "Duration": 1892485,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 102
+            },
+            "TimelineLocation": {
+              "Offset": 1433,
+              "Order": 37,
+              "Time": "2024-05-12T11:36:03.576481582+01:00"
+            },
+            "Message": "Should delete the ingress route",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "By",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 103
+            },
+            "TimelineLocation": {
+              "Offset": 1433,
+              "Order": 38,
+              "Time": "2024-05-12T11:36:03.576489904+01:00"
+            },
+            "Message": "By removing routes and reconciling ingress route using app bundle"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_ingress_test.go",
+              "LineNumber": 102
+            },
+            "TimelineLocation": {
+              "Offset": 1495,
+              "Order": 40,
+              "Time": "2024-05-12T11:36:03.579726125+01:00"
+            },
+            "Message": "Should delete the ingress route",
+            "Duration": 3244549,
+            "NodeType": "It"
+          }
+        ]
       },
       {
         "ContainerHierarchyTexts": [
@@ -722,7 +1088,7 @@
         "LeafNodeLabels": [],
         "LeafNodeText": "Should make no difference when resolving without a base against base",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212896357+01:00",
+        "StartTime": "2024-05-12T11:36:03.579751973+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
@@ -751,94 +1117,7 @@
         "LeafNodeLabels": [],
         "LeafNodeText": "Should append all routes from base to app bundle",
         "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212912736+01:00",
-        "EndTime": "0001-01-01T00:00:00Z",
-        "RunTime": 0,
-        "ParallelProcess": 1,
-        "NumAttempts": 0,
-        "MaxFlakeAttempts": 0,
-        "MaxMustPassRepeatedly": 0
-      },
-      {
-        "ContainerHierarchyTexts": [
-          "Correctly populated heavily populated AppBundle"
-        ],
-        "ContainerHierarchyLocations": [
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
-            "LineNumber": 85
-          }
-        ],
-        "ContainerHierarchyLabels": [
-          []
-        ],
-        "LeafNodeType": "It",
-        "LeafNodeLocation": {
-          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
-          "LineNumber": 131
-        },
-        "LeafNodeLabels": [],
-        "LeafNodeText": "Should make no difference when resolving without a base against base",
-        "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212916781+01:00",
-        "EndTime": "0001-01-01T00:00:00Z",
-        "RunTime": 0,
-        "ParallelProcess": 1,
-        "NumAttempts": 0,
-        "MaxFlakeAttempts": 0,
-        "MaxMustPassRepeatedly": 0
-      },
-      {
-        "ContainerHierarchyTexts": [
-          "Correctly populated heavily populated AppBundle"
-        ],
-        "ContainerHierarchyLocations": [
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
-            "LineNumber": 85
-          }
-        ],
-        "ContainerHierarchyLabels": [
-          []
-        ],
-        "LeafNodeType": "It",
-        "LeafNodeLocation": {
-          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundlebase_test.go",
-          "LineNumber": 142
-        },
-        "LeafNodeLabels": [],
-        "LeafNodeText": "Should append all routes from base to app bundle",
-        "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.212920657+01:00",
-        "EndTime": "0001-01-01T00:00:00Z",
-        "RunTime": 0,
-        "ParallelProcess": 1,
-        "NumAttempts": 0,
-        "MaxFlakeAttempts": 0,
-        "MaxMustPassRepeatedly": 0
-      },
-      {
-        "ContainerHierarchyTexts": [
-          "AppBundle with incorrectly populated route"
-        ],
-        "ContainerHierarchyLocations": [
-          {
-            "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
-            "LineNumber": 142
-          }
-        ],
-        "ContainerHierarchyLabels": [
-          []
-        ],
-        "LeafNodeType": "It",
-        "LeafNodeLocation": {
-          "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/appbundle_service_test.go",
-          "LineNumber": 170
-        },
-        "LeafNodeLabels": [],
-        "LeafNodeText": "Should not make a service",
-        "State": "skipped",
-        "StartTime": "2024-05-06T19:21:30.21292425+01:00",
+        "StartTime": "2024-05-12T11:36:03.579757827+01:00",
         "EndTime": "0001-01-01T00:00:00Z",
         "RunTime": 0,
         "ParallelProcess": 1,
@@ -853,14 +1132,14 @@
         "LeafNodeType": "AfterSuite",
         "LeafNodeLocation": {
           "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
-          "LineNumber": 85
+          "LineNumber": 87
         },
         "LeafNodeLabels": null,
         "LeafNodeText": "",
         "State": "passed",
-        "StartTime": "2024-05-06T19:21:30.212939544+01:00",
-        "EndTime": "2024-05-06T19:21:31.286526888+01:00",
-        "RunTime": 1073587345,
+        "StartTime": "2024-05-12T11:36:03.579778723+01:00",
+        "EndTime": "2024-05-12T11:36:04.649493858+01:00",
+        "RunTime": 1069715134,
         "ParallelProcess": 1,
         "NumAttempts": 0,
         "MaxFlakeAttempts": 0,
@@ -870,11 +1149,11 @@
             "SpecEventType": "Node",
             "CodeLocation": {
               "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
-              "LineNumber": 85
+              "LineNumber": 87
             },
             "TimelineLocation": {
-              "Order": 9,
-              "Time": "2024-05-06T19:21:30.212940285+01:00"
+              "Order": 41,
+              "Time": "2024-05-12T11:36:03.579779423+01:00"
             },
             "Message": "TOP-LEVEL",
             "NodeType": "AfterSuite"
@@ -883,11 +1162,11 @@
             "SpecEventType": "By",
             "CodeLocation": {
               "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
-              "LineNumber": 86
+              "LineNumber": 88
             },
             "TimelineLocation": {
-              "Order": 10,
-              "Time": "2024-05-06T19:21:30.212950941+01:00"
+              "Order": 42,
+              "Time": "2024-05-12T11:36:03.579792078+01:00"
             },
             "Message": "tearing down the test environment"
           },
@@ -895,14 +1174,14 @@
             "SpecEventType": "Node (End)",
             "CodeLocation": {
               "FileName": "/home/atropos/projects/Infra/atrok/internal/controller/suite_test.go",
-              "LineNumber": 85
+              "LineNumber": 87
             },
             "TimelineLocation": {
-              "Order": 12,
-              "Time": "2024-05-06T19:21:31.286524546+01:00"
+              "Order": 44,
+              "Time": "2024-05-12T11:36:04.649485986+01:00"
             },
             "Message": "TOP-LEVEL",
-            "Duration": 1073584262,
+            "Duration": 1069706562,
             "NodeType": "AfterSuite"
           }
         ]

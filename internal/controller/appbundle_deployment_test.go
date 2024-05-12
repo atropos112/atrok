@@ -47,7 +47,7 @@ var _ = Describe("Correctly populated AppBundle for just deplyoment", func() {
 		// CHECK the resource
 		Expect(deployment.Name).To(Equal(ab.Name))
 		Expect(deployment.Namespace).To(Equal(ab.Namespace))
-		Expect(deployment.Spec.Selector.MatchLabels["app"]).To(Equal(ab.Name))
+		Expect(deployment.Spec.Selector.MatchLabels[AppBundleSelector]).To(Equal(ab.Name))
 
 		// CHECK the resource
 		containers := deployment.Spec.Template.Spec.Containers
@@ -84,7 +84,7 @@ var _ = Describe("Correctly populated AppBundle for just deplyoment", func() {
 		// CHECK the resource
 		Expect(afterDeployment.Name).To(Equal(ab.Name))
 		Expect(afterDeployment.Namespace).To(Equal(ab.Namespace))
-		Expect(afterDeployment.Spec.Selector.MatchLabels["app"]).To(Equal(ab.Name))
+		Expect(afterDeployment.Spec.Selector.MatchLabels[AppBundleSelector]).To(Equal(ab.Name))
 
 		beforeContainers := beforeDeployment.Spec.Template.Spec.Containers
 		afterContainers := afterDeployment.Spec.Template.Spec.Containers
@@ -95,7 +95,6 @@ var _ = Describe("Correctly populated AppBundle for just deplyoment", func() {
 
 	Describe("Changing the app bundle to a more complex one with volumes and envs and ports", func() {
 		Context("And reconciling deployment", func() {
-
 			BeforeEach(func() {
 				ab.Spec.Envs = make(map[string]string)
 				ab.Spec.Envs["test"] = "test"
@@ -111,7 +110,6 @@ var _ = Describe("Correctly populated AppBundle for just deplyoment", func() {
 						"memory": resource.MustParse("750Mi"),
 					},
 				}
-
 			})
 		})
 	})

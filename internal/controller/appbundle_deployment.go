@@ -208,7 +208,7 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 		Replicas:             ab.Spec.Replicas,
 		RevisionHistoryLimit: &revision_history_limit,
 		Strategy:             appsv1.DeploymentStrategy{Type: appsv1.RecreateDeploymentStrategyType},
-		Selector:             &metav1.LabelSelector{MatchLabels: map[string]string{"atro.xyz/app-bundle": ab.Name}},
+		Selector:             &metav1.LabelSelector{MatchLabels: map[string]string{AppBundleSelector: ab.Name}},
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
 				Labels: labels,

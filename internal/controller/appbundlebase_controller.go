@@ -134,16 +134,20 @@ func (r *AppBundleBaseReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func isDefault[T any](value T) bool {
+func IsDefault[T any](value T) bool {
 	defaultValue := reflect.Zero(reflect.TypeOf(value)).Interface()
 	return reflect.DeepEqual(value, defaultValue)
+}
+
+func SetDefault[T any](value *T) {
+	*value = reflect.Zero(reflect.TypeOf(*value)).Interface().(T)
 }
 
 // ReturnFirstNonNil returns the first non-nil element in a list of pointers
 func ReturnFirstNonDefault[T any](elem ...T) T {
 	var result T
 	for _, e := range elem {
-		if !isDefault[T](e) {
+		if !IsDefault[T](e) {
 			return e
 		}
 	}

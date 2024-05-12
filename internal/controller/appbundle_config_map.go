@@ -67,7 +67,25 @@ func (r *AppBundleReconciler) ReconcileConfigMap(ctx context.Context, ab *atroxy
 			return err
 		}
 
-		return UpsertResource(ctx, r, expectedConfigMap, reason, er)
+		if err := UpsertResource(ctx, r, expectedConfigMap, reason, er); err != nil {
+			return err
+		}
+
+		// Restart the pod after the config map has been updated.
+		podList := &corev1.PodList{}
+		if err := r.List(ctx, podList, client.MatchingLabels{AppBundleSelector: ab.Name}); err != nil {
+			return err
+		}
+		if len(podList.Items) == 0 {
+			return nil
+		} else if len(podList.Items) > 1 {
+			return errors.NewBadRequest("More than one pod found for appbundle")
+		}
+
+		// By now we know there is only one item in the list
+		if err := r.Delete(ctx, &podList.Items[0]); err != nil {
+			return err
+		}
 	}
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 	"sort"
+	"strings"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 	"github.com/r3labs/diff/v3"
@@ -18,31 +19,6 @@ import (
 type ReaderWriter interface {
 	client.Reader
 	client.Writer
-}
-
-// UpsertLabel of an existing object
-func UpsertLabelIntoResource(ctx context.Context, r ReaderWriter, kv map[string]string, obj client.Object, id client.ObjectKey) error {
-	if err := r.Get(ctx, id, obj); err != nil {
-		return err
-	}
-
-	labels := obj.GetLabels()
-
-	if labels == nil {
-		labels = make(map[string]string)
-	}
-
-	for key, value := range kv {
-		labels[key] = value
-	}
-
-	obj.SetLabels(labels)
-
-	if err := r.Update(ctx, obj); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func GetDiffPaths(oldObj, newObj interface{}) (string, error) {
@@ -106,11 +82,28 @@ func UpsertResource(ctx context.Context, r ReaderWriter, newObj client.Object, r
 	} else {
 		l.Info("Resource exists but changes were found.", "type", reflect.TypeOf(newObj).String(), "object", newObj)
 		if err := r.Update(ctx, newObj); err != nil {
+			if ShouldRecreateResource(err) {
+				if derr := r.Delete(ctx, newObj); derr != nil {
+					return derr
+				}
+				if cerr := r.Create(ctx, newObj); cerr != nil {
+					return cerr
+				}
+			}
 			return err
 		}
 	}
 
 	return nil
+}
+
+// ShouldRecreateResource checks for a specific error message that indicates a resource should be recreated because the field is immutable and updating is not possible.
+func ShouldRecreateResource(err error) bool {
+	// This happens when the name of the selector changes , I can't see a reason why this would be immutable.
+	if strings.Contains(err.Error(), "is invalid: spec.selector: Invalid value:") && strings.Contains(err.Error(), "field is immutable") {
+		return true
+	}
+	return false
 }
 
 // RunReconciles takes in a list of reconcile functions, passes argument into each one and runs concurrently.
@@ -133,18 +126,15 @@ func GetAppBundleObjectMetaWithOwnerReference(app_bundle *atroxyzv1alpha1.AppBun
 	return metav1.ObjectMeta{
 		Name:            app_bundle.Name,
 		Namespace:       app_bundle.Namespace,
-		Labels:          app_bundle.GetLabels(),
 		OwnerReferences: []metav1.OwnerReference{app_bundle.OwnerReference()},
 	}
 }
 
-func GetAppBundleObjectMetaWithOwnerReferenceForIngress(app_bundle *atroxyzv1alpha1.AppBundle) metav1.ObjectMeta {
+func GetObjectMetaForIngress(app_bundle *atroxyzv1alpha1.AppBundle) metav1.ObjectMeta {
 	firstKey := getSortedKeys(app_bundle.Spec.Routes)[0]
 	return metav1.ObjectMeta{
-		Name:            app_bundle.Name + "-" + firstKey,
-		Namespace:       app_bundle.Namespace,
-		Labels:          app_bundle.GetLabels(),
-		OwnerReferences: []metav1.OwnerReference{app_bundle.OwnerReference()},
+		Name:      app_bundle.Name + "-" + firstKey,
+		Namespace: app_bundle.Namespace,
 	}
 }
 
@@ -172,6 +162,7 @@ func SetDefaultAppBundleLabels(ab *atroxyzv1alpha1.AppBundle, labels map[string]
 	labels["app.kubernetes.io/instance"] = ab.Name
 	labels["app.kubernetes.io/name"] = ab.Name
 	labels["atro.xyz/app-bundle"] = ab.Name
+	labels[AppBundleSelector] = ab.Name
 
 	return labels
 }
@@ -192,3 +183,5 @@ func StringMapsMatch(map1, map2 map[string]string) bool {
 
 	return true
 }
+
+var AppBundleSelector = "appbundle"
