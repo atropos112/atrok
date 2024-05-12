@@ -95,15 +95,27 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 		for _, config := range configs {
 			volumeName := "cm-" + strings.Replace(config.FileName, ".", "", -1)
 
-			volumes = append(volumes, corev1.Volume{
-				Name: volumeName,
-				VolumeSource: corev1.VolumeSource{
-					ConfigMap: &corev1.ConfigMapVolumeSource{
-						LocalObjectReference: corev1.LocalObjectReference{Name: ab.Name},
-						Items:                []corev1.KeyToPath{{Key: config.FileName, Path: config.FileName}},
+			if config.Existing != nil {
+				volumes = append(volumes, corev1.Volume{
+					Name: volumeName,
+					VolumeSource: corev1.VolumeSource{
+						ConfigMap: &corev1.ConfigMapVolumeSource{
+							LocalObjectReference: corev1.LocalObjectReference{Name: config.Existing.ConfigMap},
+							Items:                []corev1.KeyToPath{{Key: config.Existing.Key, Path: config.FileName}},
+						},
 					},
-				},
-			})
+				})
+			} else {
+				volumes = append(volumes, corev1.Volume{
+					Name: volumeName,
+					VolumeSource: corev1.VolumeSource{
+						ConfigMap: &corev1.ConfigMapVolumeSource{
+							LocalObjectReference: corev1.LocalObjectReference{Name: ab.Name},
+							Items:                []corev1.KeyToPath{{Key: config.FileName, Path: config.FileName}},
+						},
+					},
+				})
+			}
 
 			volumeMounts = append(volumeMounts, corev1.VolumeMount{
 				Name:      volumeName,
@@ -273,7 +285,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, ab *atrox
 		if err != nil {
 			return err
 		}
-		return UpsertResource(ctx, r, expectedDeployment, reason, er)
+		return UpsertResource(ctx, r, expectedDeployment, reason, er, false)
 	}
 
 	if !StringMapsMatch(expectedDeployment.ObjectMeta.Labels, currentDeployment.ObjectMeta.Labels) {
@@ -281,7 +293,7 @@ func (r *AppBundleReconciler) ReconcileDeployment(ctx context.Context, ab *atrox
 		if err != nil {
 			return err
 		}
-		return UpsertResource(ctx, r, expectedDeployment, reason, er)
+		return UpsertResource(ctx, r, expectedDeployment, reason, er, false)
 	}
 
 	return nil

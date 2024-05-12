@@ -48,9 +48,15 @@ func (s AppBundleConfigs) Swap(i, j int) {
 }
 
 type AppBundleConfig struct {
-	FileName string `json:"fileName,omitempty"`
-	Content  string `json:"content,omitempty"`
-	DirPath  string `json:"dirPath,omitempty"`
+	FileName string                   `json:"fileName,omitempty"`
+	Content  string                   `json:"content,omitempty"`
+	Existing *AppBundleExistingConfig `json:"existing,omitempty"`
+	DirPath  string                   `json:"dirPath,omitempty"`
+}
+
+type AppBundleExistingConfig struct {
+	ConfigMap string `json:"configMap,omitempty"`
+	Key       string `json:"key,omitempty"`
 }
 
 type AppBundleSourcedEnv struct {

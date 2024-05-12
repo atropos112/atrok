@@ -27,6 +27,10 @@ func CreateExpectedConfigMap(ab *atroxyzv1alpha1.AppBundle) (*corev1.ConfigMap, 
 	sort.Sort(configs)
 
 	for _, config := range configs {
+		if config.Existing != nil {
+			continue
+		}
+
 		cm.Data[config.FileName] = config.Content
 	}
 
@@ -67,7 +71,7 @@ func (r *AppBundleReconciler) ReconcileConfigMap(ctx context.Context, ab *atroxy
 			return err
 		}
 
-		if err := UpsertResource(ctx, r, expectedConfigMap, reason, er); err != nil {
+		if err := UpsertResource(ctx, r, expectedConfigMap, reason, er, false); err != nil {
 			return err
 		}
 

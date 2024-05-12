@@ -164,7 +164,7 @@ func (r *AppBundleReconciler) ReconcileIngress(ctx context.Context, ab *atroxyzv
 				return err
 			}
 
-			if err := UpsertResource(ctx, r, expectedIngress, reason, er); err != nil {
+			if err := UpsertResource(ctx, r, expectedIngress, reason, er, false); err != nil {
 				return err
 			}
 		}

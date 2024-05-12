@@ -97,7 +97,7 @@ func (r *AppBundleReconciler) ReconcileRecurringBackupJob(ctx context.Context, a
 	}
 
 	// UPSERT the resource
-	if err := UpsertResource(ctx, r, recurringJob, "", er); err != nil {
+	if err := UpsertResource(ctx, r, recurringJob, "", er, false); err != nil {
 		return err
 	}
 

@@ -128,7 +128,7 @@ func (r *AppBundleReconciler) ReconcileService(ctx context.Context, ab *atroxyzv
 			return err
 		}
 
-		return UpsertResource(ctx, r, expectedService, reason, er)
+		return UpsertResource(ctx, r, expectedService, reason, er, false)
 	}
 
 	if expectedService != nil && !StringMapsMatch(expectedService.ObjectMeta.Labels, currentService.ObjectMeta.Labels) {
@@ -137,7 +137,7 @@ func (r *AppBundleReconciler) ReconcileService(ctx context.Context, ab *atroxyzv
 			return err
 		}
 
-		return UpsertResource(ctx, r, expectedService, reason, er)
+		return UpsertResource(ctx, r, expectedService, reason, er, false)
 	}
 
 	return nil

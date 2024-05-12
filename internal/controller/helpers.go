@@ -63,7 +63,7 @@ func FormulateDiffMessageForLabels(oldObjLabels, newObjLabels interface{}) (stri
 }
 
 // UpsertResource creates or updates a resource with nice logging indicating what is happening.
-func UpsertResource(ctx context.Context, r ReaderWriter, newObj client.Object, reason string, er error) error {
+func UpsertResource(ctx context.Context, r ReaderWriter, newObj client.Object, reason string, er error, neverDelete bool) error {
 	l := log.FromContext(ctx)
 
 	if er != nil && !k8serror.IsNotFound(er) {
@@ -82,7 +82,7 @@ func UpsertResource(ctx context.Context, r ReaderWriter, newObj client.Object, r
 	} else {
 		l.Info("Resource exists but changes were found.", "type", reflect.TypeOf(newObj).String(), "object", newObj)
 		if err := r.Update(ctx, newObj); err != nil {
-			if ShouldRecreateResource(err) {
+			if ShouldRecreateResource(err) && !neverDelete {
 				if derr := r.Delete(ctx, newObj); derr != nil {
 					return derr
 				}

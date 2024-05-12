@@ -206,6 +206,7 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 			} else {
 				foundConfig.Content = ReturnFirstNonDefault(foundConfig.Content, abbConfig.Content)
 				foundConfig.DirPath = ReturnFirstNonDefault(foundConfig.DirPath, abbConfig.DirPath)
+				foundConfig.Existing = ReturnFirstNonDefault(foundConfig.Existing, abbConfig.Existing)
 			}
 		}
 	}
