@@ -65,6 +65,13 @@ spec:
                       type: string
                     dirPath:
                       type: string
+                    existing:
+                      properties:
+                        configMap:
+                          type: string
+                        key:
+                          type: string
+                      type: object
                     fileName:
                       type: string
                   type: object
@@ -91,6 +98,8 @@ spec:
               image:
                 properties:
                   pullPolicy:
+                    description: PullPolicy describes a policy for if/when to pull
+                      a container image
                     type: string
                   repository:
                     type: string

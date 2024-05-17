@@ -6,6 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 
@@ -78,7 +79,6 @@ var _ = Describe("Correctly populated very basic AppBundle", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(ab.Spec.Routes).To(HaveLen(2))
-
 	})
 })
 
@@ -114,7 +114,7 @@ var _ = Describe("Correctly populated heavily populated AppBundle", func() {
 			route2_name: route2,
 		}
 
-		pullPolicy := "Always"
+		pullPolicy := v1.PullAlways
 		ab.Spec.Image.PullPolicy = &pullPolicy
 		group := "test"
 		ab.Spec.Homepage = &atroxyzv1alpha1.AppBundleHomePage{Group: &group}
@@ -172,6 +172,5 @@ var _ = Describe("Correctly populated heavily populated AppBundle", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(ab.Spec.Routes).To(HaveLen(2))
-
 	})
 })

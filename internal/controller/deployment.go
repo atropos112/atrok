@@ -170,16 +170,22 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 			env = append(env, corev1.EnvVar{Name: key, ValueFrom: &envVarSource})
 		}
 	}
+	imagePullPolicy := corev1.PullAlways
+	if ab.Spec.Image.PullPolicy != nil {
+		imagePullPolicy = *ab.Spec.Image.PullPolicy
+	}
+
 	container := corev1.Container{
-		Name:           ab.Name,
-		Image:          fmt.Sprintf("%s:%s", repository, tag),
-		Resources:      resources,
-		Ports:          ports,
-		Env:            env,
-		VolumeMounts:   volumeMounts,
-		LivenessProbe:  ab.Spec.LivenessProbe,
-		ReadinessProbe: ab.Spec.ReadinessProbe,
-		StartupProbe:   ab.Spec.StartupProbe,
+		Name:            ab.Name,
+		Image:           fmt.Sprintf("%s:%s", repository, tag),
+		ImagePullPolicy: imagePullPolicy,
+		Resources:       resources,
+		Ports:           ports,
+		Env:             env,
+		VolumeMounts:    volumeMounts,
+		LivenessProbe:   ab.Spec.LivenessProbe,
+		ReadinessProbe:  ab.Spec.ReadinessProbe,
+		StartupProbe:    ab.Spec.StartupProbe,
 	}
 
 	if ab.Spec.Command != nil {
