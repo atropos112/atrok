@@ -46,10 +46,6 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	muBase.Lock()
 	defer muBase.Unlock()
 
-	if req.Name != "blahtus" {
-		return ctrl.Result{}, nil
-	}
-
 	// Get app bundle base
 	abb := &atroxyzv1alpha1.AppBundleBase{}
 	if err := r.Get(ctx, req.NamespacedName, abb); err != nil {
