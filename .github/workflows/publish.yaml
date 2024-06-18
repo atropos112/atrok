@@ -35,7 +35,7 @@ jobs:
             atropos112/atrok
           tags: "type=semver,pattern={{version}}\ntype=semver,pattern={{major}}.{{minor}}\ntype=semver,pattern={{major}}\ntype=sha  \n"
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
