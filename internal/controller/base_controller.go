@@ -42,7 +42,9 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	l := log.FromContext(ctx)
 
 	// TODO: MUST FIX THE STATE OF THE APP BUNDLE BASE
-	return ctrl.Result{}, nil
+	if req.Name != "some letters that will never happen" {
+		return ctrl.Result{}, nil
+	}
 
 	// LOCK the resource
 	muBase := getMutex("appBundleBase", req.Name, req.Namespace)
