@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"sort"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -22,16 +21,14 @@ func CreateExpectedConfigMap(ab *atroxyzv1alpha1.AppBundle) (*corev1.ConfigMap, 
 
 	// Trivail mappings.
 	cm.Data = make(map[string]string)
-	configs := ab.Spec.Configs
+	for _, key := range getSortedKeys(ab.Spec.Configs) {
+		config := ab.Spec.Configs[key]
 
-	sort.Sort(configs)
-
-	for _, config := range configs {
 		if config.Existing != nil {
 			continue
 		}
 
-		cm.Data[config.FileName] = config.Content
+		cm.Data[key] = config.Content
 	}
 
 	return cm, nil

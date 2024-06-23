@@ -2,8 +2,6 @@
 package v1alpha1
 
 import (
-	"strings"
-
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -33,30 +31,25 @@ type AppBundleSpec struct {
 	Configs        AppBundleConfigs               `json:"configs,omitempty"`
 }
 
-type AppBundleConfigs []*AppBundleConfig
+type AppBundleConfigs map[string]*AppBundleConfig
 
-func (s AppBundleConfigs) Less(i, j int) bool {
-	return strings.Compare(s[i].FileName, s[j].FileName) < 0
-}
-
-func (s AppBundleConfigs) Len() int {
-	return len(s)
-}
-
-func (s AppBundleConfigs) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
+// func (s AppBundleConfigs) Less(i, j int) bool {
+// 	return strings.Compare(s[i].FileName, s[j].FileName) < 0
+// }
+//
+// func (s AppBundleConfigs) Len() int {
+// 	return len(s)
+// }
+//
+// func (s AppBundleConfigs) Swap(i, j int) {
+// 	s[i], s[j] = s[j], s[i]
+// }
 
 type AppBundleConfig struct {
-	FileName string                   `json:"fileName,omitempty"`
-	Content  string                   `json:"content,omitempty"`
-	Existing *AppBundleExistingConfig `json:"existing,omitempty"`
-	DirPath  string                   `json:"dirPath,omitempty"`
-}
-
-type AppBundleExistingConfig struct {
-	ConfigMap string `json:"configMap,omitempty"`
-	Key       string `json:"key,omitempty"`
+	FileName string  `json:"fileName,omitempty"`
+	Content  string  `json:"content,omitempty"`
+	Existing *string `json:"existing,omitempty"`
+	DirPath  string  `json:"dirPath,omitempty"`
 }
 
 type AppBundleSourcedEnv struct {

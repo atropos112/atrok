@@ -41,6 +41,9 @@ type AppBundleIdentifier string // Identifier for the app bundle
 func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := log.FromContext(ctx)
 
+	// TODO: MUST FIX THE STATE OF THE APP BUNDLE BASE
+	return ctrl.Result{}, nil
+
 	// LOCK the resource
 	muBase := getMutex("appBundleBase", req.Name, req.Namespace)
 	muBase.Lock()
@@ -186,23 +189,25 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 	}
 
 	if abbSpec.Configs != nil {
-		for _, abbConfig := range abbSpec.Configs {
+		for _, abbKey := range getSortedKeys(abbSpec.Configs) {
 			found := false
+			abbConfig := abbSpec.Configs[abbKey]
+
 			var foundConfig *atroxyzv1alpha1.AppBundleConfig
-			for _, abConfig := range abSpec.Configs {
-				if abConfig.FileName == abbConfig.FileName {
+			for _, abKey := range getSortedKeys(abSpec.Configs) {
+				if abKey == abbKey {
 					found = true
-					foundConfig = abConfig
+					foundConfig = abSpec.Configs[abKey]
 					break
 				}
 			}
 
 			if !found {
-				abSpec.Configs = append(abSpec.Configs, abbConfig)
+				abSpec.Configs[abbKey] = abbConfig
 			} else {
-				foundConfig.Content = ReturnFirstNonDefault(foundConfig.Content, abbConfig.Content)
-				foundConfig.DirPath = ReturnFirstNonDefault(foundConfig.DirPath, abbConfig.DirPath)
-				foundConfig.Existing = ReturnFirstNonDefault(foundConfig.Existing, abbConfig.Existing)
+				abSpec.Configs[abbKey].Content = ReturnFirstNonDefault(foundConfig.Content, abbConfig.Content)
+				abSpec.Configs[abbKey].DirPath = ReturnFirstNonDefault(foundConfig.DirPath, abbConfig.DirPath)
+				abSpec.Configs[abbKey].Existing = ReturnFirstNonDefault(foundConfig.Existing, abbConfig.Existing)
 			}
 		}
 	}

@@ -59,23 +59,18 @@ spec:
                   type: string
                 type: array
               configs:
-                items:
+                additionalProperties:
                   properties:
                     content:
                       type: string
                     dirPath:
                       type: string
                     existing:
-                      properties:
-                        configMap:
-                          type: string
-                        key:
-                          type: string
-                      type: object
+                      type: string
                     fileName:
                       type: string
                   type: object
-                type: array
+                type: object
               envs:
                 additionalProperties:
                   type: string
