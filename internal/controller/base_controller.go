@@ -234,8 +234,8 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 		}
 	}
 
-	abbSpec.NodeSelector = ReturnFirstNonDefault(abSpec.NodeSelector, abbSpec.NodeSelector)
-	abbSpec.UseNvidia = ReturnFirstNonDefault(abSpec.UseNvidia, abbSpec.UseNvidia)
+	abSpec.NodeSelector = ReturnFirstNonDefault(abSpec.NodeSelector, abbSpec.NodeSelector)
+	abSpec.UseNvidia = ReturnFirstNonDefault(abSpec.UseNvidia, abbSpec.UseNvidia)
 
 	if abbSpec.Routes != nil {
 		if abSpec.Routes == nil {
