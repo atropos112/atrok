@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	"github.com/rxwycdh/rxhash"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -63,4 +64,22 @@ type AppBundleBaseList struct {
 
 func init() {
 	SchemeBuilder.Register(&AppBundleBase{}, &AppBundleBaseList{})
+}
+
+// ID returns the unique ID of the appbundle
+func (abb AppBundleBase) ID() string {
+	return abb.Name + "_" + abb.Namespace
+}
+
+// rxhash.HashStruct(ab.Spec)
+func (abb AppBundleBase) GetSpecHash() (string, error) {
+	return rxhash.HashStruct(abb.Spec)
+}
+
+func (abb AppBundleBase) GetLastReconciliation() (bool, string) {
+	if abb.Status.LastReconciliation == nil {
+		return false, ""
+	}
+
+	return true, *abb.Status.LastReconciliation
 }

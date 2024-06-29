@@ -2,6 +2,7 @@
 package v1alpha1
 
 import (
+	"github.com/rxwycdh/rxhash"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -121,8 +122,21 @@ type AppBundle struct {
 }
 
 // ID returns the unique ID of the appbundle
-func (ab *AppBundle) ID() string {
+func (ab AppBundle) ID() string {
 	return ab.Name + "_" + ab.Namespace
+}
+
+// rxhash.HashStruct(ab.Spec)
+func (ab AppBundle) GetSpecHash() (string, error) {
+	return rxhash.HashStruct(ab.Spec)
+}
+
+func (ab AppBundle) GetLastReconciliation() (bool, string) {
+	if ab.Status.LastReconciliation == nil {
+		return false, ""
+	}
+
+	return true, *ab.Status.LastReconciliation
 }
 
 func (ab *AppBundle) OwnerReference() metav1.OwnerReference {

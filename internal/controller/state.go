@@ -1,11 +1,15 @@
 package controller
 
 import (
-	"context"
+	"sync"
 	"time"
 
-	atro "github.com/atropos112/atrok.git/api/v1alpha1"
-	rxhash "github.com/rxwycdh/rxhash"
+	"github.com/atropos112/atrok.git/types"
+)
+
+var (
+	State      = make(map[string]*AppBundleState)
+	StateMutex = &sync.Mutex{}
 )
 
 // AppBundleBaseState is the in-memory cached state of an appbundlebase object.
@@ -39,12 +43,15 @@ func (e StateNotRegisteredError) Error() string {
 }
 
 // GetState returns the state of an appbundle object from the cache. Returns bool if the state was initialized and error if any.
-func RegisterStateIfNotAlreadyRegistered(ctx context.Context, ab *atro.AppBundle) error {
-	val := ctx.Value(ab.ID())
+func RegisterStateIfNotAlreadyRegistered(app types.AppId) error {
+	StateMutex.Lock()
+	defer StateMutex.Unlock()
 
-	// If state doesnt exists in the cache, register it then get it again from the cache and then return it.
-	if val == nil {
-		currentSpecHash, err := rxhash.HashStruct(ab.Spec)
+	_, ok := State[app.ID()]
+
+	// If state doesn't exists in the cache, register it then get it again from the cache and then return it.
+	if !ok {
+		currentSpecHash, err := app.GetSpecHash()
 		if err != nil {
 			return err
 		}
@@ -56,23 +63,26 @@ func RegisterStateIfNotAlreadyRegistered(ctx context.Context, ab *atro.AppBundle
 			NextBackoffInSec:   10,
 		}
 
-		ctx = context.WithValue(ctx, ab.ID(), &state)
+		State[app.ID()] = &state
 		return nil
 	}
 
 	return StateAlreadyRegisteredError{
-		objectID: ab.ID(),
+		objectID: app.ID(),
 	}
 }
 
-func UpdateState(ctx context.Context, ab *atro.AppBundle) error {
-	maybeVal := ctx.Value(ab.ID())
-	if maybeVal == nil {
-		return StateNotRegisteredError{objectID: ab.ID()}
-	}
-	val := maybeVal.(*AppBundleState)
+func UpdateState(app types.AppId) error {
+	StateMutex.Lock()
+	defer StateMutex.Unlock()
 
-	currentSpecHash, err := rxhash.HashStruct(ab.Spec)
+	val, ok := State[app.ID()]
+
+	if !ok {
+		return StateNotRegisteredError{objectID: app.ID()}
+	}
+
+	currentSpecHash, err := app.GetSpecHash()
 	if err != nil {
 		return err
 	}
@@ -80,37 +90,42 @@ func UpdateState(ctx context.Context, ab *atro.AppBundle) error {
 	val.SpecHash = currentSpecHash
 	val.LastReconciliation = time.Now()
 
-	ctx = context.WithValue(ctx, ab.ID(), val)
+	State[app.ID()] = val
 	return nil
 }
 
-func GetState(ctx context.Context, ab *atro.AppBundle) (*AppBundleState, error) {
-	maybeVal := ctx.Value(ab.ID())
-	if maybeVal == nil {
-		return nil, StateNotRegisteredError{objectID: ab.ID()}
+func GetState(app types.AppId) (*AppBundleState, error) {
+	StateMutex.Lock()
+	defer StateMutex.Unlock()
+
+	val, ok := State[app.ID()]
+	if !ok {
+		return nil, StateNotRegisteredError{objectID: app.ID()}
 	}
-	val := maybeVal.(*AppBundleState)
 
 	return val, nil
 }
 
-func StateNeedsUpdating(ctx context.Context, ab *atro.AppBundle, alreadyRegistered bool) (bool, error) {
+func StateNeedsUpdating(app types.AppId, alreadyRegistered bool) (bool, error) {
 	if !alreadyRegistered {
 		return true, nil
 	}
 
-	state, err := GetState(ctx, ab)
+	// No need to lock here as GetState locks the mutex by itself.
+	state, err := GetState(app)
 	if err != nil {
 		return false, err
 	}
 
-	currentSpecHash, err := rxhash.HashStruct(ab.Spec)
+	currentSpecHash, err := app.GetSpecHash()
 	if err != nil {
 		return false, err
 	}
+
+	anyRecon, _ := app.GetLastReconciliation()
 
 	if state.SpecHash != currentSpecHash ||
-		ab.Status.LastReconciliation == nil ||
+		!anyRecon ||
 		time.Now().Unix()-state.LastReconciliation.Unix() > 30 {
 		return true, nil
 	}

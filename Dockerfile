@@ -13,7 +13,8 @@ RUN go mod download
 # Copy the go source to build from 
 COPY cmd/main.go cmd/main.go
 COPY api/ api/
-COPY internal/controller/ internal/controller/
+COPY types/ types/
+COPY internal/ internal/
 
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build -a -o manager cmd/main.go

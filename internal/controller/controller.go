@@ -28,7 +28,7 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 
 	// Get (cached) state of the appbundle
-	err := RegisterStateIfNotAlreadyRegistered(ctx, ab)
+	err := RegisterStateIfNotAlreadyRegistered(ab)
 	stateAlreadyRegistered := false
 	if err != nil {
 		_, stateAlreadyRegistered = err.(StateAlreadyRegisteredError)
@@ -37,7 +37,7 @@ func (r *AppBundleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	}
 
-	stateNeedsUpdating, err := StateNeedsUpdating(ctx, ab, stateAlreadyRegistered)
+	stateNeedsUpdating, err := StateNeedsUpdating(ab, stateAlreadyRegistered)
 	if err != nil {
 		return ctrl.Result{RequeueAfter: 120 * time.Second}, err
 	}

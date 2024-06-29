@@ -7,7 +7,6 @@ import (
 	"time"
 
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
-	rxhash "github.com/rxwycdh/rxhash"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -20,8 +19,6 @@ type AppBundleBaseReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 }
-
-var hashedSpecAbb map[string]string = make(map[string]string)
 
 type AppBundleIdentifier string // Identifier for the app bundle
 
@@ -41,11 +38,6 @@ type AppBundleIdentifier string // Identifier for the app bundle
 func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := log.FromContext(ctx)
 
-	// TODO: MUST FIX THE STATE OF THE APP BUNDLE BASE
-	if req.Name != "some letters that will never happen" {
-		return ctrl.Result{}, nil
-	}
-
 	// LOCK the resource
 	muBase := getMutex("appBundleBase", req.Name, req.Namespace)
 	muBase.Lock()
@@ -57,43 +49,24 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, err
 	}
 
-	// Reconcile only if the observed generation is not the same as the current generation or
-	// if the app bundle base has not been reconciled yet after it was updated
-	abb_hash, err := rxhash.HashStruct(abb.Spec)
+	// Get (cached) state of the appbundlebase
+	err := RegisterStateIfNotAlreadyRegistered(abb)
+	stateAlreadyRegistered := false
 	if err != nil {
-		l.Error(err, "Unable to hash app bundle.")
-		return ctrl.Result{}, err
-	}
-
-	lastRecon := time.Unix(0, 0)
-
-	if abb.Status.LastReconciliation != nil {
-		lastRecon, err = time.Parse(time.UnixDate, *abb.Status.LastReconciliation)
-		if err != nil {
-			return ctrl.Result{}, err
+		_, stateAlreadyRegistered = err.(StateAlreadyRegisteredError)
+		if !stateAlreadyRegistered {
+			// Already registered is ok, any other error, return and requeue
+			return ctrl.Result{RequeueAfter: 20 * time.Second}, err
 		}
 	}
 
-	if hash, ok := hashedSpecAbb[abb.Name]; !ok || // If the hash is not in the map
-		hash != abb_hash || // If the hash is not the same
-		abb.Status.LastReconciliation == nil || // If the last reconcilliation is nil
-		time.Now().Unix()-lastRecon.Unix() > 30 { // If the last reconcilliation is more than 30 seconds ago
-
-		hashedSpecAbb[abb.Name] = abb_hash
-		nowTime := time.Now().UTC().Format(time.UnixDate)
-		abb.Status.LastReconciliation = &nowTime
-		if err := r.Status().Update(ctx, abb); err != nil {
-			l.Error(err, "Unable to update app bundle status.")
-			return ctrl.Result{}, err
-		}
-
-	} else {
-		return ctrl.Result{RequeueAfter: 60 * time.Second}, nil
+	stateNeedsUpdating, err := StateNeedsUpdating(abb, stateAlreadyRegistered)
+	if err != nil {
+		return ctrl.Result{RequeueAfter: 20 * time.Second}, err
 	}
 
-	// Get the object AGAIN as we re-upserted it above.
-	if err := r.Get(ctx, req.NamespacedName, abb); err != nil {
-		return ctrl.Result{}, err
+	if !stateNeedsUpdating {
+		return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
 	}
 
 	// Get all app bundles
@@ -109,15 +82,23 @@ func (r *AppBundleBaseReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		if ab.Spec.Base != nil && *ab.Spec.Base == abb.Name {
 			mus_ab[ab.Name] = getMutex("appBundle", ab.Name, ab.Namespace)
 			mus_ab[ab.Name].Lock()
-			stateAb, err := GetState(ctx, &ab)
+			stateAb, err := GetState(ab)
 			if err != nil {
-				return ctrl.Result{}, err
+				mus_ab[ab.Name].Unlock()
+				if _, ok := err.(StateNotRegisteredError); !ok {
+					return ctrl.Result{}, err
+				} else {
+					l.Info("State not registered for appbundle. This is normal at start, should not be happening when operator ahs been running for a while though. Requeueing", "appbundle", ab.Name)
+					// In case we go here before state was recorder for the appbundle itself.
+					return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
+				}
 			}
 			stateAb.SpecHash = "" // Force update by resetting the hashed spec
 			abID := AppBundleIdentifier(ab.ID())
 			ctx = context.WithValue(ctx, abID, stateAb)
 
 			if err := r.Status().Update(ctx, &ab); err != nil {
+				mus_ab[ab.Name].Unlock()
 				return ctrl.Result{}, err
 			}
 
