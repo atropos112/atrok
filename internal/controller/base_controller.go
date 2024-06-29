@@ -172,25 +172,29 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 	}
 
 	if abbSpec.Configs != nil {
-		for _, abbKey := range getSortedKeys(abbSpec.Configs) {
-			found := false
-			abbConfig := abbSpec.Configs[abbKey]
+		if abSpec.Configs == nil {
+			abSpec.Configs = abbSpec.Configs
+		} else {
+			for _, abbKey := range getSortedKeys(abbSpec.Configs) {
+				found := false
+				abbConfig := abbSpec.Configs[abbKey]
 
-			var foundConfig *atroxyzv1alpha1.AppBundleConfig
-			for _, abKey := range getSortedKeys(abSpec.Configs) {
-				if abKey == abbKey {
-					found = true
-					foundConfig = abSpec.Configs[abKey]
-					break
+				var foundConfig *atroxyzv1alpha1.AppBundleConfig
+				for _, abKey := range getSortedKeys(abSpec.Configs) {
+					if abKey == abbKey {
+						found = true
+						foundConfig = abSpec.Configs[abKey]
+						break
+					}
 				}
-			}
 
-			if !found {
-				abSpec.Configs[abbKey] = abbConfig
-			} else {
-				abSpec.Configs[abbKey].Content = ReturnFirstNonDefault(foundConfig.Content, abbConfig.Content)
-				abSpec.Configs[abbKey].DirPath = ReturnFirstNonDefault(foundConfig.DirPath, abbConfig.DirPath)
-				abSpec.Configs[abbKey].Existing = ReturnFirstNonDefault(foundConfig.Existing, abbConfig.Existing)
+				if !found {
+					abSpec.Configs[abbKey] = abbConfig
+				} else {
+					abSpec.Configs[abbKey].Content = ReturnFirstNonDefault(foundConfig.Content, abbConfig.Content)
+					abSpec.Configs[abbKey].DirPath = ReturnFirstNonDefault(foundConfig.DirPath, abbConfig.DirPath)
+					abSpec.Configs[abbKey].Existing = ReturnFirstNonDefault(foundConfig.Existing, abbConfig.Existing)
+				}
 			}
 		}
 	}
