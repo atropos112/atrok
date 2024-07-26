@@ -158,10 +158,6 @@ func SetDefaultAppBundleLabels(ab *atroxyzv1alpha1.AppBundle, labels map[string]
 		labels = make(map[string]string)
 	}
 
-	for key, value := range ab.Labels {
-		labels[key] = value
-	}
-
 	// Force overwrite if set by user.
 	labels["app.kubernetes.io/instance"] = ab.Name
 	labels["app.kubernetes.io/name"] = ab.Name
