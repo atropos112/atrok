@@ -107,6 +107,11 @@ func (r *AppBundleReconciler) ReconcileExistingPVC(ctx context.Context, ab *atro
 
 	// GET EXPECTED LABELS
 	expectedLabels := GetPVCLabels(ab, volume, currentPVC)
+	if currentPVC.Labels != nil {
+		for k, v := range currentPVC.Labels {
+			expectedLabels[k] = v
+		}
+	}
 
 	// IF CURRENT != EXPECTED LABEL-WISE THEN UPSERT
 	if !StringMapsMatch(currentPVC.Labels, expectedLabels) {
