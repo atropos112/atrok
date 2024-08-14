@@ -35,7 +35,6 @@ func CreateExpectedIngress(ab *atroxyzv1alpha1.AppBundle, name string, route *at
 	ingress.Labels = SetDefaultAppBundleLabels(ab, ingress.Labels)
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.entryPoints"] = entry_point
 	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls"] = "true"
-	ingress.Annotations["traefik.ingress.kubernetes.io/router.tls.certresolver"] = cluster_issuer
 	ingress.Annotations["cert-manager.io/cluster-issuer"] = cluster_issuer
 	if auth_middleware != "" && *route.Ingress.Auth {
 		ingress.Annotations["traefik.ingress.kubernetes.io/router.middlewares"] = auth_middleware
