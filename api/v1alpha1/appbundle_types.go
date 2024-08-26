@@ -3,6 +3,7 @@ package v1alpha1
 
 import (
 	"github.com/rxwycdh/rxhash"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -16,6 +17,7 @@ type AppBundleSpec struct {
 	Replicas       *int32                         `json:"replicas,omitempty"`
 	Resources      *v1.ResourceRequirements       `json:"resources,omitempty"`
 	Envs           map[string]string              `json:"envs,omitempty"`
+	SecretStoreRef *string                        `json:"secretStoreRef,omitempty"`
 	SourcedEnvs    map[string]AppBundleSourcedEnv `json:"sourcedEnvs,omitempty"`
 	ServiceType    *v1.ServiceType                `json:"serviceType,omitempty"`
 	Routes         map[string]AppBundleRoute      `json:"routes,omitempty"`
@@ -47,16 +49,18 @@ type AppBundleConfigs map[string]*AppBundleConfig
 // }
 
 type AppBundleConfig struct {
-	FileName string  `json:"fileName,omitempty"`
-	Content  string  `json:"content,omitempty"`
-	Existing *string `json:"existing,omitempty"`
-	DirPath  string  `json:"dirPath,omitempty"`
+	FileName string            `json:"fileName,omitempty"`
+	Content  string            `json:"content,omitempty"`
+	Existing *string           `json:"existing,omitempty"`
+	Secrets  map[string]string `json:"secrets,omitempty"`
+	DirPath  string            `json:"dirPath,omitempty"`
 }
 
 type AppBundleSourcedEnv struct {
-	Secret    string `json:"secret,omitempty"`
-	ConfigMap string `json:"configMap,omitempty"`
-	Key       string `json:"key,omitempty"`
+	ExternalSecret string `json:"externalSecret,omitempty"`
+	Secret         string `json:"secret,omitempty"`
+	ConfigMap      string `json:"configMap,omitempty"`
+	Key            string `json:"key,omitempty"`
 }
 
 type AppBundleImage struct {

@@ -38,6 +38,7 @@ import (
 	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
 
 	"github.com/atropos112/atrok.git/internal/controller"
+	extsec "github.com/external-secrets/external-secrets/apis/externalsecrets/v1beta1"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -52,6 +53,9 @@ func init() {
 	utilruntime.Must(longhornv1beta2.AddToScheme(scheme))
 
 	utilruntime.Must(atroxyzv1alpha1.AddToScheme(scheme))
+
+	utilruntime.Must(extsec.AddToScheme(scheme))
+
 	//+kubebuilder:scaffold:scheme
 }
 

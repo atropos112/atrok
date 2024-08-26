@@ -8,31 +8,6 @@ rules:
   - atro.xyz
   resources:
   - appbundlebases
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - atro.xyz
-  resources:
-  - appbundlebases/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - atro.xyz
-  resources:
-  - appbundlebases/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - atro.xyz
-  resources:
   - appbundles
   verbs:
   - create
@@ -45,12 +20,14 @@ rules:
 - apiGroups:
   - atro.xyz
   resources:
+  - appbundlebases/finalizers
   - appbundles/finalizers
   verbs:
   - update
 - apiGroups:
   - atro.xyz
   resources:
+  - appbundlebases/status
   - appbundles/status
   verbs:
   - get

@@ -6,7 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 
@@ -114,7 +114,7 @@ var _ = Describe("Correctly populated heavily populated AppBundle", func() {
 			route2_name: route2,
 		}
 
-		pullPolicy := v1.PullAlways
+		pullPolicy := corev1.PullAlways
 		ab.Spec.Image.PullPolicy = &pullPolicy
 		group := "test"
 		ab.Spec.Homepage = &atroxyzv1alpha1.AppBundleHomePage{Group: &group}

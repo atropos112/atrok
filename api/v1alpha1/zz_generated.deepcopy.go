@@ -5,7 +5,7 @@
 package v1alpha1
 
 import (
-	v1 "k8s.io/api/core/v1"
+	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
@@ -142,6 +142,11 @@ func (in *AppBundleBaseSpec) DeepCopyInto(out *AppBundleBaseSpec) {
 			(*out)[key] = val
 		}
 	}
+	if in.SecretStoreRef != nil {
+		in, out := &in.SecretStoreRef, &out.SecretStoreRef
+		*out = new(string)
+		**out = **in
+	}
 	if in.SourcedEnvs != nil {
 		in, out := &in.SourcedEnvs, &out.SourcedEnvs
 		*out = make(map[string]AppBundleSourcedEnv, len(*in))
@@ -275,6 +280,13 @@ func (in *AppBundleConfig) DeepCopyInto(out *AppBundleConfig) {
 		in, out := &in.Existing, &out.Existing
 		*out = new(string)
 		**out = **in
+	}
+	if in.Secrets != nil {
+		in, out := &in.Secrets, &out.Secrets
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
 	}
 }
 
@@ -545,6 +557,11 @@ func (in *AppBundleSpec) DeepCopyInto(out *AppBundleSpec) {
 		for key, val := range *in {
 			(*out)[key] = val
 		}
+	}
+	if in.SecretStoreRef != nil {
+		in, out := &in.SecretStoreRef, &out.SecretStoreRef
+		*out = new(string)
+		**out = **in
 	}
 	if in.SourcedEnvs != nil {
 		in, out := &in.SourcedEnvs, &out.SourcedEnvs

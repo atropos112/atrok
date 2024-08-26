@@ -90,30 +90,40 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 		configs := ab.Spec.Configs
 		for _, key := range getSortedKeys(configs) {
 			config := configs[key]
-
 			volumeName := "cm-" + key
 
+			volumeSource := corev1.VolumeSource{}
+
 			if config.Existing != nil {
-				volumes = append(volumes, corev1.Volume{
-					Name: volumeName,
-					VolumeSource: corev1.VolumeSource{
-						ConfigMap: &corev1.ConfigMapVolumeSource{
-							LocalObjectReference: corev1.LocalObjectReference{Name: *config.Existing},
-							Items:                []corev1.KeyToPath{{Key: key, Path: config.FileName}},
-						},
+				volumeSource = corev1.VolumeSource{
+					ConfigMap: &corev1.ConfigMapVolumeSource{
+						LocalObjectReference: corev1.LocalObjectReference{Name: *config.Existing},
+						Items:                []corev1.KeyToPath{{Key: key, Path: config.FileName}},
 					},
-				})
+				}
 			} else {
-				volumes = append(volumes, corev1.Volume{
-					Name: volumeName,
-					VolumeSource: corev1.VolumeSource{
+				if len(config.Secrets) == 0 {
+					volumeSource = corev1.VolumeSource{
 						ConfigMap: &corev1.ConfigMapVolumeSource{
 							LocalObjectReference: corev1.LocalObjectReference{Name: ab.Name},
 							Items:                []corev1.KeyToPath{{Key: key, Path: config.FileName}},
 						},
-					},
-				})
+					}
+				} else {
+					volumeSource = corev1.VolumeSource{
+						Secret: &corev1.SecretVolumeSource{
+							SecretName: ab.Name,
+							Items:      []corev1.KeyToPath{{Key: "cfg" + key, Path: config.FileName}},
+						},
+					}
+					volumeName = "sec-" + key
+				}
 			}
+
+			volumes = append(volumes, corev1.Volume{
+				Name:         volumeName,
+				VolumeSource: volumeSource,
+			})
 
 			volumeMounts = append(volumeMounts, corev1.VolumeMount{
 				Name:      volumeName,
@@ -125,7 +135,7 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 	}
 
 	// Small bits
-	revision_history_limit := int32(3)
+	revHistLimit := int32(3)
 
 	resources := corev1.ResourceRequirements{}
 	if ab.Spec.Resources != nil {
@@ -160,6 +170,11 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 				envVarSource.ConfigMapKeyRef = &corev1.ConfigMapKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{Name: ab.Spec.SourcedEnvs[key].ConfigMap},
 					Key:                  ab.Spec.SourcedEnvs[key].Key,
+				}
+			} else if ab.Spec.SourcedEnvs[key].ExternalSecret != "" {
+				envVarSource.SecretKeyRef = &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: ab.Name},
+					Key:                  "env" + key,
 				}
 			} else {
 				return nil, fmt.Errorf("SourcedEnv %s has neither Secret nor ConfigMap", key)
@@ -222,7 +237,7 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 
 	deployment.Spec = appsv1.DeploymentSpec{
 		Replicas:             ab.Spec.Replicas,
-		RevisionHistoryLimit: &revision_history_limit,
+		RevisionHistoryLimit: &revHistLimit,
 		Strategy:             appsv1.DeploymentStrategy{Type: appsv1.RecreateDeploymentStrategyType},
 		Selector:             &metav1.LabelSelector{MatchLabels: map[string]string{AppBundleSelector: ab.Name}},
 		Template: corev1.PodTemplateSpec{

@@ -18,6 +18,7 @@ type AppBundleBaseSpec struct {
 	Replicas       *int32                         `json:"replicas,omitempty"`
 	Resources      *v1.ResourceRequirements       `json:"resources,omitempty"`
 	Envs           map[string]string              `json:"envs,omitempty"`
+	SecretStoreRef *string                        `json:"secretStoreRef,omitempty"`
 	SourcedEnvs    map[string]AppBundleSourcedEnv `json:"sourcedEnvs,omitempty"`
 	ServiceType    *v1.ServiceType                `json:"serviceType,omitempty"`
 	Routes         map[string]AppBundleRoute      `json:"routes,omitempty"`

@@ -17,6 +17,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	extsec "github.com/external-secrets/external-secrets/apis/externalsecrets/v1beta1"
 	longhornv1beta2 "github.com/longhorn/longhorn-manager/k8s/pkg/apis/longhorn/v1beta2"
 	. "github.com/onsi/ginkgo/v2" //lint:ignore ST1001 we need to use ginkgo
 	. "github.com/onsi/gomega"    //lint:ignore ST1001 we need to use ginkgo
@@ -53,7 +54,7 @@ var _ = BeforeSuite(func() {
 			// Note that you must have the required binaries setup under the bin directory to perform
 			// the tests directly. When we run make test it will be setup and used automatically.
 			BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-				fmt.Sprintf("1.28.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
+				fmt.Sprintf("1.30.2-%s-%s", runtime.GOOS, runtime.GOARCH)),
 		}
 	}
 
@@ -69,6 +70,8 @@ var _ = BeforeSuite(func() {
 	err = clientgoscheme.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 	err = longhornv1beta2.AddToScheme(scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
+	err = extsec.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 
 	//+kubebuilder:scaffold:scheme
