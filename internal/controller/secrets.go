@@ -140,7 +140,7 @@ func (r *AppBundleReconciler) ReconcileExternalSecret(ctx context.Context, ab *a
 		}
 
 		// Delete first (as ExternalSecrets is not so happy about mutations)
-		if r.Delete(ctx, currentExternalSecret) != nil {
+		if err := r.Delete(ctx, currentExternalSecret); err != nil && !errors.IsNotFound(err) {
 			return err
 		}
 

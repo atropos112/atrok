@@ -28,6 +28,10 @@ func CreateExpectedConfigMap(ab *atroxyzv1alpha1.AppBundle) (*corev1.ConfigMap, 
 			continue
 		}
 
+		if len(config.Secrets) != 0 {
+			continue
+		}
+
 		cm.Data[key] = config.Content
 	}
 
