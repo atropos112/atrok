@@ -8,7 +8,7 @@ require (
 	github.com/getsentry/sentry-go v0.28.1
 	github.com/grafana/pyroscope-go v1.1.2
 	github.com/longhorn/longhorn-manager v1.6.1
-	github.com/onsi/ginkgo/v2 v2.20.0
+	github.com/onsi/ginkgo/v2 v2.20.1
 	github.com/onsi/gomega v1.34.1
 	github.com/r3labs/diff/v3 v3.0.1
 	golang.org/x/sync v0.8.0
