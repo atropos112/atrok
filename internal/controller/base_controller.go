@@ -194,6 +194,7 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 					abSpec.Configs[abbKey].Content = ReturnFirstNonDefault(foundConfig.Content, abbConfig.Content)
 					abSpec.Configs[abbKey].DirPath = ReturnFirstNonDefault(foundConfig.DirPath, abbConfig.DirPath)
 					abSpec.Configs[abbKey].Existing = ReturnFirstNonDefault(foundConfig.Existing, abbConfig.Existing)
+					abSpec.Configs[abbKey].CopyOver = ReturnFirstNonDefault(foundConfig.CopyOver, abbConfig.CopyOver)
 					for key, value := range abbConfig.Secrets {
 						abSpec.Configs[abbKey].Secrets[key] = ReturnFirstNonDefault(foundConfig.Secrets[key], value)
 					}

@@ -84,8 +84,9 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 			})
 		}
 	}
+	initContainers := make([]corev1.Container, 0)
 
-	// Attach ConfigMaps
+	// Attach Configs
 	if ab.Spec.Configs != nil {
 		configs := ab.Spec.Configs
 		for _, key := range getSortedKeys(configs) {
@@ -124,15 +125,40 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 				Name:         volumeName,
 				VolumeSource: volumeSource,
 			})
+			mountPath := config.DirPath + "/" + config.FileName
 
-			volumeMounts = append(volumeMounts, corev1.VolumeMount{
-				Name:      volumeName,
-				MountPath: config.DirPath + "/" + config.FileName,
-				SubPath:   config.FileName,
-				ReadOnly:  true,
-			})
+			if config.CopyOver != nil && *config.CopyOver {
+				tempMountPath := "/atrok" + config.DirPath + "/" + config.FileName
+				initVolumeMounts := append(volumeMounts, corev1.VolumeMount{
+					Name:      volumeName,
+					MountPath: tempMountPath,
+					SubPath:   config.FileName,
+					ReadOnly:  true,
+				},
+				)
+
+				initContainers = append(initContainers, corev1.Container{
+					Name:  "copy-over-" + key,
+					Image: "busybox:stable",
+					Command: []string{
+						"cp",
+						tempMountPath,
+						mountPath,
+					},
+					VolumeMounts: initVolumeMounts,
+				})
+			} else {
+				volumeMounts = append(volumeMounts, corev1.VolumeMount{
+					Name:      volumeName,
+					MountPath: mountPath,
+					SubPath:   config.FileName,
+					ReadOnly:  true,
+				})
+			}
 		}
 	}
+
+	// busybox:stable
 
 	// Small bits
 	revHistLimit := int32(3)
@@ -247,6 +273,7 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 			Spec: corev1.PodSpec{
 				Volumes:          volumes,
 				ImagePullSecrets: image_pull_secrets,
+				InitContainers:   initContainers,
 				Containers:       []corev1.Container{container},
 			},
 		},

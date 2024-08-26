@@ -54,6 +54,7 @@ type AppBundleConfig struct {
 	Existing *string           `json:"existing,omitempty"`
 	Secrets  map[string]string `json:"secrets,omitempty"`
 	DirPath  string            `json:"dirPath,omitempty"`
+	CopyOver *bool             `json:"copyOver,omitempty"`
 }
 
 type AppBundleSourcedEnv struct {

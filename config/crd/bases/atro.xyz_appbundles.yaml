@@ -64,6 +64,8 @@ spec:
                   properties:
                     content:
                       type: string
+                    copyOver:
+                      type: boolean
                     dirPath:
                       type: string
                     existing:
