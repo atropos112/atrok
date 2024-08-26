@@ -35,6 +35,10 @@ func CreateExpectedConfigMap(ab *atroxyzv1alpha1.AppBundle) (*corev1.ConfigMap, 
 		cm.Data[key] = config.Content
 	}
 
+	if len(cm.Data) == 0 {
+		return nil, nil
+	}
+
 	return cm, nil
 }
 
@@ -49,28 +53,30 @@ func (r *AppBundleReconciler) ReconcileConfigMap(ctx context.Context, ab *atroxy
 	currentConfigMap := &corev1.ConfigMap{ObjectMeta: GetAppBundleObjectMetaWithOwnerReference(ab)}
 	er := r.Get(ctx, client.ObjectKeyFromObject(currentConfigMap), currentConfigMap)
 
-	// If configmap is found but the spec is nil, delete the configmap
-	if ab.Spec.Configs == nil {
-		// If there is no config map and no configs on app bundle, leave now
-		if errors.IsNotFound(er) {
-			return nil
-		}
-
-		// If no configs, but config map exists, delete it
-		return r.Delete(ctx, currentConfigMap)
-	}
-
 	// GET THE EXPECTED CONFIGMAP
 	expectedConfigMap, err := CreateExpectedConfigMap(ab)
 	if err != nil {
 		return err
 	}
 
+	// If expected to have no config map
+	if expectedConfigMap == nil {
+		// If we have an error and its not the not found error return now, something went wrong
+		if er != nil && !errors.IsNotFound(er) {
+			return er
+		}
+
+		// We expect to have no config map and indeed have no config map just return nil
+		if errors.IsNotFound(er) {
+			return nil
+		}
+
+		// Expected to have no config map but have one, delete it
+		return r.Delete(ctx, currentConfigMap)
+	}
+
 	if expectedConfigMap != nil && !equality.Semantic.DeepDerivative(expectedConfigMap.Data, currentConfigMap.Data) {
 		reason := "Data in the ConfigMap " + ab.Name + " has changed."
-		if err != nil {
-			return err
-		}
 
 		if err := UpsertResource(ctx, r, expectedConfigMap, reason, er, false); err != nil {
 			return err
