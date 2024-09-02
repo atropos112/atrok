@@ -1,10 +1,11 @@
 module github.com/atropos112/atrok.git
 
 go 1.22.5
+toolchain go1.23.0
 
 require (
 	github.com/atropos112/gocore v0.0.37
-	github.com/external-secrets/external-secrets v0.10.0
+	github.com/external-secrets/external-secrets v0.10.2
 	github.com/getsentry/sentry-go v0.28.1
 	github.com/grafana/pyroscope-go v1.1.2
 	github.com/longhorn/longhorn-manager v1.7.0
