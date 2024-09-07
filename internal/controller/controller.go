@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	atroxyzv1alpha1 "github.com/atropos112/atrok/api/v1alpha1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )

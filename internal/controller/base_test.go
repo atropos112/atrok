@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 
-	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	atroxyzv1alpha1 "github.com/atropos112/atrok/api/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 

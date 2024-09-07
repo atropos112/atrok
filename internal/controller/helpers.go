@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	atroxyzv1alpha1 "github.com/atropos112/atrok/api/v1alpha1"
 	"github.com/r3labs/diff/v3"
 	"golang.org/x/sync/errgroup"
 	k8serror "k8s.io/apimachinery/pkg/api/errors"

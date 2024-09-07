@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	atroxyzv1alpha1 "github.com/atropos112/atrok/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"

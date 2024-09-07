@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 
-	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	atroxyzv1alpha1 "github.com/atropos112/atrok/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	equality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"

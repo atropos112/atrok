@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	atroxyzv1alpha1 "github.com/atropos112/atrok/api/v1alpha1"
 	"github.com/atropos112/gocore/utils"
 	extsec "github.com/external-secrets/external-secrets/apis/externalsecrets/v1beta1"
 	equality "k8s.io/apimachinery/pkg/api/equality"

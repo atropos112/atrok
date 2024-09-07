@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/atropos112/atrok.git/types"
+	"github.com/atropos112/atrok/types"
 )
 
 var (

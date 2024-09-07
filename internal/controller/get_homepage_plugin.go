@@ -1,7 +1,7 @@
 package controller
 
 import (
-	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	atroxyzv1alpha1 "github.com/atropos112/atrok/api/v1alpha1"
 )
 
 // TODO: Remove the gethomepage.dev stuff once moved away from gethomepage.

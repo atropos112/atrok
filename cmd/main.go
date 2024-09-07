@@ -35,9 +35,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
-	atroxyzv1alpha1 "github.com/atropos112/atrok.git/api/v1alpha1"
+	atroxyzv1alpha1 "github.com/atropos112/atrok/api/v1alpha1"
 
-	"github.com/atropos112/atrok.git/internal/controller"
+	"github.com/atropos112/atrok/internal/controller"
 	extsec "github.com/external-secrets/external-secrets/apis/externalsecrets/v1beta1"
 	//+kubebuilder:scaffold:imports
 )
