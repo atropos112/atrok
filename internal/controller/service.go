@@ -81,6 +81,11 @@ func CreateExpectedService(ab *atroxyzv1alpha1.AppBundle, generatedSpecData *Gen
 	if ab.Spec.TailscaleName != nil {
 		annotations["tailscale.com/hostname"] = *ab.Spec.TailscaleName
 		annotations["tailscale.com/expose"] = "true"
+
+		if ab.Spec.Homepage != nil {
+			// See if we need to add homepage annotations
+			annotations = GetHomePageAnnotations(annotations, ab)
+		}
 	}
 
 	service.ObjectMeta.Annotations = annotations

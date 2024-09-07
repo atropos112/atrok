@@ -1,4 +1,4 @@
-module github.com/atropos112/atrok.git
+module github.com/atropos112/atrok
 
 go 1.22.5
 toolchain go1.23.0

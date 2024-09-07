@@ -6,51 +6,42 @@ import (
 
 // TODO: Remove the gethomepage.dev stuff once moved away from gethomepage.
 
-func GetHomePageAnnotations(ingress_annotations map[string]string, ab *atroxyzv1alpha1.AppBundle) map[string]string {
-	annotations := make(map[string]string)
+func GetHomePageAnnotations(annotations map[string]string, ab *atroxyzv1alpha1.AppBundle) map[string]string {
+	newAnnotations := make(map[string]string)
 
-	for key, value := range ingress_annotations {
-		annotations[key] = value
+	for key, value := range annotations {
+		newAnnotations[key] = value
 	}
 
-	annotations["gethomepage.dev/enabled"] = "true"
-	annotations["atro.xyz/homepage.enabled"] = "true"
+	newAnnotations["atro.xyz/homepage.enabled"] = "true"
 
 	if ab.Spec.Homepage.Description != nil {
-		annotations["atro.xyz/homepage.description"] = *ab.Spec.Homepage.Description
-		annotations["gethomepage.dev/description"] = *ab.Spec.Homepage.Description
+		newAnnotations["atro.xyz/homepage.description"] = *ab.Spec.Homepage.Description
 	}
 
 	if ab.Spec.Homepage.Instance != nil {
-		annotations["atro.xyz/homepage.user"] = *ab.Spec.Homepage.Instance
-		annotations["gethomepage.dev/instance"] = *ab.Spec.Homepage.Instance
+		newAnnotations["atro.xyz/homepage.user"] = *ab.Spec.Homepage.Instance
 	}
 
 	if ab.Spec.Homepage.Group != nil {
-		annotations["atro.xyz/homepage.group"] = *ab.Spec.Homepage.Group
-		annotations["gethomepage.dev/group"] = *ab.Spec.Homepage.Group
+		newAnnotations["atro.xyz/homepage.group"] = *ab.Spec.Homepage.Group
 	} else {
-		annotations["atro.xyz/homepage.group"] = "Other"
-		annotations["gethomepage.dev/group"] = "Other"
+		newAnnotations["atro.xyz/homepage.group"] = "Other"
 	}
 
 	if ab.Spec.Homepage.Href != nil {
-		annotations["atro.xyz/homepage.href"] = *ab.Spec.Homepage.Href
-		annotations["gethomepage.dev/href"] = *ab.Spec.Homepage.Href
+		newAnnotations["atro.xyz/homepage.href"] = *ab.Spec.Homepage.Href
 	}
 
 	if ab.Spec.Homepage.Icon != nil {
-		annotations["atro.xyz/homepage.icon"] = *ab.Spec.Homepage.Icon
-		annotations["gethomepage.dev/icon"] = *ab.Spec.Homepage.Icon
+		newAnnotations["atro.xyz/homepage.icon"] = *ab.Spec.Homepage.Icon
 	}
 
 	if ab.Spec.Homepage.Name != nil {
-		annotations["atro.xyz/homepage.name"] = *ab.Spec.Homepage.Name
-		annotations["gethomepage.dev/name"] = *ab.Spec.Homepage.Name
+		newAnnotations["atro.xyz/homepage.name"] = *ab.Spec.Homepage.Name
 	} else {
-		annotations["atro.xyz/homepage.name"] = ab.Name
-		annotations["gethomepage.dev/name"] = ab.Name
+		newAnnotations["atro.xyz/homepage.name"] = ab.Name
 	}
 
-	return annotations
+	return newAnnotations
 }
