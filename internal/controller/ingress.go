@@ -18,6 +18,7 @@ func CreateExpectedIngress(ab *atroxyzv1alpha1.AppBundle, name string, route *at
 		Name:            name,
 		Namespace:       ab.Namespace,
 		OwnerReferences: []metav1.OwnerReference{ab.OwnerReference()},
+		Annotations:     ab.ObjectMeta.Annotations,
 	}}
 
 	// If no annotation, add it
