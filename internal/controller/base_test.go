@@ -116,8 +116,8 @@ var _ = Describe("Correctly populated heavily populated AppBundle", func() {
 
 		pullPolicy := corev1.PullAlways
 		ab.Spec.Image.PullPolicy = &pullPolicy
-		group := "test"
-		ab.Spec.Homepage = &atroxyzv1alpha1.AppBundleHomePage{Group: &group}
+		section := "test"
+		ab.Spec.Homepage = &atroxyzv1alpha1.AppBundleHomePage{Section: &section}
 
 		rec = &AppBundleBaseReconciler{Client: k8sClient, Scheme: scheme.Scheme}
 		abRec = &AppBundleReconciler{Client: k8sClient, Scheme: scheme.Scheme}
