@@ -19,14 +19,14 @@ func GetHomePageAnnotations(annotations map[string]string, ab *atroxyzv1alpha1.A
 		newAnnotations["atro.xyz/homepage.description"] = *ab.Spec.Homepage.Description
 	}
 
-	if ab.Spec.Homepage.Instance != nil {
-		newAnnotations["atro.xyz/homepage.user"] = *ab.Spec.Homepage.Instance
+	if ab.Spec.Homepage.Groups != nil {
+		newAnnotations["atro.xyz/homepage.groups"] = *ab.Spec.Homepage.Groups
 	}
 
-	if ab.Spec.Homepage.Group != nil {
-		newAnnotations["atro.xyz/homepage.group"] = *ab.Spec.Homepage.Group
+	if ab.Spec.Homepage.Section != nil {
+		newAnnotations["atro.xyz/homepage.section"] = *ab.Spec.Homepage.Section
 	} else {
-		newAnnotations["atro.xyz/homepage.group"] = "Other"
+		newAnnotations["atro.xyz/homepage.section"] = "Other"
 	}
 
 	if ab.Spec.Homepage.Href != nil {

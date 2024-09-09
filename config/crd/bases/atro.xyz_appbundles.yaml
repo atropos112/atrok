@@ -86,15 +86,15 @@ spec:
                 properties:
                   description:
                     type: string
-                  group:
+                  groups:
                     type: string
                   href:
                     type: string
                   icon:
                     type: string
-                  instance:
-                    type: string
                   name:
+                    type: string
+                  section:
                     type: string
                 type: object
               image:

@@ -84,11 +84,11 @@ type AppBundleRouteIngress struct {
 
 type AppBundleHomePage struct {
 	Description *string `json:"description,omitempty"`
-	Group       *string `json:"group,omitempty"`
+	Section     *string `json:"section,omitempty"`
 	Href        *string `json:"href,omitempty"`
 	Icon        *string `json:"icon,omitempty"`
 	Name        *string `json:"name,omitempty"`
-	Instance    *string `json:"instance,omitempty"`
+	Groups      *string `json:"groups,omitempty"`
 }
 
 type AppBundleVolume struct {

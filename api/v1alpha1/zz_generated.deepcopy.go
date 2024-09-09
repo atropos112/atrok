@@ -343,8 +343,8 @@ func (in *AppBundleHomePage) DeepCopyInto(out *AppBundleHomePage) {
 		*out = new(string)
 		**out = **in
 	}
-	if in.Group != nil {
-		in, out := &in.Group, &out.Group
+	if in.Section != nil {
+		in, out := &in.Section, &out.Section
 		*out = new(string)
 		**out = **in
 	}
@@ -363,8 +363,8 @@ func (in *AppBundleHomePage) DeepCopyInto(out *AppBundleHomePage) {
 		*out = new(string)
 		**out = **in
 	}
-	if in.Instance != nil {
-		in, out := &in.Instance, &out.Instance
+	if in.Groups != nil {
+		in, out := &in.Groups, &out.Groups
 		*out = new(string)
 		**out = **in
 	}

@@ -283,10 +283,10 @@ func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atrox
 	if abbSpec.Homepage != nil && abSpec.Homepage != nil {
 		abSpec.Homepage.Name = ReturnFirstNonDefault(abSpec.Homepage.Name, abbSpec.Homepage.Name)
 		abSpec.Homepage.Description = ReturnFirstNonDefault(abSpec.Homepage.Description, abbSpec.Homepage.Description)
-		abSpec.Homepage.Group = ReturnFirstNonDefault(abSpec.Homepage.Group, abbSpec.Homepage.Group)
+		abSpec.Homepage.Section = ReturnFirstNonDefault(abSpec.Homepage.Section, abbSpec.Homepage.Section)
 		abSpec.Homepage.Href = ReturnFirstNonDefault(abSpec.Homepage.Href, abbSpec.Homepage.Href)
 		abSpec.Homepage.Icon = ReturnFirstNonDefault(abSpec.Homepage.Icon, abbSpec.Homepage.Icon)
-		abSpec.Homepage.Instance = ReturnFirstNonDefault(abSpec.Homepage.Instance, abbSpec.Homepage.Instance)
+		abSpec.Homepage.Groups = ReturnFirstNonDefault(abSpec.Homepage.Groups, abbSpec.Homepage.Groups)
 	}
 
 	if abbSpec.Image != nil {
