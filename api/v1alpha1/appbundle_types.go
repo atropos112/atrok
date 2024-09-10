@@ -2,6 +2,9 @@
 package v1alpha1
 
 import (
+	"reflect"
+
+	"dario.cat/mergo"
 	"github.com/rxwycdh/rxhash"
 
 	v1 "k8s.io/api/core/v1"
@@ -31,10 +34,40 @@ type AppBundleSpec struct {
 	TailscaleName  *string                        `json:"tailscaleName,omitempty"`
 	Command        []*string                      `json:"command,omitempty"`
 	Args           []*string                      `json:"args,omitempty"`
-	Configs        AppBundleConfigs               `json:"configs,omitempty"`
+	Configs        map[string]AppBundleConfig     `json:"configs,omitempty"`
 }
 
-type AppBundleConfigs map[string]*AppBundleConfig
+func MergeDictValues(dst, src interface{}) (interface{}, error) {
+	switch dstV := dst.(type) {
+	case string:
+		if dstV == "" {
+			return src.(string), nil
+		}
+		return dstV, nil
+	case AppBundleVolume:
+		if err := mergo.Merge(&dstV, src.(AppBundleVolume)); err != nil {
+			return nil, err
+		}
+		return dstV, nil
+	case AppBundleConfig:
+		if err := mergo.Merge(&dstV, src.(AppBundleConfig)); err != nil {
+			return nil, err
+		}
+		return dstV, nil
+	case AppBundleRoute:
+		if err := mergo.Merge(&dstV, src.(AppBundleRoute)); err != nil {
+			return nil, err
+		}
+		return dstV, nil
+	case AppBundleSourcedEnv:
+		if err := mergo.Merge(&dstV, src.(AppBundleSourcedEnv)); err != nil {
+			return nil, err
+		}
+		return dstV, nil
+	default:
+		panic("Unsupported type, the types passed in are (dst,src) = " + reflect.TypeOf(dst).String() + " and " + reflect.TypeOf(src).String())
+	}
+}
 
 // func (s AppBundleConfigs) Less(i, j int) bool {
 // 	return strings.Compare(s[i].FileName, s[j].FileName) < 0

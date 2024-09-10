@@ -3,9 +3,11 @@ package controller
 import (
 	"context"
 	"reflect"
+	"slices"
 	"sync"
 	"time"
 
+	"dario.cat/mergo"
 	atroxyzv1alpha1 "github.com/atropos112/atrok/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -136,208 +138,66 @@ func ReturnFirstNonDefault[T any](elem ...T) T {
 	return result
 }
 
-// ResolveAppBundleBase
+// ResolveAppBundleBase resolves the base of an app bundle
 func ResolveAppBundleBase(ctx context.Context, r *AppBundleReconciler, ab *atroxyzv1alpha1.AppBundle, abb *atroxyzv1alpha1.AppBundleBase) error {
-	abSpec := &ab.Spec
-	abbSpec := &abb.Spec
+	followUpAbb := abb.Spec.Base
 
-	// By hand merge, can do with reflection but then its not clear when to override, when to append etc.
-	abSpec.Command = ReturnFirstNonDefault(abSpec.Command, abbSpec.Command)
-	abbSpec.Args = ReturnFirstNonDefault(abSpec.Args, abbSpec.Args)
-
-	if abbSpec.Volumes != nil {
-		if abSpec.Volumes == nil {
-			abSpec.Volumes = abbSpec.Volumes
-		} else {
-			abbVolumeKeys := getSortedKeys(abbSpec.Volumes)
-
-			for _, abbVolKey := range abbVolumeKeys {
-				abbVol := abbSpec.Volumes[abbVolKey]
-
-				if abVol, ok := abSpec.Volumes[abbVolKey]; ok {
-					abVol.Path = ReturnFirstNonDefault(abVol.Path, abbVol.Path)
-					abVol.Size = ReturnFirstNonDefault(abVol.Size, abbVol.Size)
-					abVol.StorageClass = ReturnFirstNonDefault(abVol.StorageClass, abbVol.StorageClass)
-					abVol.ExistingClaim = ReturnFirstNonDefault(abVol.ExistingClaim, abbVol.ExistingClaim)
-					abVol.Backup = ReturnFirstNonDefault(abVol.Backup, abbVol.Backup)
-					abVol.HostPath = ReturnFirstNonDefault(abVol.HostPath, abbVol.HostPath)
-					abVol.EmptyDir = ReturnFirstNonDefault(abVol.EmptyDir, abbVol.EmptyDir)
-
-					abSpec.Volumes[abbVolKey] = abVol
-				} else {
-					abSpec.Volumes[abbVolKey] = abbVol
-				}
-			}
-		}
-	}
-
-	if abbSpec.Configs != nil {
-		if abSpec.Configs == nil {
-			abSpec.Configs = abbSpec.Configs
-		} else {
-			for _, abbKey := range getSortedKeys(abbSpec.Configs) {
-				found := false
-				abbConfig := abbSpec.Configs[abbKey]
-
-				var foundConfig *atroxyzv1alpha1.AppBundleConfig
-				for _, abKey := range getSortedKeys(abSpec.Configs) {
-					if abKey == abbKey {
-						found = true
-						foundConfig = abSpec.Configs[abKey]
-						break
-					}
-				}
-
-				if !found {
-					abSpec.Configs[abbKey] = abbConfig
-				} else {
-					abSpec.Configs[abbKey].FileName = ReturnFirstNonDefault(foundConfig.FileName, abbConfig.FileName)
-					abSpec.Configs[abbKey].Content = ReturnFirstNonDefault(foundConfig.Content, abbConfig.Content)
-					abSpec.Configs[abbKey].DirPath = ReturnFirstNonDefault(foundConfig.DirPath, abbConfig.DirPath)
-					abSpec.Configs[abbKey].Existing = ReturnFirstNonDefault(foundConfig.Existing, abbConfig.Existing)
-					abSpec.Configs[abbKey].CopyOver = ReturnFirstNonDefault(foundConfig.CopyOver, abbConfig.CopyOver)
-					for key, value := range abbConfig.Secrets {
-						abSpec.Configs[abbKey].Secrets[key] = ReturnFirstNonDefault(foundConfig.Secrets[key], value)
-					}
-				}
-			}
-		}
-	}
-
-	if abbSpec.SecretStoreRef != nil {
-		abSpec.SecretStoreRef = ReturnFirstNonDefault(abSpec.SecretStoreRef, abbSpec.SecretStoreRef)
-	}
-
-	abSpec.NodeSelector = ReturnFirstNonDefault(abSpec.NodeSelector, abbSpec.NodeSelector)
-
-	if abbSpec.Backup != nil {
-		if abSpec.Backup == nil {
-			abSpec.Backup = abbSpec.Backup
-		} else {
-			abSpec.Backup.Frequency = ReturnFirstNonDefault(abSpec.Backup.Frequency, abbSpec.Backup.Frequency)
-			abSpec.Backup.Retain = ReturnFirstNonDefault(abSpec.Backup.Retain, abbSpec.Backup.Retain)
-		}
-	}
-
-	if abbSpec.Envs != nil {
-		if abSpec.Envs == nil {
-			abSpec.Envs = abbSpec.Envs
-		} else {
-			for key, value := range abbSpec.Envs {
-				if _, ok := abSpec.Envs[key]; !ok {
-					abSpec.Envs[key] = value
-				}
-			}
-		}
-	}
-
-	if abbSpec.SourcedEnvs != nil {
-		if abSpec.SourcedEnvs == nil {
-			abSpec.SourcedEnvs = abbSpec.SourcedEnvs
-		} else {
-			for key, value := range abbSpec.SourcedEnvs {
-				if _, ok := abSpec.SourcedEnvs[key]; !ok {
-					abSpec.SourcedEnvs[key] = value
-				}
-			}
-		}
-	}
-
-	abSpec.NodeSelector = ReturnFirstNonDefault(abSpec.NodeSelector, abbSpec.NodeSelector)
-	abSpec.UseNvidia = ReturnFirstNonDefault(abSpec.UseNvidia, abbSpec.UseNvidia)
-
-	if abbSpec.Routes != nil {
-		if abSpec.Routes == nil {
-			// If the app bundle has no routes, then we can just set it to the base routes
-			abSpec.Routes = abbSpec.Routes
-		} else {
-			abbRouteKeys := getSortedKeys(abbSpec.Routes)
-
-			for _, key := range abbRouteKeys {
-				abbRoute := abbSpec.Routes[key]
-
-				if abRoute, ok := abSpec.Routes[key]; ok {
-					abRoute.Port = ReturnFirstNonDefault(abRoute.Port, abbRoute.Port)
-					abRoute.TargetPort = ReturnFirstNonDefault(abRoute.TargetPort, abbRoute.TargetPort)
-					abRoute.Protocol = ReturnFirstNonDefault(abRoute.Protocol, abbRoute.Protocol)
-
-					if abbRoute.Ingress != nil && abRoute.Ingress == nil {
-						abRoute.Ingress = abbRoute.Ingress
-					} else if abbRoute.Ingress != nil && abRoute.Ingress != nil {
-						abRoute.Ingress.Auth = ReturnFirstNonDefault(abRoute.Ingress.Auth, abbRoute.Ingress.Auth)
-						abRoute.Ingress.Domain = ReturnFirstNonDefault(abRoute.Ingress.Domain, abbRoute.Ingress.Domain)
-					}
-					abSpec.Routes[key] = abRoute
-				} else {
-					abSpec.Routes[key] = abbRoute
-				}
-			}
-		}
-	}
-
-	abSpec.Resources = ReturnFirstNonDefault(abSpec.Resources, abbSpec.Resources)
-	abSpec.Replicas = ReturnFirstNonDefault(abSpec.Replicas, abbSpec.Replicas)
-
-	// Special case, happy to fill in the blanks but not the whole things,
-	// it makes no sense to inherit the whole thing, so it needs to exist in some capacity beforehand
-	if abbSpec.Homepage != nil && abSpec.Homepage != nil {
-		abSpec.Homepage.Name = ReturnFirstNonDefault(abSpec.Homepage.Name, abbSpec.Homepage.Name)
-		abSpec.Homepage.Description = ReturnFirstNonDefault(abSpec.Homepage.Description, abbSpec.Homepage.Description)
-		abSpec.Homepage.Section = ReturnFirstNonDefault(abSpec.Homepage.Section, abbSpec.Homepage.Section)
-		abSpec.Homepage.Href = ReturnFirstNonDefault(abSpec.Homepage.Href, abbSpec.Homepage.Href)
-		abSpec.Homepage.Icon = ReturnFirstNonDefault(abSpec.Homepage.Icon, abbSpec.Homepage.Icon)
-		abSpec.Homepage.Groups = ReturnFirstNonDefault(abSpec.Homepage.Groups, abbSpec.Homepage.Groups)
-	}
-
-	if abbSpec.Image != nil {
-		if abSpec.Image == nil {
-			abSpec.Image = &atroxyzv1alpha1.AppBundleImage{
-				Repository: abbSpec.Image.Repository,
-				Tag:        abbSpec.Image.Tag,
-				PullPolicy: abbSpec.Image.PullPolicy,
-			}
-		} else {
-			abSpec.Image.Repository = ReturnFirstNonDefault(abSpec.Image.Repository, abbSpec.Image.Repository)
-			abSpec.Image.Tag = ReturnFirstNonDefault(abSpec.Image.Tag, abbSpec.Image.Tag)
-			abSpec.Image.PullPolicy = ReturnFirstNonDefault(abSpec.Image.PullPolicy, abbSpec.Image.PullPolicy)
-		}
-	}
-
-	abSpec.ServiceType = ReturnFirstNonDefault(abSpec.ServiceType, abbSpec.ServiceType)
-
-	if abbSpec.Selector != nil {
-		if abSpec.Selector == nil {
-			abSpec.Selector = abbSpec.Selector
-		} else {
-			abSpec.Selector.MatchLabels = ReturnFirstNonDefault(abSpec.Selector.MatchLabels, abbSpec.Selector.MatchLabels)
-			abSpec.Selector.MatchExpressions = ReturnFirstNonDefault(abSpec.Selector.MatchExpressions, abbSpec.Selector.MatchExpressions)
-		}
-	}
-
-	abSpec.LivenessProbe = ReturnFirstNonDefault(abSpec.LivenessProbe, abbSpec.LivenessProbe)
-	abSpec.ReadinessProbe = ReturnFirstNonDefault(abSpec.ReadinessProbe, abbSpec.ReadinessProbe)
-	abSpec.StartupProbe = ReturnFirstNonDefault(abSpec.StartupProbe, abbSpec.StartupProbe)
-
-	// Recurse
-	if abb.Spec.Base == nil {
-		return nil
-	}
-
-	newAbb := &atroxyzv1alpha1.AppBundleBase{ObjectMeta: metav1.ObjectMeta{Name: *abb.Spec.Base}}
-	err := r.Get(ctx, client.ObjectKey{Name: *abb.Spec.Base}, newAbb)
+	abbAsAb, err := abb.ToAppBundle()
 	if err != nil {
 		return err
 	}
 
-	labels := ab.ObjectMeta.Labels
-	if labels == nil {
-		labels = make(map[string]string)
+	if err := mergo.Merge(ab, abbAsAb, mergo.WithTransformers(mapTransformer{})); err != nil {
+		return err
 	}
-	if _, ok := labels["atro.xyz/app-bundle-bases"]; !ok {
-		labels["atro.xyz/app-bundle-bases"] = abb.Name
-	} else {
-		labels["atro.xyz/app-bundle-bases"] += "." + abb.Name
+
+	if followUpAbb == nil {
+		return nil
+	}
+
+	newAbb := &atroxyzv1alpha1.AppBundleBase{ObjectMeta: metav1.ObjectMeta{Name: *abb.Spec.Base}}
+	if r.Get(ctx, client.ObjectKey{Name: *abb.Spec.Base}, newAbb) != nil {
+		return err
 	}
 
 	return ResolveAppBundleBase(ctx, r, ab, newAbb)
+}
+
+type mapTransformer struct{}
+
+func (t mapTransformer) Transformer(typ reflect.Type) func(dst, src reflect.Value) error {
+	if typ.Kind() == reflect.Map && typ.Key().Kind() == reflect.String {
+		return func(dst, src reflect.Value) error {
+			if dst.CanSet() {
+				keys := src.MapKeys()
+				actualKeys := []string{}
+				for _, k := range keys {
+					actualKeys = append(actualKeys, k.String())
+				}
+				slices.Sort(actualKeys)
+
+				for _, actKey := range actualKeys {
+					k := reflect.ValueOf(actKey)
+					v := src.MapIndex(k)
+					exists := dst.MapIndex(k)
+					if (exists != reflect.Value{}) {
+						dstV := dst.MapIndex(k)
+						dstVKind := dstV.Kind()
+						if dstVKind == reflect.Map || dstVKind == reflect.Slice || dstVKind == reflect.Struct {
+							vOut, err := atroxyzv1alpha1.MergeDictValues(dstV.Interface(), v.Interface())
+							if err != nil {
+								return err
+							}
+							v = reflect.ValueOf(vOut)
+							dst.SetMapIndex(k, v)
+						}
+					} else {
+						dst.SetMapIndex(k, v)
+					}
+				}
+			}
+			return nil
+		}
+	}
+	return nil
 }

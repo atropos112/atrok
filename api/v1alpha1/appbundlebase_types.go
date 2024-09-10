@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	"github.com/jinzhu/copier"
 	"github.com/rxwycdh/rxhash"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -11,7 +12,7 @@ import (
 
 // AppBundleBaseSpec defines the desired state of AppBundleBase
 type AppBundleBaseSpec struct {
-	Base           *string                        `json:"base,omitempty"`
+	Base           *string                        `json:"base,omitempty" copier:"-"`
 	Image          *AppBundleImage                `json:"image,omitempty"`
 	NodeSelector   *map[string]string             `json:"nodeSelector,omitempty"`
 	UseNvidia      *bool                          `json:"useNvidia,omitempty"`
@@ -31,7 +32,7 @@ type AppBundleBaseSpec struct {
 	StartupProbe   *v1.Probe                      `json:"startupProbe,omitempty"`
 	Command        []*string                      `json:"command,omitempty"`
 	Args           []*string                      `json:"args,omitempty"`
-	Configs        AppBundleConfigs               `json:"configs,omitempty"`
+	Configs        map[string]AppBundleConfig     `json:"configs,omitempty"`
 }
 
 // AppBundleBaseStatus defines the observed state of AppBundleBase
@@ -83,4 +84,16 @@ func (abb AppBundleBase) GetLastReconciliation() (bool, string) {
 	}
 
 	return true, *abb.Status.LastReconciliation
+}
+
+// ToAppBundle converts AppBundleBase to AppBundle. Note it is important that we pass abb by value not by reference as copier can modify the object
+func (abb AppBundleBase) ToAppBundle() (*AppBundle, error) {
+	ab := &AppBundle{}
+	err := copier.CopyWithOption(ab, abb, copier.Option{IgnoreEmpty: true})
+	if err != nil {
+		return nil, err
+	}
+
+	ab.TypeMeta.Kind = "AppBundle"
+	return ab, nil
 }
