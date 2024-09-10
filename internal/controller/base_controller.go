@@ -9,6 +9,7 @@ import (
 
 	"dario.cat/mergo"
 	atroxyzv1alpha1 "github.com/atropos112/atrok/api/v1alpha1"
+	"github.com/samber/lo"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -180,20 +181,17 @@ func (t mapTransformer) Transformer(typ reflect.Type) func(dst, src reflect.Valu
 					k := reflect.ValueOf(actKey)
 					v := src.MapIndex(k)
 					exists := dst.MapIndex(k)
-					if (exists != reflect.Value{}) {
-						dstV := dst.MapIndex(k)
-						dstVKind := dstV.Kind()
-						if dstVKind == reflect.Map || dstVKind == reflect.Slice || dstVKind == reflect.Struct {
-							vOut, err := atroxyzv1alpha1.MergeDictValues(dstV.Interface(), v.Interface())
-							if err != nil {
-								return err
-							}
-							v = reflect.ValueOf(vOut)
-							dst.SetMapIndex(k, v)
+
+					// Not empty in which case look to merge
+					if (exists != reflect.Value{}) && lo.Contains([]reflect.Kind{reflect.Map, reflect.Slice, reflect.Struct}, dst.MapIndex(k).Kind()) {
+						vOut, err := atroxyzv1alpha1.MergeDictValues(dst.MapIndex(k).Interface(), v.Interface())
+						if err != nil {
+							return err
 						}
-					} else {
-						dst.SetMapIndex(k, v)
+						v = reflect.ValueOf(vOut)
 					}
+
+					dst.SetMapIndex(k, v)
 				}
 			}
 			return nil
