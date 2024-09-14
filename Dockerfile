@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM golang:1.23-alpine3.20 as builder
+FROM golang:1.23-alpine3.20 AS builder
 ARG TARGETARCH
 WORKDIR /workspace
 
@@ -21,7 +21,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build -a -o manager cmd/mai
 
 
 # Clean minimal image, just enough to run the binary 
-FROM harbor.atro.xyz/chainguard/chainguard/static:latest
+FROM harbor.atro.xyz/chainguard/chainguard/static:latest AS final
 
 WORKDIR /
 COPY --from=builder /workspace/manager .
