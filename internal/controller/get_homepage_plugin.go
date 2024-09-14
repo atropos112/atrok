@@ -23,8 +23,8 @@ func GetHomePageAnnotations(annotations map[string]string, ab *atroxyzv1alpha1.A
 		newAnnotations["atro.xyz/homepage.groups"] = *ab.Spec.Homepage.Groups
 
 		// If we want user to see the page in their homepage, we want the user to have access also, assuming its not set already.
-		if _, ok := newAnnotations["atro.xyz/auth.group"]; !ok {
-			newAnnotations["atro.xyz/auth.group"] = *ab.Spec.Homepage.Groups
+		if _, ok := newAnnotations["atro.xyz/auth.groups"]; !ok {
+			newAnnotations["atro.xyz/auth.groups"] = *ab.Spec.Homepage.Groups
 		}
 	}
 
