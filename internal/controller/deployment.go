@@ -260,19 +260,41 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 		container.Env = envs
 	}
 
+	matchLabels := map[string]string{AppBundleSelector: ab.Name}
+	labelSelector := metav1.LabelSelector{MatchLabels: matchLabels}
+	affinity := &corev1.Affinity{
+		PodAntiAffinity: &corev1.PodAntiAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: []corev1.PodAffinityTerm{
+				{
+					TopologyKey: "kubernetes.io/hostname",
+					LabelSelector: &metav1.LabelSelector{
+						MatchExpressions: []metav1.LabelSelectorRequirement{
+							{
+								Key:      AppBundleSelector,
+								Operator: metav1.LabelSelectorOpIn,
+								Values:   []string{ab.Name},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
 	deployment.Spec = appsv1.DeploymentSpec{
 		Replicas:             ab.Spec.Replicas,
 		RevisionHistoryLimit: &revHistLimit,
 		Strategy:             appsv1.DeploymentStrategy{Type: appsv1.RecreateDeploymentStrategyType},
-		Selector:             &metav1.LabelSelector{MatchLabels: map[string]string{AppBundleSelector: ab.Name}},
+		Selector:             &labelSelector,
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
-				Labels: map[string]string{AppBundleSelector: ab.Name},
+				Labels: matchLabels,
 			},
 			Spec: corev1.PodSpec{
 				Volumes:          volumes,
 				ImagePullSecrets: image_pull_secrets,
 				InitContainers:   initContainers,
+				Affinity:         affinity,
 				Containers:       []corev1.Container{container},
 			},
 		},
