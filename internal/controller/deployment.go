@@ -141,9 +141,8 @@ func CreateExpectedDeployment(ab *atroxyzv1alpha1.AppBundle) (*appsv1.Deployment
 					Name:  "copy-over-" + key,
 					Image: "busybox:stable",
 					Command: []string{
-						"cp",
-						tempMountPath,
-						mountPath,
+						"sh", "-c", // Use a shell to run multiple commands
+						"cp " + tempMountPath + " " + mountPath + " && chmod 777 " + mountPath,
 					},
 					VolumeMounts: initVolumeMounts,
 				})
