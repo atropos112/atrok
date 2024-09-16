@@ -5,14 +5,17 @@ go 1.23
 toolchain go1.23.0
 
 require (
+	dario.cat/mergo v1.0.1
 	github.com/atropos112/gocore v0.0.37
 	github.com/external-secrets/external-secrets v0.10.2
 	github.com/getsentry/sentry-go v0.28.1
-	github.com/grafana/pyroscope-go v1.1.2
+	github.com/grafana/pyroscope-go v1.2.0
+	github.com/jinzhu/copier v0.4.0
 	github.com/longhorn/longhorn-manager v1.7.0
 	github.com/onsi/ginkgo/v2 v2.20.2
 	github.com/onsi/gomega v1.34.2
 	github.com/r3labs/diff/v3 v3.0.1
+	github.com/samber/lo v1.47.0
 	golang.org/x/sync v0.8.0
 	k8s.io/api v0.31.0
 	k8s.io/apimachinery v0.31.0
@@ -21,13 +24,10 @@ require (
 )
 
 require (
-	dario.cat/mergo v1.0.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.8 // indirect
-	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
-	github.com/samber/lo v1.47.0 // indirect
 	github.com/samber/slog-http v1.4.2 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
