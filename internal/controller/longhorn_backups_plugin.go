@@ -65,6 +65,10 @@ func (r *AppBundleReconciler) ReconcileRecurringBackupJob(ctx context.Context, a
 			continue
 		}
 
+		if abVol.EmptyDir != nil {
+			continue
+		}
+
 		volName := ab.Name + "-" + key
 		if abVol.ExistingClaim != nil {
 			volName = *abVol.ExistingClaim
