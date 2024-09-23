@@ -2,8 +2,7 @@
 # Image URL to use all building/pushing image targets
 IMG ?= controller:latest
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.31.0
-YQ := yq
+ENVTEST_K8S_VERSION = 1.30.2
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -52,8 +51,6 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
-	cat config/crd/bases/atro.xyz_appbundlebases.yaml| ${YQ} > config/crd/bases/atro.xyz_appbundlebases.json
-	cat config/crd/bases/atro.xyz_appbundles.yaml| ${YQ} > config/crd/bases/atro.xyz_appbundles.json
 
 .PHONY: fmt
 fmt: ## Run go fmt against code.
