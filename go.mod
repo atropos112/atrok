@@ -6,7 +6,7 @@ toolchain go1.23.0
 
 require (
 	dario.cat/mergo v1.0.1
-	github.com/atropos112/gocore v0.0.37
+	github.com/atropos112/gocore v0.0.42
 	github.com/external-secrets/external-secrets v0.10.3
 	github.com/getsentry/sentry-go v0.29.0
 	github.com/grafana/pyroscope-go v1.2.0
