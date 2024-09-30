@@ -1,7 +1,7 @@
 dario.cat/mergo v1.0.1 h1:Ra4+bf83h2ztPIQYNP99R6m+Y7KfnARDfID+a+vLl4s=
 dario.cat/mergo v1.0.1/go.mod h1:uNxQE+84aUszobStD9th8a29P2fMDhsBdgRYvZOxGmk=
-github.com/atropos112/gocore v0.0.42 h1:DZ84kaviRdjDDgG+dk79kFRnewzbZ77bLFDuiZiioC0=
-github.com/atropos112/gocore v0.0.42/go.mod h1:7QqcaVg6ZiL00yVAn0VSQL4mX5pgQqP7n/tU7/NQwJQ=
+github.com/atropos112/gocore v0.1.1 h1:Jf87X3IT7/TvEZTEPhPK/s8P1fEQLpAmIf/gwXRUHRg=
+github.com/atropos112/gocore v0.1.1/go.mod h1:O7ZIuzmrNAKkDKlyn6Q13kTxNmckqQNH6Lcf1Gk4KvQ=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
