@@ -16,8 +16,8 @@ require (
 	github.com/r3labs/diff/v3 v3.0.1
 	github.com/samber/lo v1.47.0
 	golang.org/x/sync v0.8.0
-	k8s.io/api v0.31.1
-	k8s.io/apimachinery v0.31.1
+	k8s.io/api v0.31.2
+	k8s.io/apimachinery v0.31.2
 	k8s.io/client-go v0.31.1
 	sigs.k8s.io/controller-runtime v0.19.0
 )
