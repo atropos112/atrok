@@ -12,7 +12,7 @@ require (
 	github.com/jinzhu/copier v0.4.0
 	github.com/longhorn/longhorn-manager v1.7.0
 	github.com/onsi/ginkgo/v2 v2.22.0
-	github.com/onsi/gomega v1.35.1
+	github.com/onsi/gomega v1.36.0
 	github.com/r3labs/diff/v3 v3.0.1
 	github.com/samber/lo v1.47.0
 	golang.org/x/sync v0.9.0
