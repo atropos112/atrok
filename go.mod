@@ -1,13 +1,10 @@
 module github.com/atropos112/atrok
 
 go 1.23.1
-
-toolchain go1.23.3
-
 require (
 	dario.cat/mergo v1.0.1
 	github.com/atropos112/gocore v0.1.18
-	github.com/external-secrets/external-secrets v0.11.0
+	github.com/external-secrets/external-secrets v0.12.1
 	github.com/getsentry/sentry-go v0.30.0
 	github.com/grafana/pyroscope-go v1.2.0
 	github.com/jinzhu/copier v0.4.0
@@ -28,6 +25,7 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.8 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/samber/slog-http v1.4.4 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
