@@ -9,7 +9,7 @@ require (
 	github.com/grafana/pyroscope-go v1.2.0
 	github.com/jinzhu/copier v0.4.0
 	github.com/longhorn/longhorn-manager v1.7.2
-	github.com/onsi/ginkgo/v2 v2.22.1
+	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
 	github.com/r3labs/diff/v3 v3.0.1
 	github.com/samber/lo v1.47.0
