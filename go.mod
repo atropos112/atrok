@@ -1,6 +1,8 @@
 module github.com/atropos112/atrok
 
 go 1.23.1
+toolchain go1.23.5
+
 require (
 	dario.cat/mergo v1.0.1
 	github.com/atropos112/gocore v0.1.18
@@ -17,13 +19,14 @@ require (
 	k8s.io/api v0.32.0
 	k8s.io/apimachinery v0.32.0
 	k8s.io/client-go v0.32.0
-	sigs.k8s.io/controller-runtime v0.19.4
+	sigs.k8s.io/controller-runtime v0.20.0
 )
 
 require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
+	github.com/google/btree v1.1.3 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.8 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
