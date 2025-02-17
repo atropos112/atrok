@@ -1,12 +1,10 @@
 module github.com/atropos112/atrok
 
 go 1.23.1
-toolchain go1.23.5
-
 require (
 	dario.cat/mergo v1.0.1
 	github.com/atropos112/gocore v0.1.18
-	github.com/external-secrets/external-secrets v0.14.1
+	github.com/external-secrets/external-secrets v0.14.2
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/grafana/pyroscope-go v1.2.0
 	github.com/jinzhu/copier v0.4.0
