@@ -1,6 +1,8 @@
 module github.com/atropos112/atrok
 
 go 1.23.1
+toolchain go1.23.7
+
 require (
 	dario.cat/mergo v1.0.1
 	github.com/atropos112/gocore v0.1.18
@@ -9,7 +11,7 @@ require (
 	github.com/grafana/pyroscope-go v1.2.0
 	github.com/jinzhu/copier v0.4.0
 	github.com/longhorn/longhorn-manager v1.7.2
-	github.com/onsi/ginkgo/v2 v2.22.2
+	github.com/onsi/ginkgo/v2 v2.23.0
 	github.com/onsi/gomega v1.36.2
 	github.com/r3labs/diff/v3 v3.0.1
 	github.com/samber/lo v1.49.1
