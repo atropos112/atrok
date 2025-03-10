@@ -1,6 +1,8 @@
 module github.com/atropos112/atrok
 
 go 1.23.1
+toolchain go1.23.7
+
 require (
 	dario.cat/mergo v1.0.1
 	github.com/atropos112/gocore v0.1.18
@@ -17,7 +19,7 @@ require (
 	k8s.io/api v0.32.2
 	k8s.io/apimachinery v0.32.2
 	k8s.io/client-go v0.32.2
-	sigs.k8s.io/controller-runtime v0.20.2
+	sigs.k8s.io/controller-runtime v0.20.3
 )
 
 require (
