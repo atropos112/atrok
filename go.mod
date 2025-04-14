@@ -5,7 +5,7 @@ require (
 	dario.cat/mergo v1.0.1
 	github.com/atropos112/gocore v0.1.18
 	github.com/external-secrets/external-secrets v0.15.1
-	github.com/getsentry/sentry-go v0.31.1
+	github.com/getsentry/sentry-go v0.32.0
 	github.com/grafana/pyroscope-go v1.2.2
 	github.com/jinzhu/copier v0.4.0
 	github.com/longhorn/longhorn-manager v1.7.2
