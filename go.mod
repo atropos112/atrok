@@ -12,7 +12,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.37.0
 	github.com/r3labs/diff/v3 v3.0.1
-	github.com/samber/lo v1.49.1
+	github.com/samber/lo v1.50.0
 	golang.org/x/sync v0.13.0
 	k8s.io/api v0.32.3
 	k8s.io/apimachinery v0.32.3
