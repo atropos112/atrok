@@ -114,8 +114,8 @@ github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0t
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/rxwycdh/rxhash v0.0.0-20230131062142-10b7a38b400d h1:pVClFYVn4nLE5D8YiihMwOznjoTuM8vA/6Rk6Jrkfe0=
 github.com/rxwycdh/rxhash v0.0.0-20230131062142-10b7a38b400d/go.mod h1:xcKiSuhva83ji3A2u7kkLOvrsruYL//yHjoAJ/u6jzA=
-github.com/samber/lo v1.49.1 h1:4BIFyVfuQSEpluc7Fua+j1NolZHiEHEpaSEKdsH0tew=
-github.com/samber/lo v1.49.1/go.mod h1:dO6KHFzUKXgP8LDhU0oI8d2hekjXnGOu0DB8Jecxd6o=
+github.com/samber/lo v1.50.0 h1:XrG0xOeHs+4FQ8gJR97zDz5uOFMW7OwFWiFVzqopKgY=
+github.com/samber/lo v1.50.0/go.mod h1:RjZyNk6WSnUFRKK6EyOhsRJMqft3G+pg7dCWHQCWvsc=
 github.com/samber/slog-http v1.4.4 h1:NuENLy39Lk6b7wfj9cG9R5C/JLZR4t6pb9cwlyroybI=
 github.com/samber/slog-http v1.4.4/go.mod h1:PAcQQrYFo5KM7Qbk50gNNwKEAMGCyfsw6GN5dI0iv9g=
 github.com/spf13/pflag v1.0.6 h1:jFzHGLGAlb3ruxLB8MhbI6A8+AQX/2eW4qeyNZXNp2o=
