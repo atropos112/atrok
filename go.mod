@@ -3,7 +3,7 @@ module github.com/atropos112/atrok
 go 1.24.2
 
 require (
-	dario.cat/mergo v1.0.1
+	dario.cat/mergo v1.0.2
 	github.com/atropos112/gocore v0.1.18
 	github.com/external-secrets/external-secrets v0.16.2
 	github.com/getsentry/sentry-go v0.32.0
