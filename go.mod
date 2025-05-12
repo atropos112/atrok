@@ -5,7 +5,7 @@ go 1.24.2
 require (
 	dario.cat/mergo v1.0.1
 	github.com/atropos112/gocore v0.1.18
-	github.com/external-secrets/external-secrets v0.16.1
+	github.com/external-secrets/external-secrets v0.16.2
 	github.com/getsentry/sentry-go v0.32.0
 	github.com/grafana/pyroscope-go v1.2.2
 	github.com/jinzhu/copier v0.4.0
@@ -54,7 +54,7 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/gnostic-models v0.6.9 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20250403155104-27863c87afa6 // indirect
+	github.com/google/pprof v0.0.0-20250418163039-24c5476c6587 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -66,7 +66,7 @@ require (
 	github.com/prometheus/client_golang v1.22.0 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.63.0 // indirect
-	github.com/prometheus/procfs v0.16.0 // indirect
+	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/rxwycdh/rxhash v0.0.0-20230131062142-10b7a38b400d
 	github.com/spf13/pflag v1.0.6 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
