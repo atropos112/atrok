@@ -17,7 +17,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	extsec "github.com/external-secrets/external-secrets/apis/externalsecrets/v1beta1"
+	extsec "github.com/external-secrets/external-secrets/apis/externalsecrets/v1"
 	longhornv1beta2 "github.com/longhorn/longhorn-manager/k8s/pkg/apis/longhorn/v1beta2"
 	. "github.com/onsi/ginkgo/v2" //lint:ignore ST1001 we need to use ginkgo
 	. "github.com/onsi/gomega"    //lint:ignore ST1001 we need to use ginkgo

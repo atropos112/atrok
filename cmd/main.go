@@ -38,7 +38,7 @@ import (
 	atroxyzv1alpha1 "github.com/atropos112/atrok/api/v1alpha1"
 
 	"github.com/atropos112/atrok/internal/controller"
-	extsec "github.com/external-secrets/external-secrets/apis/externalsecrets/v1beta1"
+	extsec "github.com/external-secrets/external-secrets/apis/externalsecrets/v1"
 	//+kubebuilder:scaffold:imports
 )
 
