@@ -1,0 +1,1 @@
+{"config":{"lang":["en"],"separator":"[\\s\\-]+","pipeline":["stopWordFilter"]},"docs":[{"location":"","title":"AtroK","text":"<p>Kubernetes operator.</p> <p>This is obviously WIP, hoping to have it in a working state soon.</p>"},{"location":"examples/","title":"Examples","text":"<p>To Be Written.</p>"},{"location":"usage/","title":"Usage","text":"<p>To Be Written.</p>"}]}
