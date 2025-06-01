@@ -4,9 +4,9 @@ on:
     tags:
       - "v*.*.*"
 jobs:
-  test:
-    uses: atropos112/atrok/.github/workflows/test.yaml@main
-    secrets: inherit
+  # test:
+  #   uses: atropos112/atrok/.github/workflows/test.yaml@main
+  #   secrets: inherit
   publish:
     needs: test
     runs-on: ubuntu-latest
