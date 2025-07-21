@@ -7,7 +7,7 @@ require (
 	github.com/atropos112/gocore v0.1.18
 	github.com/external-secrets/external-secrets v0.18.2
 	github.com/getsentry/sentry-go v0.34.1
-	github.com/grafana/pyroscope-go v1.2.3
+	github.com/grafana/pyroscope-go v1.2.4
 	github.com/jinzhu/copier v0.4.0
 	github.com/longhorn/longhorn-manager v1.9.0
 	github.com/onsi/ginkgo/v2 v2.23.4
