@@ -12,7 +12,7 @@ require (
 	github.com/longhorn/longhorn-manager v1.9.0
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.38.0
-	github.com/r3labs/diff/v3 v3.0.1
+	github.com/r3labs/diff/v3 v3.0.2
 	github.com/samber/lo v1.51.0
 	golang.org/x/sync v0.16.0
 	k8s.io/api v0.33.3
