@@ -7,7 +7,7 @@ require (
 	github.com/atropos112/gocore v0.1.18
 	github.com/external-secrets/external-secrets v0.19.2
 	github.com/getsentry/sentry-go v0.35.1
-	github.com/grafana/pyroscope-go v1.2.4
+	github.com/grafana/pyroscope-go v1.2.7
 	github.com/jinzhu/copier v0.4.0
 	github.com/longhorn/longhorn-manager v1.9.0
 	github.com/onsi/ginkgo/v2 v2.25.2
@@ -27,7 +27,7 @@ require (
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/btree v1.1.3 // indirect
-	github.com/grafana/pyroscope-go/godeltaprof v0.1.8 // indirect
+	github.com/grafana/pyroscope-go/godeltaprof v0.1.9 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/samber/slog-http v1.7.0 // indirect
