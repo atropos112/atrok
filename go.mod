@@ -10,7 +10,7 @@ require (
 	github.com/grafana/pyroscope-go v1.2.7
 	github.com/jinzhu/copier v0.4.0
 	github.com/longhorn/longhorn-manager v1.9.0
-	github.com/onsi/ginkgo/v2 v2.27.1
+	github.com/onsi/ginkgo/v2 v2.27.2
 	github.com/onsi/gomega v1.38.2
 	github.com/r3labs/diff/v3 v3.0.2
 	github.com/samber/lo v1.52.0
@@ -46,7 +46,6 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	go.opentelemetry.io/otel v1.38.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
-	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/mod v0.29.0 // indirect
