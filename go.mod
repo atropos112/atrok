@@ -14,7 +14,7 @@ require (
 	github.com/onsi/gomega v1.38.2
 	github.com/r3labs/diff/v3 v3.0.2
 	github.com/samber/lo v1.52.0
-	golang.org/x/sync v0.17.0
+	golang.org/x/sync v0.18.0
 	k8s.io/api v0.34.2
 	k8s.io/apimachinery v0.34.2
 	k8s.io/client-go v0.34.1
